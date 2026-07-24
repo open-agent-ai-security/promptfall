@@ -1077,19 +1077,33 @@ function drawPromptInjection(
 ) {
   if (!enemy.active) return;
   const x = enemy.x - cameraX + enemy.w / 2;
-  const y = enemy.y + enemy.h / 2;
+  const platformY = enemy.y + enemy.h;
   const pulse = 1 + Math.sin(enemy.pulse * 5) * 0.06;
 
   ctx.save();
-  ctx.translate(x, y);
+  ctx.translate(x, platformY);
   ctx.scale(pulse, pulse);
   ctx.shadowColor = "#ff2a74";
   ctx.shadowBlur = 24;
   if (sprite?.complete && sprite.naturalWidth > 0) {
-    ctx.drawImage(sprite, -76, -56, 152, 101);
+    const maxDrawWidth = 152;
+    const maxDrawHeight = 120;
+    const drawScale = Math.min(
+      maxDrawWidth / sprite.naturalWidth,
+      maxDrawHeight / sprite.naturalHeight,
+    );
+    const drawWidth = sprite.naturalWidth * drawScale;
+    const drawHeight = sprite.naturalHeight * drawScale;
+    ctx.drawImage(
+      sprite,
+      -drawWidth / 2,
+      -drawHeight,
+      drawWidth,
+      drawHeight,
+    );
   } else {
     ctx.fillStyle = "#ff315f";
-    roundedRect(ctx, -29, -23, 58, 46, 9);
+    roundedRect(ctx, -29, -58, 58, 46, 9);
     ctx.fill();
   }
   ctx.shadowBlur = 0;
