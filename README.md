@@ -12,6 +12,7 @@ The current playable includes:
 - Level 1: LLM01 Prompt Injection
 - Level 2: LLM02 Sensitive Information Disclosure
 - Level 3: LLM03 Excessive Agency
+- Level 4: LLM04 Supply Chain
 - Six educational encounters per level
 - Keyboard and touch controls
 - Responsive 16:9 game presentation
@@ -22,7 +23,7 @@ The current playable includes:
 - Move: `A` / `D` or Left / Right Arrow
 - Jump: `W`, Up Arrow, or Space
 - Sound toggle: `M`
-- Direct level select: `F1`, `F2`, or `F3`
+- Direct level select: `F1`–`F4` (`fn` + function key on macOS when required)
 - Mobile: on-screen movement and jump controls
 
 ## Run locally

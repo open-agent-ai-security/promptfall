@@ -166,6 +166,33 @@ const EXCESSIVE_AGENCY_LESSONS = [
   },
 ] as const;
 
+const SUPPLY_CHAIN_LESSONS = [
+  {
+    kind: "DEFINITION",
+    text: "LLM supply-chain weaknesses let attackers tamper with data, models, adapters, conversion pipelines, dependencies, or deployment platforms.",
+  },
+  {
+    kind: "WHY IT MATTERS",
+    text: "An AI artifact is more than code: its origin, training inputs, transformations, and promotion path all become part of the trust boundary.",
+  },
+  {
+    kind: "EXAMPLE 1",
+    text: "An assistant invents a plausible package name; an attacker registers it first, so the suggested dependency installs malicious code.",
+  },
+  {
+    kind: "EXAMPLE 2",
+    text: "A trusted-looking model or LoRA adapter is replaced under a mutable name, then silently enters production through a merge or conversion pipeline.",
+  },
+  {
+    kind: "DEFENSE 1",
+    text: "Vet suppliers and maintain a signed AIBOM of models, adapters, datasets, code, and licenses. Pin every artifact to an immutable hash.",
+  },
+  {
+    kind: "DEFENSE 2",
+    text: "Treat signing and scanners as integrity layers—not proof of safety. Patch loaders, secure promotion gates, and behavior-test the deployed artifact.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -193,6 +220,15 @@ const LEVELS = [
     background: "./assets/gameplay-background-l3-v1.png",
     enemy: "./assets/excessive-agency-v1.png",
     lessons: EXCESSIVE_AGENCY_LESSONS,
+  },
+  {
+    number: 4,
+    riskCode: "LLM04",
+    name: "SUPPLY CHAIN",
+    objectiveName: "Supply Chain",
+    background: "./assets/gameplay-background-l4-v1.png",
+    enemy: "./assets/supply-chain-v1.png",
+    lessons: SUPPLY_CHAIN_LESSONS,
   },
 ] as const;
 
@@ -1435,7 +1471,9 @@ export default function Game() {
               </button>
               <div className="arcade-controls">
                 <span>← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP</span>
-                <span className="arcade-level-select">F1–F3&nbsp;&nbsp;DIRECT LEVEL SELECT</span>
+                <span className="arcade-level-select">
+                  F1–F{LEVELS.length}&nbsp;&nbsp;DIRECT LEVEL SELECT
+                </span>
               </div>
             </div>
             <a
