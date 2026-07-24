@@ -270,6 +270,33 @@ const UNBOUNDED_CONSUMPTION_LESSONS = [
   },
 ] as const;
 
+const MISINFORMATION_LESSONS = [
+  {
+    kind: "DEFINITION",
+    text: "Misinformation is incorrect, incomplete, unsupported, or misleading model output that appears credible enough to drive a human decision, workflow, or agent action.",
+  },
+  {
+    kind: "WHY IT MATTERS",
+    text: "Fluency is not truth. In agentic systems, one confident false claim about state or evidence can propagate downstream and become a real harmful action.",
+  },
+  {
+    kind: "EXAMPLE 1",
+    text: "A retrieval agent falsely reports that a customer is identity-verified, so a downstream payment agent trusts that state and releases funds.",
+  },
+  {
+    kind: "EXAMPLE 2",
+    text: "An agent reports that a nightly backup completed when it never ran; the fiction remains hidden until a later restore fails.",
+  },
+  {
+    kind: "DEFENSE 1",
+    text: "Ground claims in current authoritative sources, then separate generation, checking, and action so evidence is verified before execution.",
+  },
+  {
+    kind: "DEFENSE 2",
+    text: "Validate tool arguments, authorization, preconditions, and live state; require structured fields and approval for high-impact actions.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -324,6 +351,15 @@ const LEVELS = [
     background: "./assets/gameplay-background-l6-v1.png",
     enemy: "./assets/unbounded-consumption-v1.png",
     lessons: UNBOUNDED_CONSUMPTION_LESSONS,
+  },
+  {
+    number: 7,
+    riskCode: "LLM07",
+    name: "MISINFORMATION",
+    objectiveName: "Misinformation",
+    background: "./assets/gameplay-background-l7-v1.png",
+    enemy: "./assets/misinformation-v1.png",
+    lessons: MISINFORMATION_LESSONS,
   },
 ] as const;
 
@@ -488,6 +524,30 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       enemySpawn(3, 1600, 395, 1540, 1700, -72, 2.1),
       enemySpawn(4, 2370, 380, 2310, 2470, 76, 2.8),
       enemySpawn(5, 2720, 445, 2670, 2820, -78, 3.5),
+    ],
+  },
+  {
+    platforms: [
+      { x: 0, y: 606, w: 640, h: 114, kind: "floor" },
+      { x: 700, y: 606, w: 550, h: 114, kind: "floor" },
+      { x: 1310, y: 606, w: 520, h: 114, kind: "floor" },
+      { x: 1900, y: 606, w: 580, h: 114, kind: "floor" },
+      { x: 2540, y: 606, w: 540, h: 114, kind: "floor" },
+      { x: 340, y: 500, w: 250, h: 24, kind: "ledge" },
+      { x: 720, y: 450, w: 260, h: 24, kind: "ledge" },
+      { x: 1100, y: 365, w: 270, h: 24, kind: "ledge" },
+      { x: 1450, y: 440, w: 270, h: 24, kind: "ledge" },
+      { x: 1800, y: 350, w: 270, h: 24, kind: "ledge" },
+      { x: 2170, y: 430, w: 270, h: 24, kind: "ledge" },
+      { x: 2580, y: 370, w: 280, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 780, 450, 745, 890, 72, 0),
+      enemySpawn(1, 1170, 365, 1130, 1280, -74, 0.7),
+      enemySpawn(2, 1520, 440, 1480, 1630, 78, 1.4),
+      enemySpawn(3, 1870, 350, 1830, 1980, -72, 2.1),
+      enemySpawn(4, 2240, 430, 2200, 2350, 76, 2.8),
+      enemySpawn(5, 2670, 370, 2620, 2780, -78, 3.5),
     ],
   },
 ];

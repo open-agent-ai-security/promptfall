@@ -60,6 +60,8 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /data-model-poisoning-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l6-v1\.png/i);
   assert.match(gameSource, /unbounded-consumption-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l7-v1\.png/i);
+  assert.match(gameSource, /misinformation-v1\.png/i);
   assert.match(gameSource, /integrity-crate-v1\.png/i);
   assert.match(gameSource, /BONUS_LEVEL_INTERVAL/i);
   assert.match(gameSource, /LEVEL_LAYOUTS/i);
@@ -74,6 +76,8 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /LLM05/i);
   assert.match(gameSource, /UNBOUNDED CONSUMPTION/i);
   assert.match(gameSource, /LLM06/i);
+  assert.match(gameSource, /MISINFORMATION/i);
+  assert.match(gameSource, /LLM07/i);
   assert.match(gameSource, /TEN VULNERABILITIES\./i);
   assert.match(gameSource, /ONE HERO\./i);
   assert.match(gameSource, /LEARN THE/i);
