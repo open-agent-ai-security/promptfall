@@ -60,3 +60,12 @@ node --test tests/rendered-html.test.mjs
 - `tests` — rendered-shell and accessibility checks
 
 Sponsored by the Open Agent and AI Security Community.
+
+## License
+
+Promptfall source code, original game artwork, and original documentation are
+licensed under the [Apache License 2.0](LICENSE).
+
+Educational material distilled from the OWASP Top 10 for LLM Applications 2026
+is used under the Creative Commons Attribution-ShareAlike 4.0 International
+License. See [NOTICE](NOTICE) for source attribution and scope.

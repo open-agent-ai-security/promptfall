@@ -1,0 +1,22 @@
+Promptfall
+Copyright 2026 Exabeam, Inc.
+
+This product is sponsored by the Open Agent and AI Security Community
+(https://github.com/open-agent-ai-security).
+
+This product includes material distilled from publications of the OWASP Gen AI
+Security Project (https://genai.owasp.org/):
+
+  - OWASP Top 10 for LLM Applications 2026
+
+That material is used under the Creative Commons Attribution-ShareAlike 4.0
+International License (CC BY-SA 4.0). The distilled educational extracts live
+in app/Game.tsx as the lesson content for each vulnerability.
+
+OWASP and the OWASP Gen AI Security Project names and marks belong to their
+respective owners. Their inclusion identifies the source material and does not
+imply endorsement of Promptfall.
+
+Except for the third-party material identified above, Promptfall source code,
+original game artwork, and original documentation are licensed under the
+Apache License, Version 2.0.
