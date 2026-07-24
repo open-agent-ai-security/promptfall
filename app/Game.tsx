@@ -47,6 +47,7 @@ type Enemy = {
 
 type TouchPoint = {
   side: "left" | "right";
+  controlsDirection: boolean;
   startedAt: number;
   startX: number;
   startY: number;
@@ -1296,7 +1297,11 @@ export default function Game() {
         const input = inputRef.current;
         const axis = (input.right ? 1 : 0) - (input.left ? 1 : 0);
         player.vx += (axis * MOVE_SPEED - player.vx) * Math.min(1, dt * 10);
-        if (axis === 0) player.vx *= Math.pow(0.0008, dt);
+        // Preserve running momentum in the air. This is especially important for
+        // touch jumps, where the second tap naturally ends before Praxi lands.
+        if (axis === 0 && player.grounded) {
+          player.vx *= Math.pow(0.0008, dt);
+        }
         if (axis !== 0) player.facing = axis > 0 ? 1 : -1;
 
         if (input.jump && !jumpLatchRef.current && player.grounded) {
@@ -1612,6 +1617,7 @@ export default function Game() {
     let left = false;
     let right = false;
     touchPointsRef.current.forEach((point) => {
+      if (!point.controlsDirection) return;
       if (point.side === "left") left = true;
       if (point.side === "right") right = true;
     });
@@ -1652,8 +1658,10 @@ export default function Game() {
         sinceLastTap > 45 &&
         sinceLastTap < 350 &&
         distanceFromLastTap < 96;
+      const controlsDirection = touchPointsRef.current.size === 0;
       touchPointsRef.current.set(event.pointerId, {
         side: sideForTouch(event),
+        controlsDirection,
         startedAt: now,
         startX: event.clientX,
         startY: event.clientY,
