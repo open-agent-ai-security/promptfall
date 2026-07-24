@@ -11,6 +11,7 @@ The current playable includes:
 
 - Level 1: LLM01 Prompt Injection
 - Level 2: LLM02 Sensitive Information Disclosure
+- Level 3: LLM03 Excessive Agency
 - Six educational encounters per level
 - Keyboard and touch controls
 - Responsive 16:9 game presentation

@@ -139,6 +139,33 @@ const SENSITIVE_INFORMATION_DISCLOSURE_LESSONS = [
   },
 ] as const;
 
+const EXCESSIVE_AGENCY_LESSONS = [
+  {
+    kind: "DEFINITION",
+    text: "Excessive agency lets unexpected, ambiguous, or manipulated model output trigger damaging actions through too much functionality, permission, or autonomy.",
+  },
+  {
+    kind: "WHY IT MATTERS",
+    text: "Agent safety is not only about what a model intends—it is about what the system allows it to do when the model is wrong.",
+  },
+  {
+    kind: "EXAMPLE 1",
+    text: "A mailbox assistant only needs to read email, but its tool can also send messages; an injected email tricks it into forwarding private data.",
+  },
+  {
+    kind: "EXAMPLE 2",
+    text: "A read-only database tool connects with UPDATE, INSERT, and DELETE rights, turning one bad decision into damaged records.",
+  },
+  {
+    kind: "DEFENSE 1",
+    text: "Offer only the minimum granular tools and functions required. Avoid open-ended tools, enforce strict schemas, and validate every argument.",
+  },
+  {
+    kind: "DEFENSE 2",
+    text: "Use least privilege and the user's own security context; independently authorize every action and require approval for high-impact changes.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -157,6 +184,15 @@ const LEVELS = [
     background: "./assets/gameplay-background-l2-v1.png",
     enemy: "./assets/sensitive-disclosure-v1.png",
     lessons: SENSITIVE_INFORMATION_DISCLOSURE_LESSONS,
+  },
+  {
+    number: 3,
+    riskCode: "LLM03",
+    name: "EXCESSIVE AGENCY",
+    objectiveName: "Excessive Agency",
+    background: "./assets/gameplay-background-l3-v1.png",
+    enemy: "./assets/excessive-agency-v1.png",
+    lessons: EXCESSIVE_AGENCY_LESSONS,
   },
 ] as const;
 

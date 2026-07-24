@@ -52,8 +52,12 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /prompt-injection-v2\.png/i);
   assert.match(gameSource, /gameplay-background-l2-v1\.png/i);
   assert.match(gameSource, /sensitive-disclosure-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l3-v1\.png/i);
+  assert.match(gameSource, /excessive-agency-v1\.png/i);
   assert.match(gameSource, /SENSITIVE INFORMATION DISCLOSURE/i);
   assert.match(gameSource, /LLM02/i);
+  assert.match(gameSource, /EXCESSIVE AGENCY/i);
+  assert.match(gameSource, /LLM03/i);
   assert.match(gameSource, /TEN VULNERABILITIES\./i);
   assert.match(gameSource, /ONE HERO\./i);
   assert.match(gameSource, /LEARN THE/i);
