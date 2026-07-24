@@ -324,6 +324,33 @@ const HIDDEN_CONTEXT_EXPOSURE_LESSONS = [
   },
 ] as const;
 
+const VECTOR_EMBEDDING_WEAKNESSES_LESSONS = [
+  {
+    kind: "DEFINITION",
+    text: "Vector and embedding weaknesses exploit numerical representations and similarity search—the layer that decides which retrieved information an LLM gets to see.",
+  },
+  {
+    kind: "WHY IT MATTERS",
+    text: "Embedding geometry is part of the trust boundary: poisoning makes retrieval wrong, inversion makes vectors leak, jamming makes retrieval silent, and weak scoping makes it indiscriminate.",
+  },
+  {
+    kind: "EXAMPLE 1",
+    text: "A shared vector index searches every tenant before filtering, letting attackers infer another tenant's document topics from timing, counts, and similarity patterns.",
+  },
+  {
+    kind: "EXAMPLE 2",
+    text: "A leaked “embeddings-only” backup is inverted to reconstruct source documents and PII, turning vectors into a real data breach.",
+  },
+  {
+    kind: "DEFENSE 1",
+    text: "Enforce tenant and chunk permissions inside the index query, segregate indexes by trust zone, and never trust client-supplied scope.",
+  },
+  {
+    kind: "DEFENSE 2",
+    text: "Track provenance, normalize and review content before embedding, detect anomalous vectors, and protect embeddings like the source data they represent.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -396,6 +423,15 @@ const LEVELS = [
     background: "./assets/gameplay-background-l8-v1.png",
     enemy: "./assets/hidden-context-exposure-v1.png",
     lessons: HIDDEN_CONTEXT_EXPOSURE_LESSONS,
+  },
+  {
+    number: 9,
+    riskCode: "LLM09",
+    name: "VECTOR AND EMBEDDING WEAKNESSES",
+    objectiveName: "Vector and Embedding Weaknesses",
+    background: "./assets/gameplay-background-l9-v1.png",
+    enemy: "./assets/vector-embedding-weaknesses-v1.png",
+    lessons: VECTOR_EMBEDDING_WEAKNESSES_LESSONS,
   },
 ] as const;
 
@@ -608,6 +644,30 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       enemySpawn(3, 1860, 445, 1820, 1970, -72, 2.1),
       enemySpawn(4, 2260, 355, 2220, 2370, 76, 2.8),
       enemySpawn(5, 2670, 430, 2630, 2780, -78, 3.5),
+    ],
+  },
+  {
+    platforms: [
+      { x: 0, y: 606, w: 660, h: 114, kind: "floor" },
+      { x: 720, y: 606, w: 540, h: 114, kind: "floor" },
+      { x: 1320, y: 606, w: 520, h: 114, kind: "floor" },
+      { x: 1900, y: 606, w: 600, h: 114, kind: "floor" },
+      { x: 2560, y: 606, w: 520, h: 114, kind: "floor" },
+      { x: 380, y: 430, w: 250, h: 24, kind: "ledge" },
+      { x: 750, y: 500, w: 260, h: 24, kind: "ledge" },
+      { x: 1140, y: 410, w: 270, h: 24, kind: "ledge" },
+      { x: 1490, y: 480, w: 270, h: 24, kind: "ledge" },
+      { x: 1830, y: 380, w: 280, h: 24, kind: "ledge" },
+      { x: 2240, y: 460, w: 280, h: 24, kind: "ledge" },
+      { x: 2630, y: 390, w: 280, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 810, 500, 780, 920, 72, 0),
+      enemySpawn(1, 1200, 410, 1170, 1320, -74, 0.7),
+      enemySpawn(2, 1550, 480, 1520, 1670, 78, 1.4),
+      enemySpawn(3, 1900, 380, 1860, 2010, -72, 2.1),
+      enemySpawn(4, 2310, 460, 2270, 2420, 76, 2.8),
+      enemySpawn(5, 2700, 390, 2660, 2810, -78, 3.5),
     ],
   },
 ];
