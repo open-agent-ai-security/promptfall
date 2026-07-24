@@ -8,6 +8,7 @@ type Scene =
   | "levelIntro"
   | "playing"
   | "complete"
+  | "winner"
   | "gameOver"
   | "praxenAd";
 
@@ -34,6 +35,7 @@ type Player = {
 
 type Enemy = {
   lessonIndex: number;
+  artIndex?: number;
   x: number;
   y: number;
   vx: number;
@@ -76,6 +78,8 @@ type BonusBurst = {
 type LevelLayout = {
   platforms: Platform[];
   enemies: EnemySpawn[];
+  worldWidth?: number;
+  exitFieldX?: number;
 };
 
 type Particle = {
@@ -100,7 +104,6 @@ const VIEW_W = 1280;
 const VIEW_H = 720;
 const WORLD_W = 3080;
 const EXIT_FIELD_X = 2860;
-const EXIT_FIELD_LEFT = EXIT_FIELD_X - 62;
 const GRAVITY = 2200;
 const MOVE_SPEED = 365;
 const JUMP_SPEED = 820;
@@ -378,6 +381,69 @@ const IMPROPER_OUTPUT_HANDLING_LESSONS = [
   },
 ] as const;
 
+const GAUNTLET_LESSONS = [
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM01",
+    entryName: "PROMPT INJECTION",
+    text: "LLMs do not enforce a clean trust boundary between instructions and data. Design for manipulated output with least privilege and approval gates.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM02",
+    entryName: "SENSITIVE INFORMATION DISCLOSURE",
+    text: "A leak is defined by what an unauthorized recipient can learn—answers, traces, logs, embeddings, tool arguments, and side channels all count.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM03",
+    entryName: "EXCESSIVE AGENCY",
+    text: "Agent safety depends on what the system permits when the model is wrong. Minimize functionality, permissions, and autonomy for every action.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM04",
+    entryName: "SUPPLY CHAIN",
+    text: "Models, data, adapters, dependencies, conversions, and promotion paths are one supply chain. Pin provenance and test the deployed behavior.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM05",
+    entryName: "DATA AND MODEL POISONING",
+    text: "Poisoning corrupts persistent data or model artifacts, so recovery requires signed lineage, controlled retraining, behavior tests, and rollback.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM06",
+    entryName: "UNBOUNDED CONSUMPTION",
+    text: "Request-rate limits are not enough. Control tokens, actions, recursion, time, and cost with hard caps and agent circuit breakers.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM07",
+    entryName: "MISINFORMATION",
+    text: "Fluent output is not verified truth. Ground claims and separate generation, checking, and action before a decision changes the real world.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM08",
+    entryName: "HIDDEN CONTEXT EXPOSURE",
+    text: "Assume all model context is discoverable. Never store secrets there or rely on hidden instructions as an authorization or policy boundary.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM09",
+    entryName: "VECTOR AND EMBEDDING WEAKNESSES",
+    text: "Similarity search is part of the trust boundary. Scope access inside the query and protect embeddings like the source data they can reveal.",
+  },
+  {
+    kind: "KEY INSIGHT",
+    riskCode: "LLM10",
+    entryName: "IMPROPER OUTPUT HANDLING",
+    text: "Treat model output as untrusted input: validate, authorize, sanitize, and encode it for the exact downstream sink before use.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -469,6 +535,15 @@ const LEVELS = [
     enemy: "./assets/improper-output-handling-v1.png",
     lessons: IMPROPER_OUTPUT_HANDLING_LESSONS,
   },
+  {
+    number: 11,
+    riskCode: "CAPSTONE",
+    name: "THE GAUNTLET",
+    objectiveName: "Gauntlet",
+    background: "./assets/gameplay-background-l11-gauntlet-v1.png",
+    enemy: "./assets/prompt-injection-v2.png",
+    lessons: GAUNTLET_LESSONS,
+  },
 ] as const;
 
 const enemySpawn = (
@@ -479,8 +554,10 @@ const enemySpawn = (
   maxX: number,
   vx: number,
   pulse: number,
+  artIndex?: number,
 ): EnemySpawn => ({
   lessonIndex,
+  artIndex,
   x,
   y: platformY - 66,
   vx,
@@ -728,6 +805,43 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       enemySpawn(3, 2010, 450, 1970, 2120, -72, 2.1),
       enemySpawn(4, 2380, 360, 2340, 2490, 76, 2.8),
       enemySpawn(5, 2720, 440, 2680, 2830, -78, 3.5),
+    ],
+  },
+  {
+    worldWidth: 5000,
+    exitFieldX: 4780,
+    platforms: [
+      { x: 0, y: 606, w: 650, h: 114, kind: "floor" },
+      { x: 730, y: 606, w: 490, h: 114, kind: "floor" },
+      { x: 1310, y: 606, w: 490, h: 114, kind: "floor" },
+      { x: 1880, y: 606, w: 470, h: 114, kind: "floor" },
+      { x: 2450, y: 606, w: 470, h: 114, kind: "floor" },
+      { x: 3010, y: 606, w: 470, h: 114, kind: "floor" },
+      { x: 3580, y: 606, w: 470, h: 114, kind: "floor" },
+      { x: 4140, y: 606, w: 420, h: 114, kind: "floor" },
+      { x: 4640, y: 606, w: 360, h: 114, kind: "floor" },
+      { x: 380, y: 470, w: 260, h: 24, kind: "ledge" },
+      { x: 800, y: 390, w: 270, h: 24, kind: "ledge" },
+      { x: 1240, y: 470, w: 270, h: 24, kind: "ledge" },
+      { x: 1640, y: 350, w: 280, h: 24, kind: "ledge" },
+      { x: 2050, y: 440, w: 280, h: 24, kind: "ledge" },
+      { x: 2500, y: 340, w: 280, h: 24, kind: "ledge" },
+      { x: 3000, y: 450, w: 280, h: 24, kind: "ledge" },
+      { x: 3400, y: 330, w: 280, h: 24, kind: "ledge" },
+      { x: 3890, y: 430, w: 280, h: 24, kind: "ledge" },
+      { x: 4370, y: 340, w: 300, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 470, 470, 420, 550, 78, 0, 0),
+      enemySpawn(1, 880, 390, 830, 970, -82, 0.55, 1),
+      enemySpawn(2, 1330, 470, 1270, 1420, 84, 1.1, 2),
+      enemySpawn(3, 1730, 350, 1680, 1830, -80, 1.65, 3),
+      enemySpawn(4, 2140, 440, 2080, 2240, 86, 2.2, 4),
+      enemySpawn(5, 2590, 340, 2530, 2690, -82, 2.75, 5),
+      enemySpawn(6, 3090, 450, 3030, 3190, 88, 3.3, 6),
+      enemySpawn(7, 3490, 330, 3430, 3590, -84, 3.85, 7),
+      enemySpawn(8, 3980, 430, 3920, 4080, 88, 4.4, 8),
+      enemySpawn(9, 4470, 340, 4400, 4560, -86, 4.95, 9),
     ],
   },
 ];
@@ -1082,8 +1196,9 @@ function drawExitGate(
   remaining: number,
   time: number,
   unlockProgress: number,
+  exitFieldX = EXIT_FIELD_X,
 ) {
-  const x = EXIT_FIELD_X - cameraX;
+  const x = exitFieldX - cameraX;
   if (x < -160 || x > VIEW_W + 160) return;
   const unlocked = remaining === 0;
   const retract = unlocked
@@ -1543,8 +1658,34 @@ export default function Game() {
   }, [playTone, scene]);
 
   useEffect(() => {
+    if (scene !== "winner") return;
+
+    const celebrationTones = [
+      window.setTimeout(() => playTone(523, 0.18, "triangle"), 120),
+      window.setTimeout(() => playTone(659, 0.18, "triangle"), 320),
+      window.setTimeout(() => playTone(784, 0.22, "triangle"), 520),
+      window.setTimeout(() => playTone(1047, 0.28, "sine"), 760),
+      window.setTimeout(() => playTone(784, 0.18, "triangle"), 1900),
+      window.setTimeout(() => playTone(1047, 0.24, "sine"), 2140),
+      window.setTimeout(() => playTone(1319, 0.3, "sine"), 2380),
+      window.setTimeout(() => playTone(1568, 0.35, "sine"), 3600),
+    ];
+    const showPraxen = window.setTimeout(() => {
+      sceneRef.current = "praxenAd";
+      setScene("praxenAd");
+      playTone(310, 0.18, "triangle");
+      window.setTimeout(() => playTone(465, 0.22, "sine"), 120);
+    }, 5600);
+
+    return () => {
+      celebrationTones.forEach((timer) => window.clearTimeout(timer));
+      window.clearTimeout(showPraxen);
+    };
+  }, [playTone, scene]);
+
+  useEffect(() => {
     const keyDown = (event: KeyboardEvent) => {
-      const directLevel = /^F([1-9]|10)$/.exec(event.code);
+      const directLevel = /^F([1-9]|1[01])$/.exec(event.code);
       if (directLevel) {
         const targetLevel = Number(directLevel[1]) - 1;
         if (targetLevel < LEVELS.length) {
@@ -1652,6 +1793,9 @@ export default function Game() {
       const enemies = enemiesRef.current;
       const activeLevel = LEVELS[levelIndexRef.current];
       const activeLayout = LEVEL_LAYOUTS[levelIndexRef.current];
+      const activeWorldWidth = activeLayout.worldWidth ?? WORLD_W;
+      const activeExitFieldX = activeLayout.exitFieldX ?? EXIT_FIELD_X;
+      const activeExitFieldLeft = activeExitFieldX - 62;
       const bonusCrate = bonusCrateRef.current;
       if (sceneRef.current === "playing") {
         const input = inputRef.current;
@@ -1677,7 +1821,10 @@ export default function Game() {
         player.vy += GRAVITY * dt;
         player.x += player.vx * dt;
         player.y += player.vy * dt;
-        player.x = Math.max(0, Math.min(WORLD_W - player.w, player.x));
+        player.x = Math.max(
+          0,
+          Math.min(activeWorldWidth - player.w, player.x),
+        );
         player.grounded = false;
 
         for (const platform of activeLayout.platforms) {
@@ -1836,9 +1983,9 @@ export default function Game() {
               : 0;
         if (
           (threatsRemaining > 0 || fieldUnlockProgress < 1) &&
-          player.x + player.w > EXIT_FIELD_LEFT
+          player.x + player.w > activeExitFieldLeft
         ) {
-          player.x = EXIT_FIELD_LEFT - player.w;
+          player.x = activeExitFieldLeft - player.w;
           player.vx = Math.min(0, player.vx);
         }
 
@@ -1861,7 +2008,7 @@ export default function Game() {
 
         const desiredCamera = Math.max(
           0,
-          Math.min(WORLD_W - VIEW_W, player.x - VIEW_W * 0.34),
+          Math.min(activeWorldWidth - VIEW_W, player.x - VIEW_W * 0.34),
         );
         cameraRef.current +=
           (desiredCamera - cameraRef.current) * Math.min(1, dt * 5);
@@ -1880,12 +2027,14 @@ export default function Game() {
 
         if (
           sceneRef.current === "playing" &&
-          player.x > EXIT_FIELD_X + 68 &&
+          player.x > activeExitFieldX + 68 &&
           enemies.every((enemy) => !enemy.active) &&
           fieldUnlockProgress >= 1
         ) {
-          sceneRef.current = "complete";
-          setScene("complete");
+          const completedCampaign =
+            levelIndexRef.current === LEVELS.length - 1;
+          sceneRef.current = completedCampaign ? "winner" : "complete";
+          setScene(completedCampaign ? "winner" : "complete");
           playTone(660, 0.15, "triangle");
           window.setTimeout(() => playTone(880, 0.23, "triangle"), 120);
         }
@@ -1923,13 +2072,16 @@ export default function Game() {
         remainingThreats,
         now / 1000,
         fieldUnlockProgress,
+        activeExitFieldX,
       );
       for (const enemy of enemies) {
         drawPromptInjection(
           ctx,
           enemy,
           cameraRef.current,
-          artRef.current.enemies?.[levelIndexRef.current],
+          artRef.current.enemies?.[
+            enemy.artIndex ?? levelIndexRef.current
+          ],
         );
       }
       if (capturedEnemyRef.current) {
@@ -2076,6 +2228,11 @@ export default function Game() {
   const currentLevel = LEVELS[levelIndex];
   const factLesson = currentLevel.lessons[factLessonIndex];
   const isFinalLevel = levelIndex === LEVELS.length - 1;
+  const encounterCount = currentLevel.lessons.length;
+  const factRiskCode =
+    "riskCode" in factLesson ? factLesson.riskCode : currentLevel.riskCode;
+  const factEntryName =
+    "entryName" in factLesson ? factLesson.entryName : currentLevel.name;
 
   return (
     <main className="game-shell">
@@ -2208,7 +2365,10 @@ export default function Game() {
                 </div>
                 <div className="risk-count">
                   <small>ENCOUNTERS CLEARED</small>
-                  <strong>{String(captured).padStart(2, "0")} / 06</strong>
+                  <strong>
+                    {String(captured).padStart(2, "0")} /{" "}
+                    {String(encounterCount).padStart(2, "0")}
+                  </strong>
                 </div>
                 <button
                   className="mute-button"
@@ -2229,10 +2389,10 @@ export default function Game() {
               aria-live="polite"
             >
               <div
-                className={`fact-copy${currentLevel.name.length > 22 ? " fact-copy--long" : ""}`}
+                className={`fact-copy${factEntryName.length > 22 ? " fact-copy--long" : ""}`}
               >
-                <small><em>{factLesson.kind}</em>&nbsp; // &nbsp;{currentLevel.riskCode}</small>
-                <h2>{currentLevel.name}</h2>
+                <small><em>{factLesson.kind}</em>&nbsp; // &nbsp;{factRiskCode}</small>
+                <h2>{factEntryName}</h2>
                 <p>{factLesson.text}</p>
               </div>
             </div>
@@ -2247,7 +2407,9 @@ export default function Game() {
               />
               {captured === currentLevel.lessons.length
                 ? "Cross the open force field"
-                : `Contain all six ${currentLevel.objectiveName} encounters • ${captured}/6`}
+                : currentLevel.number === 11
+                  ? `Defeat all ten OWASP threats • ${captured}/${encounterCount}`
+                  : `Contain all ${encounterCount} ${currentLevel.objectiveName} encounters • ${captured}/${encounterCount}`}
             </div>
 
             {scene === "playing" && (
@@ -2311,6 +2473,33 @@ export default function Game() {
           </div>
         )}
 
+        {scene === "winner" && (
+          <div className="winner-screen" data-testid="campaign-winner">
+            <div className="winner-fireworks" aria-hidden="true">
+              {Array.from({ length: 14 }, (_, index) => (
+                <span
+                  key={index}
+                  style={{
+                    left: `${7 + ((index * 29) % 87)}%`,
+                    top: `${8 + ((index * 37) % 66)}%`,
+                    animationDelay: `${0.25 + (index % 7) * 0.42}s`,
+                    filter: `hue-rotate(${index * 41}deg)`,
+                  }}
+                />
+              ))}
+            </div>
+            <div className="winner-burst">
+              <span>ALL TEN RISKS CONTAINED</span>
+              <strong>
+                YOUR AGENT
+                <br />
+                IS SECURE!
+              </strong>
+              <small>MISSION ACCOMPLISHED</small>
+            </div>
+          </div>
+        )}
+
         {scene === "praxenAd" && (
           <div className="praxen-ad-screen" data-testid="praxen-promo">
             <div className="praxen-ad-grid" aria-hidden="true" />
@@ -2361,13 +2550,15 @@ export default function Game() {
         {scene === "levelIntro"
           ? `Level ${currentLevel.number}: ${currentLevel.name}. Get ready.`
           : scene === "playing"
-            ? `Level ${currentLevel.number} active. ${captured} of 6 encounters cleared. ${health} integrity remaining.`
+            ? `Level ${currentLevel.number} active. ${captured} of ${encounterCount} encounters cleared. ${health} integrity remaining.`
           : scene === "complete"
             ? isFinalLevel
               ? "Level complete. Press Space to return to the title."
               : "Level complete. Press Space for the next level."
           : scene === "gameOver"
             ? "Game over."
+          : scene === "winner"
+            ? "All ten OWASP risks contained. Your agent is secure. Mission accomplished."
           : scene === "praxenAd"
             ? "Want to scan your own agents for the OWASP Top 10? Get Praxen, free and open source, or restart the game."
             : ""}

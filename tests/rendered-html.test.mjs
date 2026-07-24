@@ -68,6 +68,13 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /vector-embedding-weaknesses-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l10-v1\.png/i);
   assert.match(gameSource, /improper-output-handling-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l11-gauntlet-v1\.png/i);
+  assert.match(gameSource, /THE GAUNTLET/i);
+  assert.match(gameSource, /worldWidth: 5000/i);
+  assert.match(gameSource, /ALL TEN RISKS CONTAINED/i);
+  assert.match(gameSource, /YOUR AGENT/i);
+  assert.match(gameSource, /IS SECURE!/i);
+  assert.match(gameSource, /campaign-winner/i);
   assert.match(gameSource, /integrity-crate-v1\.png/i);
   assert.match(gameSource, /BONUS_LEVEL_INTERVAL/i);
   assert.match(gameSource, /LEVEL_LAYOUTS/i);
@@ -109,7 +116,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /praxen-lockup-dark-background\.png/i);
   assert.match(gameSource, /PRESS SPACE TO START/i);
   assert.match(gameSource, /DIRECT LEVEL SELECT/i);
-  assert.match(gameSource, /\^F\(\[1-9\]\|10\)\$/i);
+  assert.match(gameSource, /\^F\(\[1-9\]\|1\[01\]\)\$/i);
   assert.match(gameSource, /aria-label="Touch controls: hold the left or right half/i);
   assert.match(gameSource, /TAP WITH SECOND FINGER TO JUMP/i);
   assert.match(gameSource, /pointerType !== "touch"/i);
