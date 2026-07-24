@@ -461,6 +461,116 @@ button {
   animation: cta-enter 520ms 3.18s steps(4) both;
 }
 
+.opensource-link {
+  position: absolute;
+  z-index: 7;
+  right: 1.8%;
+  bottom: 2.1%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 166px;
+  padding: 7px 13px 7px 8px;
+  border: 1px solid rgba(116, 231, 255, 0.62);
+  border-radius: 8px;
+  color: #eafbff;
+  background:
+    linear-gradient(105deg, rgba(4, 17, 32, 0.94), rgba(9, 37, 59, 0.88)),
+    repeating-linear-gradient(0deg, transparent 0 7px, rgba(94, 226, 255, 0.08) 8px 9px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 16px rgba(45, 210, 255, 0.24),
+    0 9px 20px rgba(0, 0, 0, 0.56);
+  text-decoration: none;
+  transform: skewX(-4deg);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    filter 160ms ease,
+    transform 160ms ease;
+  animation: cta-enter 520ms 3.52s steps(4) both;
+}
+
+.opensource-link::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: 10%;
+  left: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #50e7ff, #ffe177, transparent);
+  box-shadow: 0 0 8px rgba(80, 231, 255, 0.78);
+}
+
+.opensource-link:hover,
+.opensource-link:focus-visible {
+  border-color: #ffe177;
+  filter: brightness(1.18);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 0 22px rgba(67, 224, 255, 0.54),
+    0 0 28px rgba(255, 157, 36, 0.22),
+    0 9px 20px rgba(0, 0, 0, 0.62);
+  transform: translateY(-2px) skewX(-4deg) scale(1.025);
+}
+
+.opensource-link:focus-visible {
+  outline: 3px solid #ffe177;
+  outline-offset: 4px;
+}
+
+.opensource-link:active {
+  transform: translateY(1px) skewX(-4deg) scale(0.99);
+}
+
+.opensource-icon {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fff7be, #54e5ff);
+  box-shadow:
+    0 0 12px rgba(83, 228, 255, 0.68),
+    2px 3px 0 rgba(7, 63, 101, 0.82);
+  transform: skewX(4deg);
+}
+
+.opensource-icon img {
+  width: 25px;
+  height: 25px;
+  filter: drop-shadow(1px 2px 0 rgba(255, 255, 255, 0.24));
+}
+
+.opensource-copy {
+  display: grid;
+  gap: 1px;
+  text-align: left;
+  transform: skewX(4deg);
+}
+
+.opensource-copy small {
+  color: #8eeeff;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+
+.opensource-copy strong {
+  color: #fff5ac;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 19px;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-shadow:
+    2px 2px 0 #7c210c,
+    0 0 10px rgba(255, 159, 32, 0.64);
+}
+
 .arcade-start {
   padding: 8px 24px;
   border: 0;

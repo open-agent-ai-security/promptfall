@@ -1323,6 +1323,21 @@ export default function Game() {
               </button>
               <div className="arcade-controls">← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP</div>
             </div>
+            <a
+              className="opensource-link"
+              href="https://github.com/open-agent-ai-security/promptfall"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Promptfall is open source. View the project on GitHub."
+            >
+              <span className="opensource-icon" aria-hidden="true">
+                <img src="./assets/github-mark.svg" alt="" />
+              </span>
+              <span className="opensource-copy">
+                <small>VIEW ON GITHUB</small>
+                <strong>OPEN SOURCE</strong>
+              </span>
+            </a>
           </div>
         )}
 
