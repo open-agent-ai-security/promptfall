@@ -40,6 +40,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+The Praxen lockup in public/assets/praxen-lockup-dark-background.png is reused
+from the Praxen project (https://github.com/open-agent-ai-security/praxen).
+Copyright 2026 Exabeam, Inc. It is used under the Apache License, Version 2.0.
+
 Except for the third-party material identified above, Promptfall source code,
 original game artwork, and original documentation are licensed under the
 Apache License, Version 2.0.

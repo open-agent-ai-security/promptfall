@@ -1233,6 +1233,335 @@ kbd {
   outline-offset: 7px;
 }
 
+.game-over-screen,
+.praxen-ad-screen {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  overflow: hidden;
+}
+
+.game-over-screen {
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(99, 5, 30, 0.18), rgba(2, 3, 9, 0.91) 70%),
+    repeating-linear-gradient(90deg, transparent 0 56px, rgba(255, 42, 100, 0.04) 57px 59px);
+  animation: game-over-overlay 3.45s ease-in-out both;
+}
+
+.game-over-screen::before,
+.game-over-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.game-over-screen::before {
+  background:
+    linear-gradient(90deg, transparent 0 12%, rgba(255, 40, 93, 0.72) 49.5%, #fff 50%, rgba(255, 150, 29, 0.66) 50.5%, transparent 88%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.58), transparent 34%);
+  mix-blend-mode: screen;
+  animation: game-over-impact 850ms ease-out both;
+}
+
+.game-over-screen::after {
+  opacity: 0.23;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 8px,
+    rgba(255, 53, 101, 0.22) 9px 10px
+  );
+  animation: game-over-jitter 120ms steps(2) 8;
+}
+
+.game-over-static {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background-image:
+    radial-gradient(circle at 14% 22%, #ff2c67 0 1px, transparent 2px),
+    radial-gradient(circle at 76% 68%, #5ceaff 0 1px, transparent 2px),
+    radial-gradient(circle at 47% 43%, #fff 0 1px, transparent 2px);
+  background-size: 29px 31px, 41px 37px, 53px 47px;
+  mix-blend-mode: screen;
+  animation: game-over-static 180ms steps(2) infinite;
+}
+
+.game-over-burst {
+  position: relative;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  transform-origin: center;
+  animation: game-over-slam 760ms cubic-bezier(0.12, 0.88, 0.18, 1.15) both;
+}
+
+.game-over-burst::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 155%;
+  height: 155%;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 33, 91, 0.32) 25%, rgba(255, 154, 30, 0.25) 75%, transparent),
+    repeating-linear-gradient(0deg, transparent 0 13px, rgba(255, 121, 151, 0.1) 14px 15px);
+  clip-path: polygon(7% 0, 93% 0, 100% 50%, 93% 100%, 7% 100%, 0 50%);
+}
+
+.game-over-burst span {
+  color: #ffd4df;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(24px, 4.2vw, 64px);
+  font-style: italic;
+  letter-spacing: 0.18em;
+  line-height: 0.9;
+  -webkit-text-stroke: clamp(1px, 0.16vw, 2px) #651129;
+  text-shadow:
+    5px 5px 0 #250711,
+    0 0 22px rgba(255, 52, 103, 0.92);
+}
+
+.game-over-burst strong {
+  margin-top: 0.04em;
+  color: #fff0a3;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(76px, 16vw, 236px);
+  font-style: italic;
+  letter-spacing: 0.015em;
+  line-height: 0.82;
+  white-space: nowrap;
+  -webkit-text-stroke: clamp(3px, 0.5vw, 8px) #97152f;
+  text-shadow:
+    11px 13px 0 #300711,
+    -6px -5px 0 #074c8d,
+    0 0 46px rgba(255, 49, 98, 0.96);
+  transform-origin: center;
+  animation: game-over-throb 610ms 850ms ease-in-out 3;
+}
+
+.praxen-ad-screen {
+  display: grid;
+  place-items: center;
+  color: #f2fbff;
+  background:
+    radial-gradient(circle at 23% 48%, rgba(255, 110, 17, 0.16), transparent 31%),
+    radial-gradient(circle at 79% 37%, rgba(55, 218, 255, 0.17), transparent 34%),
+    linear-gradient(135deg, #020a14, #071828 50%, #030912);
+  animation: praxen-ad-fade 920ms ease-out both;
+}
+
+.praxen-ad-screen::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(110deg, transparent 42%, rgba(255, 255, 255, 0.11) 49%, transparent 56%);
+  mix-blend-mode: screen;
+  transform: translateX(-55%);
+  animation: praxen-ad-sweep 1.3s 380ms ease-out both;
+}
+
+.praxen-ad-grid {
+  position: absolute;
+  inset: 46% -10% -32%;
+  opacity: 0.34;
+  background-image:
+    linear-gradient(rgba(59, 221, 255, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 221, 255, 0.16) 1px, transparent 1px);
+  background-size: 6% 14%;
+  transform: perspective(430px) rotateX(61deg);
+  transform-origin: center top;
+  animation: grid-drive 1.5s linear infinite;
+}
+
+.praxen-ad-orbit {
+  position: absolute;
+  width: 36%;
+  aspect-ratio: 1;
+  border: 2px solid rgba(74, 225, 255, 0.16);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 28px rgba(56, 216, 255, 0.06),
+    0 0 24px rgba(56, 216, 255, 0.08);
+}
+
+.praxen-ad-orbit::before,
+.praxen-ad-orbit::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: #ff7518;
+  box-shadow: 0 0 14px #ff7518;
+}
+
+.praxen-ad-orbit::before {
+  top: 9%;
+  left: 19%;
+  width: 10px;
+  height: 10px;
+}
+
+.praxen-ad-orbit::after {
+  right: 8%;
+  bottom: 27%;
+  width: 6px;
+  height: 6px;
+}
+
+.praxen-ad-orbit--one {
+  top: -17%;
+  left: -9%;
+  animation: praxen-orbit 14s linear infinite;
+}
+
+.praxen-ad-orbit--two {
+  right: -12%;
+  bottom: -22%;
+  border-color: rgba(255, 123, 23, 0.15);
+  animation: praxen-orbit 18s linear infinite reverse;
+}
+
+.praxen-ad-content {
+  position: relative;
+  z-index: 2;
+  width: min(86%, 1040px);
+  display: grid;
+  place-items: center;
+  gap: clamp(8px, 1.2vh, 14px);
+  text-align: center;
+  animation: praxen-ad-assemble 950ms 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.praxen-ad-kicker {
+  color: #75eaff;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: clamp(9px, 1.15vw, 17px);
+  font-weight: 900;
+  letter-spacing: 0.23em;
+  text-shadow: 0 0 14px rgba(61, 223, 255, 0.74);
+}
+
+.praxen-ad-content h2 {
+  margin: 0;
+  color: #f1fbff;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(32px, 5.1vw, 74px);
+  font-style: italic;
+  letter-spacing: 0.025em;
+  line-height: 0.92;
+  -webkit-text-stroke: clamp(1px, 0.17vw, 3px) #07568e;
+  text-shadow:
+    6px 7px 0 #031b30,
+    0 0 24px rgba(57, 219, 255, 0.68);
+}
+
+.praxen-ad-content h2 span {
+  display: block;
+  color: #ffe371;
+  -webkit-text-stroke-color: #8e230c;
+  text-shadow:
+    6px 7px 0 #361006,
+    -3px -2px 0 #07568e,
+    0 0 25px rgba(255, 139, 24, 0.86);
+}
+
+.praxen-ad-logo {
+  display: block;
+  width: min(54%, 620px);
+  max-height: 118px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 15px rgba(255, 109, 14, 0.4))
+    drop-shadow(0 12px 18px rgba(0, 0, 0, 0.54));
+}
+
+.praxen-ad-content p {
+  margin: 0;
+  color: #cfeefa;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: clamp(14px, 1.8vw, 26px);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  text-shadow: 2px 3px 0 #020a12;
+}
+
+.praxen-ad-content p strong {
+  display: inline;
+  margin-left: 0.28em;
+  color: #fff2a2;
+}
+
+.praxen-ad-cta {
+  position: relative;
+  min-width: min(64%, 540px);
+  padding: 10px 38px 12px;
+  border: 2px solid #63e8ff;
+  color: #fff;
+  background:
+    linear-gradient(100deg, rgba(4, 45, 70, 0.96), rgba(98, 30, 9, 0.95)),
+    #061522;
+  box-shadow:
+    inset 0 0 24px rgba(86, 229, 255, 0.08),
+    0 0 18px rgba(72, 224, 255, 0.38),
+    0 12px 22px rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+  clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0 50%);
+  transition:
+    filter 150ms ease,
+    transform 150ms ease;
+}
+
+.praxen-ad-cta:hover,
+.praxen-ad-cta:focus-visible {
+  filter: brightness(1.2);
+  transform: scale(1.035);
+}
+
+.praxen-ad-cta:focus-visible,
+.praxen-retry:focus-visible {
+  outline: 3px solid #ffe477;
+  outline-offset: 5px;
+}
+
+.praxen-ad-cta small {
+  display: block;
+  color: #88efff;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: clamp(8px, 0.85vw, 12px);
+  font-weight: 900;
+  letter-spacing: 0.22em;
+}
+
+.praxen-ad-cta strong {
+  display: block;
+  color: #fff0a0;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(27px, 3.7vw, 54px);
+  font-style: italic;
+  letter-spacing: 0.08em;
+  line-height: 0.94;
+  -webkit-text-stroke: clamp(1px, 0.13vw, 2px) #8f250d;
+  text-shadow:
+    4px 5px 0 #321006,
+    0 0 16px rgba(255, 135, 24, 0.75);
+}
+
+.praxen-retry {
+  padding: 2px 8px;
+  border: 0;
+  color: rgba(202, 241, 251, 0.8);
+  background: transparent;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(12px, 1.35vw, 20px);
+  font-style: italic;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 12px rgba(70, 222, 255, 0.5);
+  cursor: pointer;
+  animation: start-blink 1.25s steps(2) infinite;
+}
+
 .scanlines {
   position: absolute;
   z-index: 12;
@@ -1673,6 +2002,133 @@ kbd {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes game-over-overlay {
+  0% {
+    opacity: 0;
+    background-color: rgba(255, 255, 255, 0.72);
+  }
+  10%,
+  83% {
+    opacity: 1;
+    background-color: transparent;
+  }
+  100% {
+    opacity: 0;
+    filter: blur(5px) brightness(0.35);
+  }
+}
+
+@keyframes game-over-impact {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.03);
+  }
+  22% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  48% {
+    opacity: 0.12;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1.35);
+  }
+}
+
+@keyframes game-over-jitter {
+  0% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(-2px);
+  }
+}
+
+@keyframes game-over-static {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 17px -13px, -19px 11px, 23px 19px;
+  }
+}
+
+@keyframes game-over-slam {
+  0% {
+    opacity: 0;
+    transform: scale(3.4) rotate(-4deg);
+    filter: blur(18px) brightness(2.2);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.9) rotate(1deg);
+    filter: blur(0) brightness(1.35);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    filter: brightness(1);
+  }
+}
+
+@keyframes game-over-throb {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.08);
+    filter: brightness(1.42)
+      drop-shadow(0 0 22px rgba(255, 51, 101, 0.7));
+  }
+}
+
+@keyframes praxen-ad-fade {
+  from {
+    opacity: 0;
+    filter: blur(8px) brightness(0.25);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+  }
+}
+
+@keyframes praxen-ad-sweep {
+  from {
+    transform: translateX(-55%);
+  }
+  to {
+    transform: translateX(55%);
+  }
+}
+
+@keyframes praxen-ad-assemble {
+  0% {
+    opacity: 0;
+    transform: translateY(42px) scale(0.86);
+    filter: blur(12px);
+  }
+  72% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.02);
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes praxen-orbit {
+  to {
+    transform: rotate(360deg);
   }
 }
 

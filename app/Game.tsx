@@ -2,7 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Scene = "splash" | "title" | "levelIntro" | "playing" | "complete";
+type Scene =
+  | "splash"
+  | "title"
+  | "levelIntro"
+  | "playing"
+  | "complete"
+  | "gameOver"
+  | "praxenAd";
 
 type Platform = {
   x: number;
@@ -758,6 +765,19 @@ export default function Game() {
     [],
   );
 
+  const triggerGameOver = useCallback(() => {
+    if (sceneRef.current !== "playing") return;
+    inputRef.current = { left: false, right: false, jump: false };
+    setCallout(false);
+    if (factTimerRef.current !== null) {
+      window.clearTimeout(factTimerRef.current);
+      factTimerRef.current = null;
+    }
+    sceneRef.current = "gameOver";
+    setScene("gameOver");
+    playTone(92, 0.42, "sawtooth");
+  }, [playTone]);
+
   const resetGame = useCallback(() => {
     if (factTimerRef.current !== null) {
       window.clearTimeout(factTimerRef.current);
@@ -897,6 +917,36 @@ export default function Game() {
   }, [playTone, scene]);
 
   useEffect(() => {
+    if (scene !== "gameOver") return;
+
+    const pulseOne = window.setTimeout(
+      () => playTone(132, 0.16, "square"),
+      900,
+    );
+    const pulseTwo = window.setTimeout(
+      () => playTone(116, 0.16, "square"),
+      1510,
+    );
+    const pulseThree = window.setTimeout(
+      () => playTone(98, 0.22, "square"),
+      2120,
+    );
+    const showPraxen = window.setTimeout(() => {
+      sceneRef.current = "praxenAd";
+      setScene("praxenAd");
+      playTone(310, 0.18, "triangle");
+      window.setTimeout(() => playTone(465, 0.22, "sine"), 120);
+    }, 3450);
+
+    return () => {
+      window.clearTimeout(pulseOne);
+      window.clearTimeout(pulseTwo);
+      window.clearTimeout(pulseThree);
+      window.clearTimeout(showPraxen);
+    };
+  }, [playTone, scene]);
+
+  useEffect(() => {
     const keyDown = (event: KeyboardEvent) => {
       if (
         ["ArrowLeft", "ArrowRight", "ArrowUp", " ", "KeyA", "KeyD", "KeyW"].includes(
@@ -917,6 +967,19 @@ export default function Game() {
         (event.code === "Space" || event.code === "Enter")
       ) {
         advanceCampaign();
+        return;
+      }
+      if (
+        sceneRef.current === "praxenAd" &&
+        (event.code === "Space" || event.code === "Enter") &&
+        !(
+          event.code === "Enter" &&
+          event.target instanceof Element &&
+          event.target.closest("a")
+        )
+      ) {
+        event.preventDefault();
+        startLevel(levelIndexRef.current);
         return;
       }
       if (event.code === "ArrowLeft" || event.code === "KeyA") {
@@ -955,7 +1018,7 @@ export default function Game() {
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
     };
-  }, [advanceCampaign, startCampaign]);
+  }, [advanceCampaign, startCampaign, startLevel]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1015,11 +1078,11 @@ export default function Game() {
           player.x = Math.max(80, cameraRef.current + 100);
           player.y = 440;
           player.vy = -320;
-          healthRef.current -= 1;
+          healthRef.current = Math.max(0, healthRef.current - 1);
           setHealth(healthRef.current);
           playTone(110, 0.25, "sawtooth");
           if (healthRef.current <= 0) {
-            resetGame();
+            triggerGameOver();
           }
         }
 
@@ -1027,6 +1090,7 @@ export default function Game() {
         player.runClock += dt;
 
         for (const enemy of enemies) {
+          if (sceneRef.current !== "playing") break;
           if (!enemy.active) continue;
 
           enemy.x += enemy.vx * dt;
@@ -1083,13 +1147,16 @@ export default function Game() {
                 });
               }
             } else if (player.invulnerable <= 0) {
-              healthRef.current -= 1;
+              healthRef.current = Math.max(0, healthRef.current - 1);
               setHealth(healthRef.current);
               player.invulnerable = 1.4;
               player.vx = player.x < enemy.x ? -420 : 420;
               player.vy = -410;
               playTone(125, 0.24, "sawtooth");
-              if (healthRef.current <= 0) resetGame();
+              if (healthRef.current <= 0) {
+                triggerGameOver();
+                break;
+              }
             }
           }
         }
@@ -1145,6 +1212,7 @@ export default function Game() {
         }
 
         if (
+          sceneRef.current === "playing" &&
           player.x > EXIT_FIELD_X + 68 &&
           enemies.every((enemy) => !enemy.active) &&
           fieldUnlockProgress >= 1
@@ -1225,7 +1293,7 @@ export default function Game() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [playTone, resetGame]);
+  }, [playTone, triggerGameOver]);
 
   const touchProps = (key: "left" | "right" | "jump") => ({
     onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
@@ -1457,6 +1525,56 @@ export default function Game() {
           </div>
         )}
 
+        {scene === "gameOver" && (
+          <div className="game-over-screen" data-testid="game-over">
+            <div className="game-over-static" aria-hidden="true" />
+            <div className="game-over-burst">
+              <span>INTEGRITY LOST</span>
+              <strong>GAME OVER</strong>
+            </div>
+          </div>
+        )}
+
+        {scene === "praxenAd" && (
+          <div className="praxen-ad-screen" data-testid="praxen-promo">
+            <div className="praxen-ad-grid" aria-hidden="true" />
+            <div className="praxen-ad-orbit praxen-ad-orbit--one" aria-hidden="true" />
+            <div className="praxen-ad-orbit praxen-ad-orbit--two" aria-hidden="true" />
+            <div className="praxen-ad-content">
+              <div className="praxen-ad-kicker">YOUR AGENTS // YOUR MISSION</div>
+              <h2>
+                WANT TO SCAN YOUR OWN AGENTS
+                <span>FOR THE OWASP TOP 10?</span>
+              </h2>
+              <img
+                className="praxen-ad-logo"
+                src="./assets/praxen-lockup-dark-background.png"
+                alt="Praxen — Agent Behavior Verifier"
+              />
+              <p>
+                Make sure your agent does its job
+                <strong>— and only its job!</strong>
+              </p>
+              <a
+                className="praxen-ad-cta"
+                href="https://github.com/open-agent-ai-security/praxen"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <small>FREE AND OPEN SOURCE</small>
+                <strong>GRAB PRAXEN</strong>
+              </a>
+              <button
+                type="button"
+                className="praxen-retry"
+                onClick={() => startLevel(levelIndex)}
+              >
+                PRESS SPACE TO RETRY LEVEL {currentLevel.number}
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="scanlines" aria-hidden="true" />
       </section>
       <p className="sr-only" aria-live="polite">
@@ -1468,6 +1586,10 @@ export default function Game() {
             ? isFinalLevel
               ? "Level complete. Press Space to return to the title."
               : "Level complete. Press Space for the next level."
+          : scene === "gameOver"
+            ? "Game over."
+          : scene === "praxenAd"
+            ? "Want to scan your own agents for the OWASP Top 10? Grab Praxen, free and open source. Press Space to retry."
             : ""}
       </p>
     </main>

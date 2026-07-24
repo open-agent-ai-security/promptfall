@@ -65,6 +65,11 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /github\.com\/open-agent-ai-security\/promptfall/i);
   assert.match(gameSource, /OPEN SOURCE/i);
   assert.match(gameSource, /github-mark\.svg/i);
+  assert.match(gameSource, /GAME OVER/i);
+  assert.match(gameSource, /GRAB PRAXEN/i);
+  assert.match(gameSource, /FREE AND OPEN SOURCE/i);
+  assert.match(gameSource, /github\.com\/open-agent-ai-security\/praxen/i);
+  assert.match(gameSource, /praxen-lockup-dark-background\.png/i);
   assert.match(gameSource, /PRESS SPACE TO START/i);
   assert.match(gameSource, /aria-label="Touch controls"/i);
   assert.match(gameSource, /Move Praxi right and jump on each threat/i);
