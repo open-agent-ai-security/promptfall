@@ -66,6 +66,8 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /hidden-context-exposure-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l9-v1\.png/i);
   assert.match(gameSource, /vector-embedding-weaknesses-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l10-v1\.png/i);
+  assert.match(gameSource, /improper-output-handling-v1\.png/i);
   assert.match(gameSource, /integrity-crate-v1\.png/i);
   assert.match(gameSource, /BONUS_LEVEL_INTERVAL/i);
   assert.match(gameSource, /LEVEL_LAYOUTS/i);
@@ -86,6 +88,8 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /LLM08/i);
   assert.match(gameSource, /VECTOR AND EMBEDDING WEAKNESSES/i);
   assert.match(gameSource, /LLM09/i);
+  assert.match(gameSource, /IMPROPER OUTPUT HANDLING/i);
+  assert.match(gameSource, /LLM10/i);
   assert.match(gameSource, /TEN VULNERABILITIES\./i);
   assert.match(gameSource, /ONE HERO\./i);
   assert.match(gameSource, /LEARN THE/i);

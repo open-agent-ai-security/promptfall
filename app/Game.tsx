@@ -351,6 +351,33 @@ const VECTOR_EMBEDDING_WEAKNESSES_LESSONS = [
   },
 ] as const;
 
+const IMPROPER_OUTPUT_HANDLING_LESSONS = [
+  {
+    kind: "DEFINITION",
+    text: "Improper output handling is the unsafe use of LLM-generated content without sufficient validation, sanitization, or encoding before passing it downstream.",
+  },
+  {
+    kind: "WHY IT MATTERS",
+    text: "Model output can be attacker-controlled. Treating it as trusted gives users indirect access to shells, browsers, databases, files, tools, and other interpreting systems.",
+  },
+  {
+    kind: "EXAMPLE 1",
+    text: "An application sends model output directly to exec or eval, allowing crafted output to become remote code execution.",
+  },
+  {
+    kind: "EXAMPLE 2",
+    text: "A chat UI automatically fetches an image URL emitted by the model, exfiltrating conversation data through the attacker-controlled request.",
+  },
+  {
+    kind: "DEFENSE 1",
+    text: "Treat the model as an untrusted user: validate outputs against strict schemas and allowlists, then independently authorize every downstream action.",
+  },
+  {
+    kind: "DEFENSE 2",
+    text: "Use context-aware encoding and prepared queries, neutralize terminal control characters, and disable automatic outbound fetches from rendered output.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -432,6 +459,15 @@ const LEVELS = [
     background: "./assets/gameplay-background-l9-v1.png",
     enemy: "./assets/vector-embedding-weaknesses-v1.png",
     lessons: VECTOR_EMBEDDING_WEAKNESSES_LESSONS,
+  },
+  {
+    number: 10,
+    riskCode: "LLM10",
+    name: "IMPROPER OUTPUT HANDLING",
+    objectiveName: "Improper Output Handling",
+    background: "./assets/gameplay-background-l10-v1.png",
+    enemy: "./assets/improper-output-handling-v1.png",
+    lessons: IMPROPER_OUTPUT_HANDLING_LESSONS,
   },
 ] as const;
 
@@ -668,6 +704,30 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       enemySpawn(3, 1900, 380, 1860, 2010, -72, 2.1),
       enemySpawn(4, 2310, 460, 2270, 2420, 76, 2.8),
       enemySpawn(5, 2700, 390, 2660, 2810, -78, 3.5),
+    ],
+  },
+  {
+    platforms: [
+      { x: 0, y: 606, w: 700, h: 114, kind: "floor" },
+      { x: 760, y: 606, w: 570, h: 114, kind: "floor" },
+      { x: 1390, y: 606, w: 530, h: 114, kind: "floor" },
+      { x: 1980, y: 606, w: 540, h: 114, kind: "floor" },
+      { x: 2580, y: 606, w: 500, h: 114, kind: "floor" },
+      { x: 410, y: 470, w: 250, h: 24, kind: "ledge" },
+      { x: 810, y: 390, w: 270, h: 24, kind: "ledge" },
+      { x: 1210, y: 480, w: 270, h: 24, kind: "ledge" },
+      { x: 1560, y: 370, w: 280, h: 24, kind: "ledge" },
+      { x: 1940, y: 450, w: 270, h: 24, kind: "ledge" },
+      { x: 2310, y: 360, w: 280, h: 24, kind: "ledge" },
+      { x: 2650, y: 440, w: 280, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 870, 390, 840, 990, 72, 0),
+      enemySpawn(1, 1270, 480, 1240, 1390, -74, 0.7),
+      enemySpawn(2, 1630, 370, 1590, 1740, 78, 1.4),
+      enemySpawn(3, 2010, 450, 1970, 2120, -72, 2.1),
+      enemySpawn(4, 2380, 360, 2340, 2490, 76, 2.8),
+      enemySpawn(5, 2720, 440, 2680, 2830, -78, 3.5),
     ],
   },
 ];
