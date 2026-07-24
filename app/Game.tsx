@@ -973,13 +973,12 @@ export default function Game() {
         sceneRef.current === "praxenAd" &&
         (event.code === "Space" || event.code === "Enter") &&
         !(
-          event.code === "Enter" &&
           event.target instanceof Element &&
-          event.target.closest("a")
+          event.target.closest("a, button")
         )
       ) {
         event.preventDefault();
-        startLevel(levelIndexRef.current);
+        startCampaign();
         return;
       }
       if (event.code === "ArrowLeft" || event.code === "KeyA") {
@@ -1555,22 +1554,26 @@ export default function Game() {
                 Make sure your agent does its job
                 <strong>— and only its job!</strong>
               </p>
-              <a
-                className="praxen-ad-cta"
-                href="https://github.com/open-agent-ai-security/praxen"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <small>FREE AND OPEN SOURCE</small>
-                <strong>GRAB PRAXEN</strong>
-              </a>
-              <button
-                type="button"
-                className="praxen-retry"
-                onClick={() => startLevel(levelIndex)}
-              >
-                PRESS SPACE TO RETRY LEVEL {currentLevel.number}
-              </button>
+              <div className="praxen-ad-actions">
+                <button
+                  type="button"
+                  className="praxen-action praxen-restart"
+                  onClick={startCampaign}
+                >
+                  <small>BACK TO LEVEL 1</small>
+                  <strong>RESTART GAME</strong>
+                </button>
+                <a
+                  className="praxen-action praxen-ad-cta"
+                  href="https://open-agent-ai-security.github.io/praxen/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <small>FREE AND OPEN SOURCE</small>
+                  <strong>GET PRAXEN</strong>
+                </a>
+              </div>
+              <div className="praxen-space-hint">SPACE // RESTART GAME</div>
             </div>
           </div>
         )}
@@ -1589,7 +1592,7 @@ export default function Game() {
           : scene === "gameOver"
             ? "Game over."
           : scene === "praxenAd"
-            ? "Want to scan your own agents for the OWASP Top 10? Grab Praxen, free and open source. Press Space to retry."
+            ? "Want to scan your own agents for the OWASP Top 10? Get Praxen, free and open source, or restart the game."
             : ""}
       </p>
     </main>

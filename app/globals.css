@@ -1493,39 +1493,56 @@ kbd {
   color: #fff2a2;
 }
 
-.praxen-ad-cta {
+.praxen-ad-actions {
+  width: min(84%, 900px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.6vw, 22px);
+}
+
+.praxen-action {
   position: relative;
-  min-width: min(64%, 540px);
-  padding: 10px 38px 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 24px 12px;
   border: 2px solid #63e8ff;
   color: #fff;
-  background:
-    linear-gradient(100deg, rgba(4, 45, 70, 0.96), rgba(98, 30, 9, 0.95)),
-    #061522;
+  background: linear-gradient(100deg, rgba(4, 45, 70, 0.96), rgba(8, 74, 95, 0.95));
   box-shadow:
     inset 0 0 24px rgba(86, 229, 255, 0.08),
     0 0 18px rgba(72, 224, 255, 0.38),
     0 12px 22px rgba(0, 0, 0, 0.5);
+  font: inherit;
+  text-align: center;
   text-decoration: none;
   clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0 50%);
+  cursor: pointer;
   transition:
     filter 150ms ease,
     transform 150ms ease;
 }
 
-.praxen-ad-cta:hover,
-.praxen-ad-cta:focus-visible {
+.praxen-ad-cta {
+  border-color: #ffab42;
+  background: linear-gradient(100deg, rgba(73, 22, 8, 0.96), rgba(120, 44, 8, 0.95));
+  box-shadow:
+    inset 0 0 24px rgba(255, 174, 70, 0.08),
+    0 0 18px rgba(255, 127, 28, 0.34),
+    0 12px 22px rgba(0, 0, 0, 0.5);
+}
+
+.praxen-action:hover,
+.praxen-action:focus-visible {
   filter: brightness(1.2);
   transform: scale(1.035);
 }
 
-.praxen-ad-cta:focus-visible,
-.praxen-retry:focus-visible {
+.praxen-action:focus-visible {
   outline: 3px solid #ffe477;
   outline-offset: 5px;
 }
 
-.praxen-ad-cta small {
+.praxen-action small {
   display: block;
   color: #88efff;
   font-family: "Arial Black", Arial, sans-serif;
@@ -1534,11 +1551,15 @@ kbd {
   letter-spacing: 0.22em;
 }
 
-.praxen-ad-cta strong {
+.praxen-ad-cta small {
+  color: #ffd28c;
+}
+
+.praxen-action strong {
   display: block;
   color: #fff0a0;
   font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(27px, 3.7vw, 54px);
+  font-size: clamp(24px, 3.1vw, 46px);
   font-style: italic;
   letter-spacing: 0.08em;
   line-height: 0.94;
@@ -1548,17 +1569,21 @@ kbd {
     0 0 16px rgba(255, 135, 24, 0.75);
 }
 
-.praxen-retry {
-  padding: 2px 8px;
-  border: 0;
+.praxen-restart strong {
+  color: #e9fbff;
+  -webkit-text-stroke-color: #07598d;
+  text-shadow:
+    4px 5px 0 #031c30,
+    0 0 16px rgba(67, 224, 255, 0.72);
+}
+
+.praxen-space-hint {
   color: rgba(202, 241, 251, 0.8);
-  background: transparent;
   font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(12px, 1.35vw, 20px);
+  font-size: clamp(10px, 1.12vw, 17px);
   font-style: italic;
   letter-spacing: 0.14em;
   text-shadow: 0 0 12px rgba(70, 222, 255, 0.5);
-  cursor: pointer;
   animation: start-blink 1.25s steps(2) infinite;
 }
 
