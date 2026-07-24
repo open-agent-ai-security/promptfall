@@ -1654,11 +1654,13 @@ export default function Game() {
         event.clientX - lastTapRef.current.x,
         event.clientY - lastTapRef.current.y,
       );
+      const isSecondFinger = touchPointsRef.current.size > 0;
       const isJumpTap =
-        sinceLastTap > 45 &&
-        sinceLastTap < 350 &&
-        distanceFromLastTap < 96;
-      const controlsDirection = touchPointsRef.current.size === 0;
+        isSecondFinger ||
+        (sinceLastTap > 45 &&
+          sinceLastTap < 350 &&
+          distanceFromLastTap < 96);
+      const controlsDirection = !isSecondFinger;
       touchPointsRef.current.set(event.pointerId, {
         side: sideForTouch(event),
         controlsDirection,
@@ -1801,7 +1803,7 @@ export default function Game() {
                   ← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP
                 </span>
                 <span className="touch-control-copy">
-                  HOLD LEFT / RIGHT TO MOVE&nbsp;&nbsp;•&nbsp;&nbsp;DOUBLE TAP TO JUMP
+                  HOLD LEFT / RIGHT&nbsp;&nbsp;•&nbsp;&nbsp;TAP WITH SECOND FINGER TO JUMP
                 </span>
                 <span className="arcade-level-select">
                   F1–F{LEVELS.length}&nbsp;&nbsp;DIRECT LEVEL SELECT
@@ -1893,7 +1895,7 @@ export default function Game() {
                 <div
                   className="touch-playfield"
                   role="application"
-                  aria-label="Touch controls: hold the left or right half of the playfield to move. Double-tap either half to jump."
+                  aria-label="Touch controls: hold the left or right half of the playfield to move. Tap with a second finger to jump, or double-tap with one finger."
                   {...touchPlayfieldProps}
                 />
                 <div className="touch-controls" aria-hidden="true">
@@ -1902,7 +1904,7 @@ export default function Game() {
                     <small>HOLD LEFT</small>
                   </div>
                   <div className="touch-jump-hint">
-                    <strong>DOUBLE TAP</strong>
+                    <strong>SECOND FINGER</strong>
                     <small>JUMP</small>
                   </div>
                   <div className="touch-side-hint touch-side-hint--right">

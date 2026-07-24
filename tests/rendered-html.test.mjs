@@ -87,7 +87,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /DIRECT LEVEL SELECT/i);
   assert.match(gameSource, /\^F\(\[1-9\]\|10\)\$/i);
   assert.match(gameSource, /aria-label="Touch controls: hold the left or right half/i);
-  assert.match(gameSource, /DOUBLE TAP TO JUMP/i);
+  assert.match(gameSource, /TAP WITH SECOND FINGER TO JUMP/i);
   assert.match(gameSource, /pointerType !== "touch"/i);
   assert.match(gameSource, /Move Praxi right and jump on each threat/i);
 });
