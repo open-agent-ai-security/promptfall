@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 
 const description =
   "Catch the 2026 OWASP Top 10 for LLM Apps. Ten vulnerabilities. One hero. Defend the future.";
+const socialTitle = "Promptfall — Learn the OWASP Top 10 for LLMs";
+const socialImageAlt =
+  "Praxi faces two AI-security foes in Promptfall, a game for learning the OWASP Top 10 for LLMs.";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -30,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol =
     forwardedProtocol ?? (host?.startsWith("localhost") ? "http" : "https");
   const metadataBase = new URL(`${protocol}://${host ?? "localhost:3000"}`);
-  const socialImage = new URL("/og.png", metadataBase).toString();
+  const socialImage = new URL("/social-preview.jpg", metadataBase).toString();
 
   return {
     metadataBase,
@@ -42,20 +45,20 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       type: "website",
-      title: "Promptfall",
+      title: socialTitle,
       description,
       images: [
         {
           url: socialImage,
-          width: 1728,
-          height: 910,
-          alt: "Praxi races toward a Prompt Injection threat in Promptfall.",
+          width: 1280,
+          height: 640,
+          alt: socialImageAlt,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: "Promptfall",
+      title: socialTitle,
       description,
       images: [socialImage],
     },

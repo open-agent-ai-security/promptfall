@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1280 640" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="titleGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8bc"/>
+      <stop offset="0.32" stop-color="#ffe36c"/>
+      <stop offset="0.68" stop-color="#ffad22"/>
+      <stop offset="1" stop-color="#ff7518"/>
+    </linearGradient>
+    <linearGradient id="tagline" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8eeeff"/>
+      <stop offset="0.48" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffd878"/>
+    </linearGradient>
+    <linearGradient id="stageShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#020512" stop-opacity="0.28"/>
+      <stop offset="0.38" stop-color="#020512" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#020512" stop-opacity="0.66"/>
+    </linearGradient>
+    <radialGradient id="titlePlate">
+      <stop offset="0" stop-color="#061326" stop-opacity="0.92"/>
+      <stop offset="0.68" stop-color="#061326" stop-opacity="0.66"/>
+      <stop offset="1" stop-color="#061326" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="titleShadow" x="-30%" y="-50%" width="160%" height="220%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
+      <feOffset in="blur" dx="10" dy="14" result="offset"/>
+      <feFlood flood-color="#180407" flood-opacity="0.95" result="color"/>
+      <feComposite in="color" in2="offset" operator="in" result="shadow"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="cyanGlow" x="-40%" y="-80%" width="180%" height="260%">
+      <feGaussianBlur stdDeviation="8" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="characterShadow" x="-30%" y="-30%" width="170%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="9" result="blur"/>
+      <feOffset in="blur" dx="7" dy="14" result="offset"/>
+      <feFlood flood-color="#000000" flood-opacity="0.9" result="color"/>
+      <feComposite in="color" in2="offset" operator="in" result="shadow"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="cardClip">
+      <rect width="1280" height="640" rx="0"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#cardClip)">
+    <image href="assets/social-preview-background-v1.png" width="1280" height="640" preserveAspectRatio="xMidYMid slice"/>
+    <rect width="1280" height="640" fill="url(#stageShade)"/>
+    <ellipse cx="640" cy="152" rx="515" ry="205" fill="url(#titlePlate)"/>
+
+    <g opacity="0.72">
+      <path d="M70 78H338" stroke="#42e7ff" stroke-width="3"/>
+      <path d="M942 78H1210" stroke="#ff9b29" stroke-width="3"/>
+      <circle cx="70" cy="78" r="6" fill="#42e7ff"/>
+      <circle cx="1210" cy="78" r="6" fill="#ff9b29"/>
+    </g>
+
+    <text x="640" y="84"
+      fill="#c9f7ff"
+      font-family="Arial Black, Arial, sans-serif"
+      font-size="20"
+      font-weight="900"
+      letter-spacing="7"
+      text-anchor="middle"
+      filter="url(#cyanGlow)">OWASP TOP 10 FOR LLM APPLICATIONS // 2026</text>
+
+    <text x="640" y="218"
+      fill="url(#titleGold)"
+      stroke="#511207"
+      stroke-width="12"
+      paint-order="stroke fill"
+      font-family="Impact, Arial Black, sans-serif"
+      font-size="154"
+      font-style="italic"
+      letter-spacing="5"
+      text-anchor="middle"
+      filter="url(#titleShadow)">PROMPTFALL</text>
+
+    <path d="M258 252H1022" stroke="#45e8ff" stroke-width="2" opacity="0.88"/>
+    <path d="M390 258H890" stroke="#ff9c25" stroke-width="2" opacity="0.72"/>
+
+    <text x="640" y="302"
+      fill="url(#tagline)"
+      stroke="#061427"
+      stroke-width="7"
+      paint-order="stroke fill"
+      font-family="Impact, Arial Black, sans-serif"
+      font-size="46"
+      font-style="italic"
+      letter-spacing="2.2"
+      text-anchor="middle">LEARN THE OWASP TOP 10 FOR LLMs</text>
+
+    <g filter="url(#characterShadow)">
+      <image href="assets/praxi-idle-v6.png" x="70" y="285" width="352" height="352"/>
+      <image href="assets/prompt-injection-v2.png" x="745" y="338" width="350" height="233" preserveAspectRatio="xMidYMid meet"/>
+      <image href="assets/data-model-poisoning-v1.png" x="1002" y="326" width="278" height="278"/>
+    </g>
+
+    <g transform="translate(640 551)">
+      <path d="M-238 0H238" stroke="#ffffff" stroke-opacity="0.16" stroke-width="44"/>
+      <path d="M-238 -22L-258 0L-238 22M238 -22L258 0L238 22" fill="#ffffff" fill-opacity="0.16"/>
+      <text y="10"
+        fill="#fff3a5"
+        stroke="#561206"
+        stroke-width="6"
+        paint-order="stroke fill"
+        font-family="Impact, Arial Black, sans-serif"
+        font-size="38"
+        font-style="italic"
+        letter-spacing="2"
+        text-anchor="middle">TEN VULNERABILITIES. ONE HERO.</text>
+    </g>
+
+    <rect x="18" y="18" width="1244" height="604" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="2"/>
+    <path d="M18 92V18H92M1188 18H1262V92M18 548V622H92M1188 622H1262V548"
+      fill="none" stroke="#69eaff" stroke-opacity="0.65" stroke-width="5"/>
+  </g>
+</svg>
