@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
 
 const description =
   "Catch the 2026 OWASP Top 10 for LLM Apps. Ten vulnerabilities. One hero. Defend the future.";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#030711",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();

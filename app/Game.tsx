@@ -45,6 +45,16 @@ type Enemy = {
   pulse: number;
 };
 
+type TouchPoint = {
+  side: "left" | "right";
+  startedAt: number;
+  startX: number;
+  startY: number;
+  x: number;
+  y: number;
+  isJumpTap: boolean;
+};
+
 type EnemySpawn = Omit<Enemy, "active">;
 
 type BonusCrate = {
@@ -895,6 +905,9 @@ export default function Game() {
   const levelIndexRef = useRef(0);
   const inputRef = useRef({ left: false, right: false, jump: false });
   const jumpLatchRef = useRef(false);
+  const touchPointsRef = useRef<Map<number, TouchPoint>>(new Map());
+  const lastTapRef = useRef({ time: 0, x: 0, y: 0 });
+  const jumpReleaseTimerRef = useRef<number | null>(null);
   const playerRef = useRef<Player>({
     x: 150,
     y: 516,
@@ -973,6 +986,12 @@ export default function Game() {
 
   const triggerGameOver = useCallback(() => {
     if (sceneRef.current !== "playing") return;
+    touchPointsRef.current.clear();
+    lastTapRef.current.time = 0;
+    if (jumpReleaseTimerRef.current !== null) {
+      window.clearTimeout(jumpReleaseTimerRef.current);
+      jumpReleaseTimerRef.current = null;
+    }
     inputRef.current = { left: false, right: false, jump: false };
     setCallout(false);
     if (factTimerRef.current !== null) {
@@ -988,6 +1007,12 @@ export default function Game() {
     if (factTimerRef.current !== null) {
       window.clearTimeout(factTimerRef.current);
       factTimerRef.current = null;
+    }
+    touchPointsRef.current.clear();
+    lastTapRef.current.time = 0;
+    if (jumpReleaseTimerRef.current !== null) {
+      window.clearTimeout(jumpReleaseTimerRef.current);
+      jumpReleaseTimerRef.current = null;
     }
     inputRef.current = { left: false, right: false, jump: false };
     jumpLatchRef.current = false;
@@ -1230,11 +1255,22 @@ export default function Game() {
         inputRef.current.jump = false;
       }
     };
+    const releaseInputs = () => {
+      touchPointsRef.current.clear();
+      lastTapRef.current.time = 0;
+      inputRef.current = { left: false, right: false, jump: false };
+      if (jumpReleaseTimerRef.current !== null) {
+        window.clearTimeout(jumpReleaseTimerRef.current);
+        jumpReleaseTimerRef.current = null;
+      }
+    };
     window.addEventListener("keydown", keyDown, { passive: false });
     window.addEventListener("keyup", keyUp);
+    window.addEventListener("blur", releaseInputs);
     return () => {
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
+      window.removeEventListener("blur", releaseInputs);
     };
   }, [advanceCampaign, startCampaign, startLevel]);
 
@@ -1572,15 +1608,100 @@ export default function Game() {
     };
   }, [playTone, triggerGameOver]);
 
-  const touchProps = (key: "left" | "right" | "jump") => ({
-    onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
+  const syncTouchDirection = useCallback(() => {
+    let left = false;
+    let right = false;
+    touchPointsRef.current.forEach((point) => {
+      if (point.side === "left") left = true;
+      if (point.side === "right") right = true;
+    });
+    setInput("left", left);
+    setInput("right", right);
+  }, [setInput]);
+
+  const pulseTouchJump = useCallback(() => {
+    if (jumpReleaseTimerRef.current !== null) {
+      window.clearTimeout(jumpReleaseTimerRef.current);
+    }
+    setInput("jump", true);
+    jumpReleaseTimerRef.current = window.setTimeout(() => {
+      setInput("jump", false);
+      jumpReleaseTimerRef.current = null;
+    }, 130);
+  }, [setInput]);
+
+  const sideForTouch = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ): "left" | "right" => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return event.clientX < rect.left + rect.width / 2 ? "left" : "right";
+  };
+
+  const touchPlayfieldProps = {
+    onPointerDown: (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType !== "touch") return;
+      event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
-      setInput(key, true);
+      const now = performance.now();
+      const sinceLastTap = now - lastTapRef.current.time;
+      const distanceFromLastTap = Math.hypot(
+        event.clientX - lastTapRef.current.x,
+        event.clientY - lastTapRef.current.y,
+      );
+      const isJumpTap =
+        sinceLastTap > 45 &&
+        sinceLastTap < 350 &&
+        distanceFromLastTap < 96;
+      touchPointsRef.current.set(event.pointerId, {
+        side: sideForTouch(event),
+        startedAt: now,
+        startX: event.clientX,
+        startY: event.clientY,
+        x: event.clientX,
+        y: event.clientY,
+        isJumpTap,
+      });
+      syncTouchDirection();
+      if (isJumpTap) {
+        lastTapRef.current.time = 0;
+        pulseTouchJump();
+      }
     },
-    onPointerUp: () => setInput(key, false),
-    onPointerCancel: () => setInput(key, false),
-    onPointerLeave: () => setInput(key, false),
-  });
+    onPointerMove: (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType !== "touch") return;
+      const point = touchPointsRef.current.get(event.pointerId);
+      if (!point) return;
+      event.preventDefault();
+      point.side = sideForTouch(event);
+      point.x = event.clientX;
+      point.y = event.clientY;
+      syncTouchDirection();
+    },
+    onPointerUp: (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType !== "touch") return;
+      event.preventDefault();
+      const point = touchPointsRef.current.get(event.pointerId);
+      touchPointsRef.current.delete(event.pointerId);
+      syncTouchDirection();
+      if (
+        point &&
+        !point.isJumpTap &&
+        performance.now() - point.startedAt < 260 &&
+        Math.hypot(point.x - point.startX, point.y - point.startY) < 28
+      ) {
+        lastTapRef.current = {
+          time: performance.now(),
+          x: point.x,
+          y: point.y,
+        };
+      }
+    },
+    onPointerCancel: (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType !== "touch") return;
+      touchPointsRef.current.delete(event.pointerId);
+      syncTouchDirection();
+    },
+  };
 
   const currentLevel = LEVELS[levelIndex];
   const factLesson = currentLevel.lessons[factLessonIndex];
@@ -1664,10 +1785,16 @@ export default function Game() {
                 onClick={startCampaign}
                 data-testid="start-game"
               >
-                PRESS SPACE TO START
+                <span className="desktop-start-copy">PRESS SPACE TO START</span>
+                <span className="touch-start-copy">TAP TO START</span>
               </button>
               <div className="arcade-controls">
-                <span>← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP</span>
+                <span className="desktop-control-copy">
+                  ← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP
+                </span>
+                <span className="touch-control-copy">
+                  HOLD LEFT / RIGHT TO MOVE&nbsp;&nbsp;•&nbsp;&nbsp;DOUBLE TAP TO JUMP
+                </span>
                 <span className="arcade-level-select">
                   F1–F{LEVELS.length}&nbsp;&nbsp;DIRECT LEVEL SELECT
                 </span>
@@ -1753,33 +1880,30 @@ export default function Game() {
                 : `Contain all six ${currentLevel.objectiveName} encounters • ${captured}/6`}
             </div>
 
-            <div className="touch-controls" aria-label="Touch controls">
-              <div className="touch-move">
-                <button
-                  type="button"
-                  aria-label="Move left"
-                  {...touchProps("left")}
-                >
-                  ‹
-                </button>
-                <button
-                  type="button"
-                  aria-label="Move right"
-                  {...touchProps("right")}
-                >
-                  ›
-                </button>
-              </div>
-              <button
-                type="button"
-                className="touch-jump"
-                aria-label="Jump"
-                {...touchProps("jump")}
-              >
-                ↑
-                <small>JUMP</small>
-              </button>
-            </div>
+            {scene === "playing" && (
+              <>
+                <div
+                  className="touch-playfield"
+                  role="application"
+                  aria-label="Touch controls: hold the left or right half of the playfield to move. Double-tap either half to jump."
+                  {...touchPlayfieldProps}
+                />
+                <div className="touch-controls" aria-hidden="true">
+                  <div className="touch-side-hint touch-side-hint--left">
+                    <strong>‹</strong>
+                    <small>HOLD LEFT</small>
+                  </div>
+                  <div className="touch-jump-hint">
+                    <strong>DOUBLE TAP</strong>
+                    <small>JUMP</small>
+                  </div>
+                  <div className="touch-side-hint touch-side-hint--right">
+                    <strong>›</strong>
+                    <small>HOLD RIGHT</small>
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
 

@@ -9,6 +9,10 @@
   --orange-soft: #ffd08e;
   --danger: #ff3b76;
   --white: #eefcff;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
 }
 
 * {
@@ -17,6 +21,8 @@
 
 html,
 body {
+  width: 100%;
+  height: 100%;
   min-height: 100%;
   margin: 0;
   overflow: hidden;
@@ -37,6 +43,10 @@ button {
   inset: 0;
   display: grid;
   place-items: center;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
   overflow: hidden;
   background:
     radial-gradient(circle at 75% 15%, rgba(255, 136, 21, 0.08), transparent 28%),
@@ -44,6 +54,7 @@ button {
     #02050b;
   touch-action: none;
   user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .game-shell::before {
@@ -60,8 +71,14 @@ button {
 
 .game-frame {
   position: relative;
-  width: min(100vw, calc(100vh * 16 / 9));
-  height: min(100vh, calc(100vw * 9 / 16));
+  width: min(
+    calc(100vw - var(--safe-left) - var(--safe-right)),
+    calc((100dvh - var(--safe-top) - var(--safe-bottom)) * 16 / 9)
+  );
+  height: min(
+    calc(100dvh - var(--safe-top) - var(--safe-bottom)),
+    calc((100vw - var(--safe-left) - var(--safe-right)) * 9 / 16)
+  );
   overflow: hidden;
   isolation: isolate;
   background: #06101b;
@@ -587,6 +604,11 @@ button {
   animation: start-blink 880ms 3.7s steps(2) infinite;
 }
 
+.touch-start-copy,
+.touch-control-copy {
+  display: none;
+}
+
 .arcade-start::before,
 .arcade-start::after {
   content: "▶";
@@ -912,22 +934,31 @@ kbd {
 
 .touch-controls {
   position: absolute;
-  z-index: 7;
+  z-index: 8;
   right: 3%;
   bottom: 3%;
   left: 3%;
   display: none;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   pointer-events: none;
+  animation: touch-hints-retire 5.2s 900ms ease-out both;
 }
 
-.touch-move {
-  display: flex;
-  gap: 10px;
+.touch-playfield {
+  position: absolute;
+  z-index: 5;
+  top: 18%;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
-.touch-controls button {
+.touch-side-hint {
   width: clamp(52px, 10vw, 80px);
   aspect-ratio: 1;
   display: grid;
@@ -937,22 +968,50 @@ kbd {
   color: rgba(220, 251, 255, 0.9);
   background: rgba(4, 22, 35, 0.72);
   box-shadow: inset 0 0 20px rgba(40, 196, 255, 0.07);
-  font-size: clamp(24px, 5vw, 38px);
-  pointer-events: auto;
-  touch-action: none;
+  text-align: center;
 }
 
-.touch-controls .touch-jump {
+.touch-side-hint strong {
+  margin-top: -0.08em;
+  font-size: clamp(28px, 5vw, 42px);
+  line-height: 0.68;
+}
+
+.touch-side-hint small,
+.touch-jump-hint small {
+  display: block;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: clamp(6px, 0.82vw, 9px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.touch-jump-hint {
+  display: grid;
+  place-items: center;
+  min-width: clamp(92px, 18vw, 152px);
+  padding: clamp(7px, 1vw, 11px) clamp(9px, 1.4vw, 16px);
+  border: 1px solid rgba(255, 169, 53, 0.58);
+  color: var(--orange-soft);
+  background: rgba(36, 18, 5, 0.66);
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
+  text-align: center;
+}
+
+.touch-jump-hint strong {
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(11px, 1.55vw, 18px);
+  font-style: italic;
+  letter-spacing: 0.06em;
+}
+
+.touch-jump-hint small {
+  color: #fff0a2;
+}
+
+.touch-side-hint--right {
   border-color: rgba(255, 169, 53, 0.58);
   color: var(--orange-soft);
-}
-
-.touch-jump small {
-  display: block;
-  margin-top: -17px;
-  font-size: 7px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
 }
 
 .screen--complete {
@@ -2159,6 +2218,18 @@ kbd {
   }
 }
 
+@keyframes touch-hints-retire {
+  0%,
+  68% {
+    opacity: 0.88;
+    filter: brightness(1);
+  }
+  100% {
+    opacity: 0.18;
+    filter: brightness(0.72);
+  }
+}
+
 @keyframes praxen-orbit {
   to {
     transform: rotate(360deg);
@@ -2194,26 +2265,33 @@ kbd {
 }
 
 @media (hover: none), (pointer: coarse) {
-  .touch-controls {
+  .touch-controls,
+  .touch-playfield {
     display: flex;
   }
 
   .objective {
     top: 12.5%;
   }
+
+  .desktop-start-copy,
+  .desktop-control-copy,
+  .arcade-level-select {
+    display: none;
+  }
+
+  .touch-start-copy,
+  .touch-control-copy {
+    display: inline;
+  }
 }
 
 @media (max-aspect-ratio: 4 / 5) {
-  .game-frame {
-    width: 100vw;
-    height: min(62vw, 72vh);
-  }
-
   .game-shell::after {
     content: "Rotate your device for the best mission view";
     position: absolute;
     right: 0;
-    bottom: 7%;
+    bottom: calc(7% + var(--safe-bottom));
     left: 0;
     color: rgba(198, 238, 250, 0.58);
     font-size: 11px;
@@ -2221,6 +2299,95 @@ kbd {
     letter-spacing: 0.08em;
     text-align: center;
     text-transform: uppercase;
+  }
+
+  .praxen-ad-content {
+    width: 94%;
+    gap: 2px;
+  }
+
+  .praxen-ad-kicker {
+    font-size: clamp(7px, 2vw, 10px);
+  }
+
+  .praxen-ad-content h2 {
+    font-size: clamp(18px, 6vw, 27px);
+    line-height: 0.86;
+  }
+
+  .praxen-ad-logo {
+    width: 42%;
+    max-height: 54px;
+  }
+
+  .praxen-ad-content p {
+    font-size: clamp(8px, 2.7vw, 12px);
+  }
+
+  .praxen-ad-actions {
+    width: 76%;
+    gap: 7px;
+  }
+
+  .praxen-action {
+    padding: 4px 10px 5px;
+    border-width: 1px;
+  }
+
+  .praxen-action small {
+    font-size: 6px;
+  }
+
+  .praxen-action strong {
+    font-size: clamp(14px, 5vw, 22px);
+  }
+
+  .praxen-space-hint {
+    display: none;
+  }
+}
+
+@media (hover: none) and (max-height: 500px) {
+  .opensource-link {
+    right: 1%;
+    bottom: 1%;
+    scale: 0.76;
+    transform-origin: right bottom;
+  }
+
+  .praxen-ad-content {
+    width: 90%;
+    gap: 3px;
+  }
+
+  .praxen-ad-content h2 {
+    font-size: clamp(25px, 5.2vw, 44px);
+  }
+
+  .praxen-ad-logo {
+    width: 43%;
+    max-height: 72px;
+  }
+
+  .praxen-ad-content p {
+    font-size: clamp(10px, 1.55vw, 15px);
+  }
+
+  .praxen-ad-actions {
+    width: 68%;
+    gap: 9px;
+  }
+
+  .praxen-action {
+    padding: 5px 14px 7px;
+  }
+
+  .praxen-action strong {
+    font-size: clamp(19px, 2.7vw, 30px);
+  }
+
+  .praxen-space-hint {
+    display: none;
   }
 }
 
