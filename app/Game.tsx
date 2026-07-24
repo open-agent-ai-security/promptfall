@@ -297,6 +297,33 @@ const MISINFORMATION_LESSONS = [
   },
 ] as const;
 
+const HIDDEN_CONTEXT_EXPOSURE_LESSONS = [
+  {
+    kind: "DEFINITION",
+    text: "Hidden context exposure is the unauthorized extraction, inference, or reconstruction of non-user-facing instructions or operational context available to the model.",
+  },
+  {
+    kind: "WHY IT MATTERS",
+    text: "Assume anything in model context is discoverable. A hidden prompt is not a security boundary, and leaked rules, tools, or trust logic can sharpen later attacks.",
+  },
+  {
+    kind: "EXAMPLE 1",
+    text: "An attacker extracts hidden tool names and parameter schemas, gaining concrete targets for prompt injection and downstream action chaining.",
+  },
+  {
+    kind: "EXAMPLE 2",
+    text: "Credentials embedded in a system prompt are revealed through conversational probing, then reused outside the application.",
+  },
+  {
+    kind: "DEFENSE 1",
+    text: "Never place credentials, tokens, connection strings, or security-critical configuration in hidden context. Keep secrets in systems the model cannot access.",
+  },
+  {
+    kind: "DEFENSE 2",
+    text: "Enforce authorization, privilege separation, validation, and guardrails with deterministic auditable controls outside the model and grant least privilege.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -360,6 +387,15 @@ const LEVELS = [
     background: "./assets/gameplay-background-l7-v1.png",
     enemy: "./assets/misinformation-v1.png",
     lessons: MISINFORMATION_LESSONS,
+  },
+  {
+    number: 8,
+    riskCode: "LLM08",
+    name: "HIDDEN CONTEXT EXPOSURE",
+    objectiveName: "Hidden Context Exposure",
+    background: "./assets/gameplay-background-l8-v1.png",
+    enemy: "./assets/hidden-context-exposure-v1.png",
+    lessons: HIDDEN_CONTEXT_EXPOSURE_LESSONS,
   },
 ] as const;
 
@@ -548,6 +584,30 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       enemySpawn(3, 1870, 350, 1830, 1980, -72, 2.1),
       enemySpawn(4, 2240, 430, 2200, 2350, 76, 2.8),
       enemySpawn(5, 2670, 370, 2620, 2780, -78, 3.5),
+    ],
+  },
+  {
+    platforms: [
+      { x: 0, y: 606, w: 700, h: 114, kind: "floor" },
+      { x: 760, y: 606, w: 460, h: 114, kind: "floor" },
+      { x: 1280, y: 606, w: 590, h: 114, kind: "floor" },
+      { x: 1930, y: 606, w: 530, h: 114, kind: "floor" },
+      { x: 2520, y: 606, w: 560, h: 114, kind: "floor" },
+      { x: 300, y: 455, w: 250, h: 24, kind: "ledge" },
+      { x: 660, y: 370, w: 270, h: 24, kind: "ledge" },
+      { x: 1020, y: 450, w: 270, h: 24, kind: "ledge" },
+      { x: 1420, y: 360, w: 280, h: 24, kind: "ledge" },
+      { x: 1790, y: 445, w: 270, h: 24, kind: "ledge" },
+      { x: 2190, y: 355, w: 280, h: 24, kind: "ledge" },
+      { x: 2590, y: 430, w: 280, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 730, 370, 690, 840, 72, 0),
+      enemySpawn(1, 1080, 450, 1050, 1200, -74, 0.7),
+      enemySpawn(2, 1490, 360, 1450, 1600, 78, 1.4),
+      enemySpawn(3, 1860, 445, 1820, 1970, -72, 2.1),
+      enemySpawn(4, 2260, 355, 2220, 2370, 76, 2.8),
+      enemySpawn(5, 2670, 430, 2630, 2780, -78, 3.5),
     ],
   },
 ];
