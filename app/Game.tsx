@@ -243,6 +243,33 @@ const DATA_MODEL_POISONING_LESSONS = [
   },
 ] as const;
 
+const UNBOUNDED_CONSUMPTION_LESSONS = [
+  {
+    kind: "DEFINITION",
+    text: "Unbounded consumption lets uncontrolled inference drain compute, availability, budgets, or intellectual property because resource use lacks adequate limits.",
+  },
+  {
+    kind: "WHY IT MATTERS",
+    text: "LLM cost asymmetry lets a cheap prompt trigger expensive reasoning, multimodal processing, or tool fan-out. Request-rate limits alone cannot measure that blast radius.",
+  },
+  {
+    kind: "EXAMPLE 1",
+    text: "Near-limit prompts and long agent sessions repeatedly reprocess growing context, quietly multiplying per-turn memory, token, and compute costs.",
+  },
+  {
+    kind: "EXAMPLE 2",
+    text: "A malicious tool traps an agent in a recursive call loop, turning one innocent-looking task into hundreds of paid operations—a denial of wallet.",
+  },
+  {
+    kind: "DEFENSE 1",
+    text: "Estimate cost before inference, enforce token and action quotas, and use hard spending caps that stop workloads instead of merely sending alerts.",
+  },
+  {
+    kind: "DEFENSE 2",
+    text: "Add agent circuit breakers for steps, recursion, time, and cost; detect repeated states, monitor tool behavior, and degrade gracefully under load.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -288,6 +315,15 @@ const LEVELS = [
     background: "./assets/gameplay-background-l5-v1.png",
     enemy: "./assets/data-model-poisoning-v1.png",
     lessons: DATA_MODEL_POISONING_LESSONS,
+  },
+  {
+    number: 6,
+    riskCode: "LLM06",
+    name: "UNBOUNDED CONSUMPTION",
+    objectiveName: "Unbounded Consumption",
+    background: "./assets/gameplay-background-l6-v1.png",
+    enemy: "./assets/unbounded-consumption-v1.png",
+    lessons: UNBOUNDED_CONSUMPTION_LESSONS,
   },
 ] as const;
 
@@ -428,6 +464,30 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       enemySpawn(3, 1950, 370, 1900, 2050, -72, 2.1),
       enemySpawn(4, 2320, 440, 2280, 2430, 76, 2.8),
       enemySpawn(5, 2710, 385, 2670, 2820, -78, 3.5),
+    ],
+  },
+  {
+    platforms: [
+      { x: 0, y: 606, w: 720, h: 114, kind: "floor" },
+      { x: 780, y: 606, w: 500, h: 114, kind: "floor" },
+      { x: 1340, y: 606, w: 570, h: 114, kind: "floor" },
+      { x: 1970, y: 606, w: 560, h: 114, kind: "floor" },
+      { x: 2590, y: 606, w: 490, h: 114, kind: "floor" },
+      { x: 390, y: 485, w: 250, h: 24, kind: "ledge" },
+      { x: 790, y: 420, w: 270, h: 24, kind: "ledge" },
+      { x: 1180, y: 475, w: 260, h: 24, kind: "ledge" },
+      { x: 1510, y: 395, w: 280, h: 24, kind: "ledge" },
+      { x: 1880, y: 465, w: 260, h: 24, kind: "ledge" },
+      { x: 2280, y: 380, w: 280, h: 24, kind: "ledge" },
+      { x: 2640, y: 445, w: 270, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 480, 485, 420, 560, 72, 0),
+      enemySpawn(1, 870, 420, 820, 970, -74, 0.7),
+      enemySpawn(2, 1250, 475, 1210, 1350, 78, 1.4),
+      enemySpawn(3, 1600, 395, 1540, 1700, -72, 2.1),
+      enemySpawn(4, 2370, 380, 2310, 2470, 76, 2.8),
+      enemySpawn(5, 2720, 445, 2670, 2820, -78, 3.5),
     ],
   },
 ];
