@@ -45,6 +45,28 @@ type Enemy = {
   pulse: number;
 };
 
+type EnemySpawn = Omit<Enemy, "active">;
+
+type BonusCrate = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  collected: boolean;
+  pulse: number;
+};
+
+type BonusBurst = {
+  x: number;
+  y: number;
+  time: number;
+};
+
+type LevelLayout = {
+  platforms: Platform[];
+  enemies: EnemySpawn[];
+};
+
 type Particle = {
   x: number;
   y: number;
@@ -60,6 +82,7 @@ type GameArt = {
   ready?: HTMLImageElement;
   jump?: HTMLImageElement;
   enemies?: HTMLImageElement[];
+  bonusCrate?: HTMLImageElement;
 };
 
 const VIEW_W = 1280;
@@ -70,20 +93,9 @@ const EXIT_FIELD_LEFT = EXIT_FIELD_X - 62;
 const GRAVITY = 2200;
 const MOVE_SPEED = 365;
 const JUMP_SPEED = 820;
-
-const PLATFORMS: Platform[] = [
-  { x: 0, y: 606, w: 620, h: 114, kind: "floor" },
-  { x: 680, y: 606, w: 510, h: 114, kind: "floor" },
-  { x: 1240, y: 606, w: 640, h: 114, kind: "floor" },
-  { x: 1930, y: 606, w: 520, h: 114, kind: "floor" },
-  { x: 2500, y: 606, w: 580, h: 114, kind: "floor" },
-  { x: 430, y: 474, w: 230, h: 24, kind: "ledge" },
-  { x: 890, y: 420, w: 250, h: 24, kind: "ledge" },
-  { x: 1390, y: 490, w: 230, h: 24, kind: "ledge" },
-  { x: 1690, y: 368, w: 250, h: 24, kind: "ledge" },
-  { x: 2180, y: 464, w: 220, h: 24, kind: "ledge" },
-  { x: 2580, y: 402, w: 260, h: 24, kind: "ledge" },
-];
+const STARTING_INTEGRITY = 3;
+const BONUS_INTEGRITY_CAP = 4;
+const BONUS_LEVEL_INTERVAL = 3;
 
 const PROMPT_INJECTION_LESSONS = [
   {
@@ -232,80 +244,140 @@ const LEVELS = [
   },
 ] as const;
 
-const createEnemies = (): Enemy[] => [
+const enemySpawn = (
+  lessonIndex: number,
+  x: number,
+  platformY: number,
+  minX: number,
+  maxX: number,
+  vx: number,
+  pulse: number,
+): EnemySpawn => ({
+  lessonIndex,
+  x,
+  y: platformY - 66,
+  vx,
+  w: 66,
+  h: 66,
+  minX,
+  maxX,
+  pulse,
+});
+
+const LEVEL_LAYOUTS: LevelLayout[] = [
   {
-    lessonIndex: 0,
-    x: 735,
-    y: 540,
-    vx: 72,
-    w: 66,
-    h: 66,
-    minX: 700,
-    maxX: 820,
-    active: true,
-    pulse: 0,
+    platforms: [
+      { x: 0, y: 606, w: 620, h: 114, kind: "floor" },
+      { x: 680, y: 606, w: 510, h: 114, kind: "floor" },
+      { x: 1240, y: 606, w: 640, h: 114, kind: "floor" },
+      { x: 1930, y: 606, w: 520, h: 114, kind: "floor" },
+      { x: 2500, y: 606, w: 580, h: 114, kind: "floor" },
+      { x: 430, y: 474, w: 230, h: 24, kind: "ledge" },
+      { x: 890, y: 420, w: 250, h: 24, kind: "ledge" },
+      { x: 1390, y: 490, w: 230, h: 24, kind: "ledge" },
+      { x: 1690, y: 368, w: 250, h: 24, kind: "ledge" },
+      { x: 2180, y: 464, w: 220, h: 24, kind: "ledge" },
+      { x: 2580, y: 402, w: 260, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 735, 606, 700, 820, 72, 0),
+      enemySpawn(1, 990, 420, 915, 1055, -78, 0.7),
+      enemySpawn(2, 1470, 490, 1410, 1540, 82, 1.4),
+      enemySpawn(3, 1770, 368, 1715, 1850, -74, 2.1),
+      enemySpawn(4, 2240, 464, 2195, 2310, 78, 2.8),
+      enemySpawn(5, 2670, 402, 2600, 2750, -80, 3.5),
+    ],
   },
   {
-    lessonIndex: 1,
-    x: 990,
-    y: 354,
-    vx: -78,
-    w: 66,
-    h: 66,
-    minX: 915,
-    maxX: 1055,
-    active: true,
-    pulse: 0.7,
+    platforms: [
+      { x: 0, y: 606, w: 680, h: 114, kind: "floor" },
+      { x: 740, y: 606, w: 450, h: 114, kind: "floor" },
+      { x: 1260, y: 606, w: 540, h: 114, kind: "floor" },
+      { x: 1880, y: 606, w: 650, h: 114, kind: "floor" },
+      { x: 2600, y: 606, w: 480, h: 114, kind: "floor" },
+      { x: 360, y: 500, w: 250, h: 24, kind: "ledge" },
+      { x: 780, y: 430, w: 260, h: 24, kind: "ledge" },
+      { x: 1180, y: 480, w: 250, h: 24, kind: "ledge" },
+      { x: 1540, y: 390, w: 270, h: 24, kind: "ledge" },
+      { x: 1990, y: 445, w: 250, h: 24, kind: "ledge" },
+      { x: 2400, y: 370, w: 260, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 790, 606, 765, 900, 72, 0),
+      enemySpawn(1, 860, 430, 805, 950, -76, 0.7),
+      enemySpawn(2, 1260, 480, 1205, 1350, 80, 1.4),
+      enemySpawn(3, 1640, 390, 1570, 1720, -72, 2.1),
+      enemySpawn(4, 2070, 445, 2015, 2160, 76, 2.8),
+      enemySpawn(5, 2470, 370, 2425, 2560, -78, 3.5),
+    ],
   },
   {
-    lessonIndex: 2,
-    x: 1470,
-    y: 424,
-    vx: 82,
-    w: 66,
-    h: 66,
-    minX: 1410,
-    maxX: 1540,
-    active: true,
-    pulse: 1.4,
+    platforms: [
+      { x: 0, y: 606, w: 600, h: 114, kind: "floor" },
+      { x: 680, y: 606, w: 560, h: 114, kind: "floor" },
+      { x: 1310, y: 606, w: 530, h: 114, kind: "floor" },
+      { x: 1920, y: 606, w: 500, h: 114, kind: "floor" },
+      { x: 2490, y: 606, w: 590, h: 114, kind: "floor" },
+      { x: 370, y: 490, w: 220, h: 24, kind: "ledge" },
+      { x: 730, y: 430, w: 250, h: 24, kind: "ledge" },
+      { x: 1070, y: 370, w: 250, h: 24, kind: "ledge" },
+      { x: 1430, y: 430, w: 260, h: 24, kind: "ledge" },
+      { x: 1750, y: 350, w: 260, h: 24, kind: "ledge" },
+      { x: 2180, y: 440, w: 250, h: 24, kind: "ledge" },
+      { x: 2570, y: 390, w: 270, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 780, 430, 750, 890, 72, 0),
+      enemySpawn(1, 1120, 370, 1090, 1230, -74, 0.7),
+      enemySpawn(2, 1490, 430, 1450, 1590, 78, 1.4),
+      enemySpawn(3, 1810, 350, 1770, 1920, -72, 2.1),
+      enemySpawn(4, 2230, 440, 2200, 2340, 76, 2.8),
+      enemySpawn(5, 2640, 390, 2600, 2750, -78, 3.5),
+    ],
   },
   {
-    lessonIndex: 3,
-    x: 1770,
-    y: 302,
-    vx: -74,
-    w: 66,
-    h: 66,
-    minX: 1715,
-    maxX: 1850,
-    active: true,
-    pulse: 2.1,
-  },
-  {
-    lessonIndex: 4,
-    x: 2240,
-    y: 398,
-    vx: 78,
-    w: 66,
-    h: 66,
-    minX: 2195,
-    maxX: 2310,
-    active: true,
-    pulse: 2.8,
-  },
-  {
-    lessonIndex: 5,
-    x: 2670,
-    y: 336,
-    vx: -80,
-    w: 66,
-    h: 66,
-    minX: 2600,
-    maxX: 2750,
-    active: true,
-    pulse: 3.5,
+    platforms: [
+      { x: 0, y: 606, w: 650, h: 114, kind: "floor" },
+      { x: 710, y: 606, w: 500, h: 114, kind: "floor" },
+      { x: 1270, y: 606, w: 570, h: 114, kind: "floor" },
+      { x: 1900, y: 606, w: 540, h: 114, kind: "floor" },
+      { x: 2500, y: 606, w: 580, h: 114, kind: "floor" },
+      { x: 380, y: 475, w: 250, h: 24, kind: "ledge" },
+      { x: 780, y: 500, w: 240, h: 24, kind: "ledge" },
+      { x: 1180, y: 430, w: 260, h: 24, kind: "ledge" },
+      { x: 1580, y: 380, w: 260, h: 24, kind: "ledge" },
+      { x: 1990, y: 435, w: 270, h: 24, kind: "ledge" },
+      { x: 2350, y: 365, w: 260, h: 24, kind: "ledge" },
+      { x: 2640, y: 450, w: 260, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 820, 500, 800, 920, 72, 0),
+      enemySpawn(1, 1230, 430, 1200, 1340, -74, 0.7),
+      enemySpawn(2, 1640, 380, 1600, 1750, 78, 1.4),
+      enemySpawn(3, 2050, 435, 2010, 2160, -72, 2.1),
+      enemySpawn(4, 2410, 365, 2370, 2520, 76, 2.8),
+      enemySpawn(5, 2690, 450, 2660, 2800, -78, 3.5),
+    ],
   },
 ];
+
+const createEnemies = (levelIndex = 0): Enemy[] =>
+  LEVEL_LAYOUTS[levelIndex].enemies.map((enemy) => ({
+    ...enemy,
+    active: true,
+  }));
+
+const createBonusCrate = (levelIndex = 0): BonusCrate | null =>
+  LEVELS[levelIndex].number % BONUS_LEVEL_INTERVAL === 0
+    ? {
+        x: 2010,
+        y: 520,
+        w: 58,
+        h: 58,
+        collected: false,
+        pulse: 0,
+      }
+    : null;
 
 const stars = Array.from({ length: 70 }, (_, i) => ({
   x: (i * 173 + 41) % VIEW_W,
@@ -536,6 +608,65 @@ function drawPromptInjection(
     ctx.fill();
   }
   ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+function drawBonusCrate(
+  ctx: CanvasRenderingContext2D,
+  crate: BonusCrate,
+  cameraX: number,
+  sprite?: HTMLImageElement,
+) {
+  if (crate.collected) return;
+  const x = crate.x - cameraX + crate.w / 2;
+  if (x < -100 || x > VIEW_W + 100) return;
+  const bob = Math.sin(crate.pulse * 3.4) * 7;
+  const pulse = 1 + Math.sin(crate.pulse * 5.2) * 0.045;
+
+  ctx.save();
+  ctx.translate(x, crate.y + crate.h / 2 + bob);
+  ctx.scale(pulse, pulse);
+  ctx.shadowColor = "#55efff";
+  ctx.shadowBlur = 26;
+  if (sprite?.complete && sprite.naturalWidth > 0) {
+    ctx.drawImage(sprite, -48, -48, 96, 96);
+  } else {
+    ctx.fillStyle = "#0b2941";
+    roundedRect(ctx, -29, -29, 58, 58, 8);
+    ctx.fill();
+    ctx.fillStyle = "#6ff3ff";
+    ctx.font = "900 34px Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("+", 0, 1);
+  }
+  ctx.restore();
+}
+
+function drawBonusBurst(
+  ctx: CanvasRenderingContext2D,
+  burst: BonusBurst,
+  cameraX: number,
+) {
+  const progress = 1 - burst.time / 1.5;
+  const alpha = Math.min(1, burst.time * 2.4);
+  const x = burst.x - cameraX;
+  const y = burst.y - progress * 62;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(x, y);
+  ctx.scale(0.82 + Math.min(0.18, progress * 0.5), 0.82 + Math.min(0.18, progress * 0.5));
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = "italic 900 26px Impact, 'Arial Black', sans-serif";
+  ctx.lineWidth = 7;
+  ctx.strokeStyle = "rgba(2, 8, 17, .9)";
+  ctx.strokeText("+1 INTEGRITY!", 0, 0);
+  ctx.fillStyle = "#efffff";
+  ctx.shadowColor = "#4deaff";
+  ctx.shadowBlur = 18;
+  ctx.fillText("+1 INTEGRITY!", 0, 0);
   ctx.restore();
 }
 
@@ -776,7 +907,10 @@ export default function Game() {
     invulnerable: 0,
     runClock: 0,
   });
-  const enemiesRef = useRef<Enemy[]>(createEnemies());
+  const enemiesRef = useRef<Enemy[]>(createEnemies(0));
+  const bonusCrateRef = useRef<BonusCrate | null>(createBonusCrate(0));
+  const bonusBurstRef = useRef<BonusBurst | null>(null);
+  const safePositionRef = useRef({ x: 150, y: 516 });
   const capturedEnemyRef = useRef<Enemy | null>(null);
   const particlesRef = useRef<Particle[]>([]);
   const cameraRef = useRef(0);
@@ -785,8 +919,8 @@ export default function Game() {
   const factTimerRef = useRef<number | null>(null);
   const [scene, setScene] = useState<Scene>("splash");
   const [levelIndex, setLevelIndex] = useState(0);
-  const [health, setHealth] = useState(3);
-  const healthRef = useRef(3);
+  const [health, setHealth] = useState(STARTING_INTEGRITY);
+  const healthRef = useRef(STARTING_INTEGRITY);
   const [captured, setCaptured] = useState(0);
   const [callout, setCallout] = useState(false);
   const [factLessonIndex, setFactLessonIndex] = useState(0);
@@ -850,7 +984,7 @@ export default function Game() {
     playTone(92, 0.42, "sawtooth");
   }, [playTone]);
 
-  const resetGame = useCallback(() => {
+  const resetGame = useCallback((nextLevelIndex = 0) => {
     if (factTimerRef.current !== null) {
       window.clearTimeout(factTimerRef.current);
       factTimerRef.current = null;
@@ -869,21 +1003,24 @@ export default function Game() {
       invulnerable: 0,
       runClock: 0,
     };
-    enemiesRef.current = createEnemies();
+    enemiesRef.current = createEnemies(nextLevelIndex);
+    bonusCrateRef.current = createBonusCrate(nextLevelIndex);
+    bonusBurstRef.current = null;
+    safePositionRef.current = { x: 150, y: 516 };
     capturedEnemyRef.current = null;
     particlesRef.current = [];
     cameraRef.current = 0;
     captureTimeRef.current = 0;
     fieldUnlockStartedRef.current = null;
-    healthRef.current = 3;
-    setHealth(3);
+    healthRef.current = STARTING_INTEGRITY;
+    setHealth(STARTING_INTEGRITY);
     setCaptured(0);
     setCallout(false);
     setFactLessonIndex(0);
   }, []);
 
   const startLevel = useCallback((nextLevelIndex: number) => {
-    resetGame();
+    resetGame(nextLevelIndex);
     levelIndexRef.current = nextLevelIndex;
     setLevelIndex(nextLevelIndex);
     sceneRef.current = "levelIntro";
@@ -901,7 +1038,7 @@ export default function Game() {
       startLevel(nextLevelIndex);
       return;
     }
-    resetGame();
+    resetGame(0);
     levelIndexRef.current = 0;
     setLevelIndex(0);
     sceneRef.current = "title";
@@ -934,6 +1071,7 @@ export default function Game() {
       ready: load("./assets/praxi-idle-v6.png"),
       jump: load("./assets/praxi-jump-v6.png"),
       enemies: LEVELS.map((level) => load(level.enemy)),
+      bonusCrate: load("./assets/integrity-crate-v1.png"),
     };
   }, []);
 
@@ -1116,6 +1254,8 @@ export default function Game() {
       const player = playerRef.current;
       const enemies = enemiesRef.current;
       const activeLevel = LEVELS[levelIndexRef.current];
+      const activeLayout = LEVEL_LAYOUTS[levelIndexRef.current];
+      const bonusCrate = bonusCrateRef.current;
       if (sceneRef.current === "playing") {
         const input = inputRef.current;
         const axis = (input.right ? 1 : 0) - (input.left ? 1 : 0);
@@ -1139,7 +1279,7 @@ export default function Game() {
         player.x = Math.max(0, Math.min(WORLD_W - player.w, player.x));
         player.grounded = false;
 
-        for (const platform of PLATFORMS) {
+        for (const platform of activeLayout.platforms) {
           const wasAbove = previousY + player.h <= platform.y + 8;
           const crossesTop =
             player.y + player.h >= platform.y &&
@@ -1154,10 +1294,15 @@ export default function Game() {
           }
         }
 
+        if (player.grounded) {
+          safePositionRef.current = { x: player.x, y: player.y };
+        }
+
         if (player.y > VIEW_H + 180) {
-          player.x = Math.max(80, cameraRef.current + 100);
-          player.y = 440;
+          player.x = safePositionRef.current.x;
+          player.y = safePositionRef.current.y - 24;
           player.vy = -320;
+          player.invulnerable = 1.25;
           healthRef.current = Math.max(0, healthRef.current - 1);
           setHealth(healthRef.current);
           playTone(110, 0.25, "sawtooth");
@@ -1168,6 +1313,41 @@ export default function Game() {
 
         player.invulnerable = Math.max(0, player.invulnerable - dt);
         player.runClock += dt;
+
+        if (bonusCrate && !bonusCrate.collected) {
+          bonusCrate.pulse += dt;
+          const overlapsBonus =
+            player.x < bonusCrate.x + bonusCrate.w &&
+            player.x + player.w > bonusCrate.x &&
+            player.y < bonusCrate.y + bonusCrate.h &&
+            player.y + player.h > bonusCrate.y;
+          if (overlapsBonus) {
+            bonusCrate.collected = true;
+            healthRef.current = Math.min(
+              BONUS_INTEGRITY_CAP,
+              healthRef.current + 1,
+            );
+            setHealth(healthRef.current);
+            bonusBurstRef.current = {
+              x: bonusCrate.x + bonusCrate.w / 2,
+              y: bonusCrate.y - 12,
+              time: 1.5,
+            };
+            playTone(880, 0.13, "triangle");
+            window.setTimeout(() => playTone(1180, 0.2, "sine"), 90);
+            for (let i = 0; i < 22; i++) {
+              const a = (Math.PI * 2 * i) / 22;
+              particlesRef.current.push({
+                x: bonusCrate.x + bonusCrate.w / 2,
+                y: bonusCrate.y + bonusCrate.h / 2,
+                vx: Math.cos(a) * (70 + (i % 5) * 20),
+                vy: Math.sin(a) * (70 + (i % 4) * 22),
+                life: 0.7 + (i % 3) * 0.13,
+                color: i % 2 ? "#72f5ff" : "#ffac32",
+              });
+            }
+          }
+        }
 
         for (const enemy of enemies) {
           if (sceneRef.current !== "playing") break;
@@ -1262,6 +1442,12 @@ export default function Game() {
         }
 
         captureTimeRef.current = Math.max(0, captureTimeRef.current - dt);
+        if (bonusBurstRef.current) {
+          bonusBurstRef.current.time -= dt;
+          if (bonusBurstRef.current.time <= 0) {
+            bonusBurstRef.current = null;
+          }
+        }
         particlesRef.current = particlesRef.current
           .map((particle) => ({
             ...particle,
@@ -1309,8 +1495,16 @@ export default function Game() {
         cameraRef.current,
         artRef.current.backgrounds?.[levelIndexRef.current],
       );
-      for (const platform of PLATFORMS) {
+      for (const platform of activeLayout.platforms) {
         drawPlatform(ctx, platform, cameraRef.current);
+      }
+      if (bonusCrate) {
+        drawBonusCrate(
+          ctx,
+          bonusCrate,
+          cameraRef.current,
+          artRef.current.bonusCrate,
+        );
       }
       const remainingThreats = enemies.filter((enemy) => enemy.active).length;
       const fieldUnlockProgress =
@@ -1353,6 +1547,9 @@ export default function Game() {
         artRef.current.ready,
         artRef.current.jump,
       );
+      if (bonusBurstRef.current) {
+        drawBonusBurst(ctx, bonusBurstRef.current, cameraRef.current);
+      }
 
       for (const particle of particlesRef.current) {
         ctx.globalAlpha = Math.max(0, particle.life);
@@ -1509,7 +1706,7 @@ export default function Game() {
                   <small>INTEGRITY</small>
                   <span>{"◆".repeat(Math.max(0, health))}</span>
                   <span className="health-empty">
-                    {"◆".repeat(Math.max(0, 3 - health))}
+                    {"◆".repeat(Math.max(0, STARTING_INTEGRITY - health))}
                   </span>
                 </div>
                 <div className="risk-count">

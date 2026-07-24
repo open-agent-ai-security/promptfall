@@ -14,6 +14,8 @@ The current playable includes:
 - Level 3: LLM03 Excessive Agency
 - Level 4: LLM04 Supply Chain
 - Six educational encounters per level
+- Distinct, approachable platform routes for every level
+- Bonus `+1 integrity` crate on every third level
 - Keyboard and touch controls
 - Responsive 16:9 game presentation
 - Static hosting support for GitHub Pages or any ordinary web server
