@@ -451,7 +451,7 @@ const LEVELS = [
     name: "PROMPT INJECTION",
     objectiveName: "Prompt Injection",
     background: "./assets/gameplay-background-v2.png",
-    enemy: "./assets/prompt-injection-v2.png",
+    enemy: "./assets/enemies-game-v1/prompt-injection-v2.png",
     lessons: PROMPT_INJECTION_LESSONS,
   },
   {
@@ -460,7 +460,7 @@ const LEVELS = [
     name: "SENSITIVE INFORMATION DISCLOSURE",
     objectiveName: "Sensitive Information Disclosure",
     background: "./assets/gameplay-background-l2-v1.png",
-    enemy: "./assets/sensitive-disclosure-v1.png",
+    enemy: "./assets/enemies-game-v1/sensitive-disclosure-v1.png",
     lessons: SENSITIVE_INFORMATION_DISCLOSURE_LESSONS,
   },
   {
@@ -469,7 +469,7 @@ const LEVELS = [
     name: "EXCESSIVE AGENCY",
     objectiveName: "Excessive Agency",
     background: "./assets/gameplay-background-l3-v1.png",
-    enemy: "./assets/excessive-agency-v1.png",
+    enemy: "./assets/enemies-game-v1/excessive-agency-v1.png",
     lessons: EXCESSIVE_AGENCY_LESSONS,
   },
   {
@@ -478,7 +478,7 @@ const LEVELS = [
     name: "SUPPLY CHAIN",
     objectiveName: "Supply Chain",
     background: "./assets/gameplay-background-l4-v1.png",
-    enemy: "./assets/supply-chain-v1.png",
+    enemy: "./assets/enemies-game-v1/supply-chain-v1.png",
     lessons: SUPPLY_CHAIN_LESSONS,
   },
   {
@@ -487,7 +487,7 @@ const LEVELS = [
     name: "DATA AND MODEL POISONING",
     objectiveName: "Data and Model Poisoning",
     background: "./assets/gameplay-background-l5-v1.png",
-    enemy: "./assets/data-model-poisoning-v1.png",
+    enemy: "./assets/enemies-game-v1/data-model-poisoning-v1.png",
     lessons: DATA_MODEL_POISONING_LESSONS,
   },
   {
@@ -496,7 +496,7 @@ const LEVELS = [
     name: "UNBOUNDED CONSUMPTION",
     objectiveName: "Unbounded Consumption",
     background: "./assets/gameplay-background-l6-v2.png",
-    enemy: "./assets/unbounded-consumption-v1.png",
+    enemy: "./assets/enemies-game-v1/unbounded-consumption-v1.png",
     lessons: UNBOUNDED_CONSUMPTION_LESSONS,
   },
   {
@@ -505,7 +505,7 @@ const LEVELS = [
     name: "MISINFORMATION",
     objectiveName: "Misinformation",
     background: "./assets/gameplay-background-l7-v2.png",
-    enemy: "./assets/misinformation-v1.png",
+    enemy: "./assets/enemies-game-v1/misinformation-v1.png",
     lessons: MISINFORMATION_LESSONS,
   },
   {
@@ -514,7 +514,7 @@ const LEVELS = [
     name: "HIDDEN CONTEXT EXPOSURE",
     objectiveName: "Hidden Context Exposure",
     background: "./assets/gameplay-background-l8-v1.png",
-    enemy: "./assets/hidden-context-exposure-v1.png",
+    enemy: "./assets/enemies-game-v1/hidden-context-exposure-v1.png",
     lessons: HIDDEN_CONTEXT_EXPOSURE_LESSONS,
   },
   {
@@ -523,7 +523,7 @@ const LEVELS = [
     name: "VECTOR AND EMBEDDING WEAKNESSES",
     objectiveName: "Vector and Embedding Weaknesses",
     background: "./assets/gameplay-background-l9-v1.png",
-    enemy: "./assets/vector-embedding-weaknesses-v1.png",
+    enemy: "./assets/enemies-game-v1/vector-embedding-weaknesses-v1.png",
     lessons: VECTOR_EMBEDDING_WEAKNESSES_LESSONS,
   },
   {
@@ -532,7 +532,7 @@ const LEVELS = [
     name: "IMPROPER OUTPUT HANDLING",
     objectiveName: "Improper Output Handling",
     background: "./assets/gameplay-background-l10-v2.png",
-    enemy: "./assets/improper-output-handling-v1.png",
+    enemy: "./assets/enemies-game-v1/improper-output-handling-v1.png",
     lessons: IMPROPER_OUTPUT_HANDLING_LESSONS,
   },
   {
@@ -541,7 +541,7 @@ const LEVELS = [
     name: "THE GAUNTLET",
     objectiveName: "Gauntlet",
     background: "./assets/gameplay-background-l11-gauntlet-v1.png",
-    enemy: "./assets/prompt-injection-v2.png",
+    enemy: "./assets/enemies-game-v1/prompt-injection-v2.png",
     lessons: GAUNTLET_LESSONS,
   },
 ] as const;

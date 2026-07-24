@@ -50,6 +50,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /praxi-idle-v6\.png/i);
   assert.match(gameSource, /praxi-jump-v6\.png/i);
   assert.match(gameSource, /prompt-injection-v2\.png/i);
+  assert.match(gameSource, /enemies-game-v1/i);
   assert.match(gameSource, /gameplay-background-l2-v1\.png/i);
   assert.match(gameSource, /sensitive-disclosure-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l3-v1\.png/i);
