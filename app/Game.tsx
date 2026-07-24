@@ -216,6 +216,33 @@ const SUPPLY_CHAIN_LESSONS = [
   },
 ] as const;
 
+const DATA_MODEL_POISONING_LESSONS = [
+  {
+    kind: "DEFINITION",
+    text: "Data and model poisoning corrupts persistent data or model artifacts so an AI system learns harmful behavior, bias, backdoors, or exploitable weaknesses.",
+  },
+  {
+    kind: "WHY IT MATTERS",
+    text: "Poisoning attacks the learning process—not one runtime bug. Recovery may require revalidating data, replacing models, redesigning pipelines, or retraining.",
+  },
+  {
+    kind: "EXAMPLE 1",
+    text: "Mislabeled fraud transactions teach a financial model that real fraud is legitimate, quietly enabling bypass while normal evaluations still pass.",
+  },
+  {
+    kind: "EXAMPLE 2",
+    text: "A poisoned model, adapter, or chat template behaves normally until a hidden trigger activates its backdoor in downstream systems.",
+  },
+  {
+    kind: "DEFENSE 1",
+    text: "Track signed dataset and model lineage, pin every artifact by hash, validate incoming data, and keep version history for rollback and forensics.",
+  },
+  {
+    kind: "DEFENSE 2",
+    text: "Gate automated retraining, monitor behavior for drift, and red-team every model and alignment cycle with dedicated backdoor-trigger probes.",
+  },
+] as const;
+
 const LEVELS = [
   {
     number: 1,
@@ -252,6 +279,15 @@ const LEVELS = [
     background: "./assets/gameplay-background-l4-v1.png",
     enemy: "./assets/supply-chain-v1.png",
     lessons: SUPPLY_CHAIN_LESSONS,
+  },
+  {
+    number: 5,
+    riskCode: "LLM05",
+    name: "DATA AND MODEL POISONING",
+    objectiveName: "Data and Model Poisoning",
+    background: "./assets/gameplay-background-l5-v1.png",
+    enemy: "./assets/data-model-poisoning-v1.png",
+    lessons: DATA_MODEL_POISONING_LESSONS,
   },
 ] as const;
 
@@ -368,6 +404,30 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       enemySpawn(3, 2050, 435, 2010, 2160, -72, 2.1),
       enemySpawn(4, 2410, 365, 2370, 2520, 76, 2.8),
       enemySpawn(5, 2690, 450, 2660, 2800, -78, 3.5),
+    ],
+  },
+  {
+    platforms: [
+      { x: 0, y: 606, w: 700, h: 114, kind: "floor" },
+      { x: 760, y: 606, w: 540, h: 114, kind: "floor" },
+      { x: 1360, y: 606, w: 540, h: 114, kind: "floor" },
+      { x: 1960, y: 606, w: 560, h: 114, kind: "floor" },
+      { x: 2580, y: 606, w: 500, h: 114, kind: "floor" },
+      { x: 320, y: 440, w: 250, h: 24, kind: "ledge" },
+      { x: 760, y: 485, w: 260, h: 24, kind: "ledge" },
+      { x: 1080, y: 390, w: 260, h: 24, kind: "ledge" },
+      { x: 1490, y: 460, w: 270, h: 24, kind: "ledge" },
+      { x: 1870, y: 370, w: 270, h: 24, kind: "ledge" },
+      { x: 2250, y: 440, w: 270, h: 24, kind: "ledge" },
+      { x: 2640, y: 385, w: 270, h: 24, kind: "ledge" },
+    ],
+    enemies: [
+      enemySpawn(0, 820, 485, 785, 925, 72, 0),
+      enemySpawn(1, 1150, 390, 1110, 1250, -74, 0.7),
+      enemySpawn(2, 1570, 460, 1520, 1670, 78, 1.4),
+      enemySpawn(3, 1950, 370, 1900, 2050, -72, 2.1),
+      enemySpawn(4, 2320, 440, 2280, 2430, 76, 2.8),
+      enemySpawn(5, 2710, 385, 2670, 2820, -78, 3.5),
     ],
   },
 ];
