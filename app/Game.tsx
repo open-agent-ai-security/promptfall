@@ -984,6 +984,15 @@ export default function Game() {
 
   useEffect(() => {
     const keyDown = (event: KeyboardEvent) => {
+      const directLevel = /^F([1-9]|10)$/.exec(event.code);
+      if (directLevel) {
+        const targetLevel = Number(directLevel[1]) - 1;
+        if (targetLevel < LEVELS.length) {
+          event.preventDefault();
+          if (!event.repeat) startLevel(targetLevel);
+          return;
+        }
+      }
       if (
         ["ArrowLeft", "ArrowRight", "ArrowUp", " ", "KeyA", "KeyD", "KeyW"].includes(
           event.code,
@@ -1424,7 +1433,10 @@ export default function Game() {
               >
                 PRESS SPACE TO START
               </button>
-              <div className="arcade-controls">← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP</div>
+              <div className="arcade-controls">
+                <span>← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP</span>
+                <span className="arcade-level-select">F1–F3&nbsp;&nbsp;DIRECT LEVEL SELECT</span>
+              </div>
             </div>
             <a
               className="opensource-link"

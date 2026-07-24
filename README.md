@@ -22,6 +22,7 @@ The current playable includes:
 - Move: `A` / `D` or Left / Right Arrow
 - Jump: `W`, Up Arrow, or Space
 - Sound toggle: `M`
+- Direct level select: `F1`, `F2`, or `F3`
 - Mobile: on-screen movement and jump controls
 
 ## Run locally

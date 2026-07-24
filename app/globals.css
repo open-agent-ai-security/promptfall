@@ -605,12 +605,20 @@ button {
 }
 
 .arcade-controls {
+  display: flex;
+  justify-content: center;
+  gap: clamp(12px, 1.4vw, 24px);
+  flex-wrap: wrap;
   color: rgba(214, 246, 255, 0.78);
   font-family: var(--font-geist-mono), monospace;
   font-size: clamp(9px, 0.78vw, 13px);
   font-weight: 900;
   letter-spacing: 0.08em;
   text-shadow: 0 2px 8px #000;
+}
+
+.arcade-level-select {
+  color: rgba(255, 177, 52, 0.88);
 }
 
 .eyebrow {

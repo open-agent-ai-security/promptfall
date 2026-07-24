@@ -76,6 +76,8 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /open-agent-ai-security\.github\.io\/praxen/i);
   assert.match(gameSource, /praxen-lockup-dark-background\.png/i);
   assert.match(gameSource, /PRESS SPACE TO START/i);
+  assert.match(gameSource, /DIRECT LEVEL SELECT/i);
+  assert.match(gameSource, /\^F\(\[1-9\]\|10\)\$/i);
   assert.match(gameSource, /aria-label="Touch controls"/i);
   assert.match(gameSource, /Move Praxi right and jump on each threat/i);
 });
