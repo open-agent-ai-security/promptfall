@@ -58,15 +58,15 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /supply-chain-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l5-v1\.png/i);
   assert.match(gameSource, /data-model-poisoning-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l6-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l6-v2\.png/i);
   assert.match(gameSource, /unbounded-consumption-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l7-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l7-v2\.png/i);
   assert.match(gameSource, /misinformation-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l8-v1\.png/i);
   assert.match(gameSource, /hidden-context-exposure-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l9-v1\.png/i);
   assert.match(gameSource, /vector-embedding-weaknesses-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l10-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l10-v2\.png/i);
   assert.match(gameSource, /improper-output-handling-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l11-gauntlet-v1\.png/i);
   assert.match(gameSource, /THE GAUNTLET/i);
