@@ -99,7 +99,16 @@ type DamageBurst = {
   duration: number;
 };
 
-type MusicTrackKey = "title" | "levelOne" | "levelTwo" | "gameOver";
+type MusicTrackKey =
+  | "title"
+  | "levelOne"
+  | "levelTwo"
+  | "levelThree"
+  | "levelFour"
+  | "levelFive"
+  | "levelSix"
+  | "levelSeven"
+  | "gameOver";
 
 type GameArt = {
   backgrounds?: HTMLImageElement[];
@@ -125,13 +134,29 @@ const MUSIC_SOURCES: Record<MusicTrackKey, string> = {
   title: "./assets/music/promptfall-title.mp3",
   levelOne: "./assets/music/llm01-borrowed-hands.mp3",
   levelTwo: "./assets/music/llm02-everything-you-told-me.mp3",
+  levelThree: "./assets/music/llm03-too-much-rope.mp3",
+  levelFour: "./assets/music/llm04-looks-like-the-real-thing.mp3",
+  levelFive: "./assets/music/llm05-raised-on-a-lie.mp3",
+  levelSix: "./assets/music/llm06-again-and-again.mp3",
+  levelSeven: "./assets/music/llm07-beautifully-wrong.mp3",
   gameOver: "./assets/music/game-over.mp3",
 };
-const AVAILABLE_LEVEL_MUSIC: MusicTrackKey[] = ["levelOne", "levelTwo"];
+const AVAILABLE_LEVEL_MUSIC: MusicTrackKey[] = [
+  "levelOne",
+  "levelTwo",
+  "levelThree",
+  "levelFour",
+  "levelFive",
+  "levelSix",
+  "levelSeven",
+];
 
 function musicForLevel(levelIndex: number): MusicTrackKey {
-  // Rotate the available themes until each later level receives its own track.
-  return AVAILABLE_LEVEL_MUSIC[levelIndex % AVAILABLE_LEVEL_MUSIC.length];
+  // Use each risk's dedicated theme, then rotate only for levels still awaiting one.
+  return (
+    AVAILABLE_LEVEL_MUSIC[levelIndex] ??
+    AVAILABLE_LEVEL_MUSIC[levelIndex % AVAILABLE_LEVEL_MUSIC.length]
+  );
 }
 
 const PROMPT_INJECTION_LESSONS = [
