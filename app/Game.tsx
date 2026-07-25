@@ -2302,8 +2302,17 @@ export default function Game() {
       });
       return;
     }
-    if (scene === "complete" || scene === "winner") {
+    if (scene === "complete") {
       transitionMusic(null, { fadeOut: 900 });
+      return;
+    }
+    if (scene === "winner") {
+      // Preserve the Gauntlet reprise at its current position throughout the
+      // victory celebration; the Praxen screen inherits the same active track.
+      transitionMusic(musicForLevel(levelIndex), {
+        fadeOut: 0,
+        fadeIn: 0,
+      });
       return;
     }
     if (scene === "gameOver") {
@@ -2313,7 +2322,8 @@ export default function Game() {
         restart: true,
       });
     }
-    // The Praxen screen keeps the Game Over song if that was the route here.
+    // The Praxen screen keeps whichever route brought us here: the Game Over
+    // theme after a loss, or the Gauntlet reprise after a campaign victory.
   }, [levelIndex, scene, transitionMusic]);
 
   useEffect(
