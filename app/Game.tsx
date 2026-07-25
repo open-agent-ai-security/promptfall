@@ -1835,6 +1835,7 @@ export default function Game() {
             key === "title" || key === "levelOne" ? "auto" : "metadata";
           track.volume = 0;
           track.src = source;
+          if (key === "title") track.load();
           return [key, track];
         },
       ),
