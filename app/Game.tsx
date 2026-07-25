@@ -99,6 +99,20 @@ type DamageBurst = {
   duration: number;
 };
 
+type TailDust = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  size: number;
+  rotation: number;
+  spin: number;
+  kind: "pixel" | "diamond" | "cross";
+  front: boolean;
+};
+
 type MusicTrackKey =
   | "title"
   | "levelOne"
@@ -1171,6 +1185,42 @@ function drawDamageBurst(
   ctx.restore();
 }
 
+function drawTailDust(
+  ctx: CanvasRenderingContext2D,
+  dust: TailDust[],
+  cameraX: number,
+  front: boolean,
+) {
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (const mote of dust) {
+    if (mote.front !== front) continue;
+    const life = Math.max(0, mote.life / mote.maxLife);
+    const alpha = Math.min(1, life * 1.8);
+    const x = mote.x - cameraX;
+
+    ctx.save();
+    ctx.translate(x, mote.y);
+    ctx.rotate(mote.rotation);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = mote.kind === "pixel" ? "#dffaff" : "#ffffff";
+    ctx.shadowColor = mote.kind === "diamond" ? "#ffffff" : "#8feeff";
+    ctx.shadowBlur = 5 + mote.size * 1.8;
+
+    if (mote.kind === "cross") {
+      ctx.fillRect(-mote.size * 1.55, -mote.size * 0.28, mote.size * 3.1, mote.size * 0.56);
+      ctx.fillRect(-mote.size * 0.28, -mote.size * 1.55, mote.size * 0.56, mote.size * 3.1);
+    } else if (mote.kind === "diamond") {
+      ctx.rotate(Math.PI / 4);
+      ctx.fillRect(-mote.size / 2, -mote.size / 2, mote.size, mote.size);
+    } else {
+      ctx.fillRect(-mote.size / 2, -mote.size / 2, mote.size, mote.size);
+    }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
 function drawPromptInjection(
   ctx: CanvasRenderingContext2D,
   enemy: Enemy,
@@ -1519,6 +1569,9 @@ export default function Game() {
   const capturedEnemyRef = useRef<Enemy | null>(null);
   const particlesRef = useRef<Particle[]>([]);
   const damageBurstRef = useRef<DamageBurst | null>(null);
+  const tailDustRef = useRef<TailDust[]>([]);
+  const tailDustClockRef = useRef(0);
+  const tailDustSerialRef = useRef(0);
   const cameraRef = useRef(0);
   const captureTimeRef = useRef(0);
   const fieldUnlockStartedRef = useRef<number | null>(null);
@@ -1804,6 +1857,9 @@ export default function Game() {
     capturedEnemyRef.current = null;
     particlesRef.current = [];
     damageBurstRef.current = null;
+    tailDustRef.current = [];
+    tailDustClockRef.current = 0;
+    tailDustSerialRef.current = 0;
     cameraRef.current = 0;
     captureTimeRef.current = 0;
     fieldUnlockStartedRef.current = null;
@@ -2277,6 +2333,63 @@ export default function Game() {
         player.invulnerable = Math.max(0, player.invulnerable - dt);
         player.runClock += dt;
 
+        const tailSpeed = Math.abs(player.vx);
+        const tailIsMoving = tailSpeed > 55;
+        const tailEmissionRate = tailIsMoving
+          ? 11 + Math.min(9, tailSpeed / 48)
+          : 7;
+        tailDustClockRef.current += dt * tailEmissionRate;
+        while (tailDustClockRef.current >= 1) {
+          tailDustClockRef.current -= 1;
+          const serial = tailDustSerialRef.current++;
+          const shimmer = Math.sin(serial * 12.9898) * 0.5 + 0.5;
+          const lift = Math.sin(serial * 5.398) * 0.5 + 0.5;
+          const trailDirection = player.vx === 0 ? -player.facing : -Math.sign(player.vx);
+          const tailX =
+            player.x +
+            player.w / 2 -
+            player.facing * (48 + shimmer * 11);
+          const tailY =
+            player.y +
+            player.h -
+            68 +
+            Math.sin(player.runClock * 12 + serial) * 8;
+          const maxLife = tailIsMoving
+            ? 0.48 + shimmer * 0.34
+            : 0.45 + shimmer * 0.25;
+          tailDustRef.current.push({
+            x: tailX + trailDirection * shimmer * 8,
+            y: tailY + (lift - 0.5) * 20,
+            vx: tailIsMoving
+              ? player.vx * (0.06 + shimmer * 0.12) + trailDirection * 18
+              : trailDirection * (8 + shimmer * 12),
+            vy: -8 - lift * 30,
+            life: maxLife,
+            maxLife,
+            size: 3.5 + shimmer * 5.2,
+            rotation: shimmer * Math.PI,
+            spin: (shimmer - 0.5) * 5,
+            kind:
+              serial % 5 === 0
+                ? "cross"
+                : serial % 3 === 0
+                  ? "diamond"
+                  : "pixel",
+            front: !tailIsMoving || serial % 3 === 0,
+          });
+        }
+        tailDustRef.current = tailDustRef.current
+          .map((mote) => ({
+            ...mote,
+            x: mote.x + mote.vx * dt,
+            y: mote.y + mote.vy * dt,
+            vy: mote.vy - 4 * dt,
+            life: mote.life - dt,
+            rotation: mote.rotation + mote.spin * dt,
+          }))
+          .filter((mote) => mote.life > 0)
+          .slice(-90);
+
         if (bonusCrate && !bonusCrate.collected) {
           bonusCrate.pulse += dt;
           const overlapsBonus =
@@ -2514,6 +2627,7 @@ export default function Game() {
           captureTimeRef.current,
         );
       }
+      drawTailDust(ctx, tailDustRef.current, cameraRef.current, false);
       if (damageBurstRef.current) {
         drawDamageBurst(ctx, damageBurstRef.current, cameraRef.current);
       }
@@ -2525,6 +2639,7 @@ export default function Game() {
         artRef.current.ready,
         artRef.current.jump,
       );
+      drawTailDust(ctx, tailDustRef.current, cameraRef.current, true);
       if (bonusBurstRef.current) {
         drawBonusBurst(ctx, bonusBurstRef.current, cameraRef.current);
       }
