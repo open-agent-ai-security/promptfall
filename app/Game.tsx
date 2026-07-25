@@ -2829,11 +2829,18 @@ export default function Game() {
                 <span key={index} />
               ))}
             </div>
-            <img
-              className="title-praxi"
-              src="./assets/praxi-idle-v6.png"
-              alt=""
-            />
+            <div className="title-praxi-stage" aria-hidden="true">
+              <img
+                className="title-praxi"
+                src="./assets/praxi-idle-v6.png"
+                alt=""
+              />
+              <div className="title-tail-generator">
+                {Array.from({ length: 14 }, (_, index) => (
+                  <span key={index} />
+                ))}
+              </div>
+            </div>
             <img
               className="title-enemy"
               src="./assets/prompt-injection-v2.png"

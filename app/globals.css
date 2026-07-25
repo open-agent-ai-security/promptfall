@@ -374,7 +374,7 @@ button {
   animation: title-logo-breathe 3.8s 2.1s ease-in-out infinite;
 }
 
-.title-praxi {
+.title-praxi-stage {
   position: absolute;
   z-index: 2;
   left: 3%;
@@ -385,6 +385,89 @@ button {
     praxi-arrive 760ms 1.02s cubic-bezier(0.16, 1, 0.3, 1) both,
     hero-ready 1.8s 1.78s ease-in-out infinite;
 }
+
+.title-praxi {
+  display: block;
+  width: 100%;
+}
+
+.title-tail-generator {
+  position: absolute;
+  z-index: 3;
+  left: 16%;
+  bottom: 27%;
+  width: 20%;
+  height: 22%;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 0 4px #fff)
+    drop-shadow(0 0 11px rgba(77, 221, 255, 0.98));
+  mix-blend-mode: screen;
+}
+
+.title-tail-generator::before {
+  content: "";
+  position: absolute;
+  right: 5%;
+  top: 37%;
+  width: 40%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.96) 0 8%,
+    rgba(133, 237, 255, 0.68) 12%,
+    rgba(49, 198, 255, 0.2) 35%,
+    transparent 70%
+  );
+  animation: title-tail-core 1.35s -0.35s ease-in-out infinite;
+}
+
+.title-tail-generator span {
+  position: absolute;
+  right: 9%;
+  top: 48%;
+  width: 7px;
+  height: 7px;
+  opacity: 0;
+  background: #fff;
+  box-shadow:
+    0 0 4px #fff,
+    0 0 9px rgba(85, 222, 255, 0.95);
+  animation: title-tail-mote 1.5s ease-out infinite;
+}
+
+.title-tail-generator span:nth-child(2n) {
+  width: 4px;
+  height: 4px;
+  animation-duration: 1.22s;
+}
+
+.title-tail-generator span:nth-child(3n) {
+  background: #a9efff;
+  transform: rotate(45deg);
+}
+
+.title-tail-generator span:nth-child(4n) {
+  width: 10px;
+  height: 3px;
+}
+
+.title-tail-generator span:nth-child(1) { --tail-dx: -50px; --tail-dy: -20px; animation-delay: -0.08s; }
+.title-tail-generator span:nth-child(2) { --tail-dx: -68px; --tail-dy: 7px; animation-delay: -0.2s; }
+.title-tail-generator span:nth-child(3) { --tail-dx: -38px; --tail-dy: 24px; animation-delay: -0.32s; }
+.title-tail-generator span:nth-child(4) { --tail-dx: -76px; --tail-dy: -8px; animation-delay: -0.44s; }
+.title-tail-generator span:nth-child(5) { --tail-dx: -46px; --tail-dy: 13px; animation-delay: -0.56s; }
+.title-tail-generator span:nth-child(6) { --tail-dx: -62px; --tail-dy: -28px; animation-delay: -0.68s; }
+.title-tail-generator span:nth-child(7) { --tail-dx: -34px; --tail-dy: -10px; animation-delay: -0.8s; }
+.title-tail-generator span:nth-child(8) { --tail-dx: -80px; --tail-dy: 19px; animation-delay: -0.92s; }
+.title-tail-generator span:nth-child(9) { --tail-dx: -55px; --tail-dy: 31px; animation-delay: -1.04s; }
+.title-tail-generator span:nth-child(10) { --tail-dx: -72px; --tail-dy: -18px; animation-delay: -1.16s; }
+.title-tail-generator span:nth-child(11) { --tail-dx: -42px; --tail-dy: 4px; animation-delay: -1.28s; }
+.title-tail-generator span:nth-child(12) { --tail-dx: -64px; --tail-dy: 26px; animation-delay: -1.4s; }
+.title-tail-generator span:nth-child(13) { --tail-dx: -48px; --tail-dy: -31px; animation-delay: -1.52s; }
+.title-tail-generator span:nth-child(14) { --tail-dx: -82px; --tail-dy: 4px; animation-delay: -1.64s; }
 
 .title-enemy {
   position: absolute;
@@ -2017,6 +2100,36 @@ kbd {
 @keyframes hero-ready {
   50% {
     transform: translateY(-1.5%) scaleY(1.012);
+  }
+}
+
+@keyframes title-tail-core {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: scale(0.72);
+  }
+  45% {
+    opacity: 0.88;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes title-tail-mote {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(45deg) scale(0.35);
+  }
+  12% {
+    opacity: 1;
+    transform: translate3d(-5px, 0, 0) rotate(45deg) scale(1);
+  }
+  65% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--tail-dx), var(--tail-dy), 0) rotate(135deg) scale(0.2);
   }
 }
 
