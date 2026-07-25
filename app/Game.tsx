@@ -1050,17 +1050,26 @@ function drawPraxi(
   const x = player.x - cameraX + player.w / 2;
   const damageGlow = Math.max(
     0,
-    Math.min(1, (player.invulnerable - 0.78) / 0.62),
+    Math.min(1, (player.invulnerable - 0.45) / 0.75),
   );
+  const damagePulse =
+    damageGlow * (0.86 + Math.sin(player.runClock * 28) * 0.14);
 
   ctx.save();
   ctx.translate(x, player.y + player.h);
   ctx.scale(player.facing, 1);
   ctx.shadowColor =
     damageGlow > 0
-      ? `rgba(255, 26, 66, ${0.48 + damageGlow * 0.42})`
+      ? `rgba(255, 8, 54, ${0.82 + damagePulse * 0.18})`
       : "rgba(255, 139, 24, .48)";
-  ctx.shadowBlur = 16 + damageGlow * 22;
+  ctx.shadowBlur = 16 + damagePulse * 42;
+  if (damageGlow > 0) {
+    ctx.filter = [
+      `drop-shadow(0 0 ${3 + damagePulse * 3}px rgba(255, 220, 226, ${damagePulse * 0.9}))`,
+      `drop-shadow(0 0 ${10 + damagePulse * 8}px rgba(255, 8, 54, ${damagePulse}))`,
+      `drop-shadow(0 0 ${24 + damagePulse * 14}px rgba(190, 0, 38, ${damagePulse * 0.9}))`,
+    ].join(" ");
+  }
 
   if (!player.grounded && jumpSprite?.complete && jumpSprite.naturalWidth > 0) {
     ctx.drawImage(jumpSprite, -100, -188, 200, 200);
@@ -1093,14 +1102,14 @@ function drawDamageBurst(
   ctx.translate(x, burst.y);
   ctx.globalCompositeOperation = "screen";
 
-  const glow = ctx.createRadialGradient(0, 0, 5, 0, 0, 95 + progress * 35);
+  const glow = ctx.createRadialGradient(0, 0, 5, 0, 0, 112 + progress * 42);
   glow.addColorStop(0, `rgba(255, 235, 240, ${alpha * 0.72})`);
   glow.addColorStop(0.18, `rgba(255, 28, 70, ${alpha * 0.6})`);
   glow.addColorStop(0.52, `rgba(190, 0, 38, ${alpha * 0.24})`);
   glow.addColorStop(1, "rgba(120, 0, 28, 0)");
   ctx.fillStyle = glow;
   ctx.beginPath();
-  ctx.arc(0, 0, 105 + progress * 35, 0, Math.PI * 2);
+  ctx.arc(0, 0, 124 + progress * 42, 0, Math.PI * 2);
   ctx.fill();
 
   for (let ring = 0; ring < 2; ring++) {
@@ -1113,7 +1122,7 @@ function drawDamageBurst(
     ctx.arc(
       0,
       0,
-      25 + progress * (92 + ring * 26),
+      28 + progress * (108 + ring * 30),
       0,
       Math.PI * 2,
     );
@@ -1549,7 +1558,7 @@ export default function Game() {
         vy: Math.sin(angle) * speed - 45,
         life: 0.46 + (i % 5) * 0.045,
         color: colors[i % colors.length],
-        size: 4 + (i % 6) * 1.25,
+        size: 6 + (i % 6) * 1.55,
       });
     }
   }, []);
