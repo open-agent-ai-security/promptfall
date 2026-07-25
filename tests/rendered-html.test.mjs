@@ -71,7 +71,9 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /improper-output-handling-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l11-gauntlet-v1\.png/i);
   assert.match(gameSource, /THE GAUNTLET/i);
-  assert.match(gameSource, /worldWidth: 5000/i);
+  assert.match(gameSource, /worldWidth: 5390/i);
+  assert.match(gameSource, /motion:\s*\{\s*axis:/i);
+  assert.match(gameSource, /energyTraps:/i);
   assert.match(gameSource, /ALL TEN RISKS CONTAINED/i);
   assert.match(gameSource, /YOUR AGENT/i);
   assert.match(gameSource, /IS SECURE!/i);

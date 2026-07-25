@@ -18,6 +18,22 @@ type Platform = {
   w: number;
   h: number;
   kind?: "floor" | "ledge";
+  motion?: {
+    axis: "x" | "y";
+    distance: number;
+    period: number;
+    phase?: number;
+  };
+};
+
+type EnergyTrap = {
+  x: number;
+  y: number;
+  w: number;
+  period: number;
+  warningDuration: number;
+  firingDuration: number;
+  phase: number;
 };
 
 type Player = {
@@ -78,6 +94,7 @@ type BonusBurst = {
 type LevelLayout = {
   platforms: Platform[];
   enemies: EnemySpawn[];
+  energyTraps?: EnergyTrap[];
   worldWidth?: number;
   exitFieldX?: number;
 };
@@ -870,40 +887,91 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
     ],
   },
   {
-    worldWidth: 5000,
-    exitFieldX: 4780,
+    worldWidth: 5390,
+    exitFieldX: 5055,
     platforms: [
       { x: 0, y: 606, w: 650, h: 114, kind: "floor" },
       { x: 730, y: 606, w: 490, h: 114, kind: "floor" },
-      { x: 1310, y: 606, w: 490, h: 114, kind: "floor" },
+      { x: 1310, y: 606, w: 500, h: 114, kind: "floor" },
       { x: 1880, y: 606, w: 470, h: 114, kind: "floor" },
-      { x: 2450, y: 606, w: 470, h: 114, kind: "floor" },
-      { x: 3010, y: 606, w: 470, h: 114, kind: "floor" },
-      { x: 3580, y: 606, w: 470, h: 114, kind: "floor" },
-      { x: 4140, y: 606, w: 420, h: 114, kind: "floor" },
-      { x: 4640, y: 606, w: 360, h: 114, kind: "floor" },
+      { x: 2570, y: 606, w: 530, h: 114, kind: "floor" },
+      { x: 3180, y: 606, w: 370, h: 114, kind: "floor" },
+      { x: 3790, y: 606, w: 460, h: 114, kind: "floor" },
+      { x: 4330, y: 606, w: 450, h: 114, kind: "floor" },
+      { x: 4860, y: 606, w: 530, h: 114, kind: "floor" },
       { x: 380, y: 470, w: 260, h: 24, kind: "ledge" },
-      { x: 800, y: 390, w: 270, h: 24, kind: "ledge" },
-      { x: 1240, y: 470, w: 270, h: 24, kind: "ledge" },
-      { x: 1640, y: 350, w: 280, h: 24, kind: "ledge" },
-      { x: 2050, y: 440, w: 280, h: 24, kind: "ledge" },
-      { x: 2500, y: 340, w: 280, h: 24, kind: "ledge" },
-      { x: 3000, y: 450, w: 280, h: 24, kind: "ledge" },
-      { x: 3400, y: 330, w: 280, h: 24, kind: "ledge" },
-      { x: 3890, y: 430, w: 280, h: 24, kind: "ledge" },
-      { x: 4370, y: 340, w: 300, h: 24, kind: "ledge" },
+      {
+        x: 820,
+        y: 470,
+        w: 220,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "y", distance: 70, period: 3.8, phase: 0.8 },
+      },
+      { x: 1280, y: 455, w: 250, h: 24, kind: "ledge" },
+      { x: 1640, y: 350, w: 250, h: 24, kind: "ledge" },
+      { x: 2050, y: 440, w: 250, h: 24, kind: "ledge" },
+      {
+        x: 2375,
+        y: 520,
+        w: 150,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "x", distance: 70, period: 3.2, phase: -1.2 },
+      },
+      { x: 2650, y: 410, w: 260, h: 24, kind: "ledge" },
+      { x: 2960, y: 480, w: 220, h: 24, kind: "ledge" },
+      { x: 3220, y: 420, w: 190, h: 24, kind: "ledge" },
+      {
+        x: 3575,
+        y: 510,
+        w: 150,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "x", distance: 66, period: 3.45, phase: 1.1 },
+      },
+      { x: 3930, y: 390, w: 250, h: 24, kind: "ledge" },
+      {
+        x: 4410,
+        y: 465,
+        w: 220,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "y", distance: 62, period: 4.1, phase: 2.2 },
+      },
+      { x: 4880, y: 430, w: 260, h: 24, kind: "ledge" },
+    ],
+    energyTraps: [
+      {
+        x: 1570,
+        y: 606,
+        w: 76,
+        period: 3.4,
+        warningDuration: 0.85,
+        firingDuration: 0.62,
+        phase: 0.25,
+      },
+      {
+        x: 3425,
+        y: 606,
+        w: 76,
+        period: 3.65,
+        warningDuration: 0.9,
+        firingDuration: 0.65,
+        phase: 1.7,
+      },
     ],
     enemies: [
       enemySpawn(0, 470, 470, 420, 550, 78, 0, 0),
-      enemySpawn(1, 880, 390, 830, 970, -82, 0.55, 1),
-      enemySpawn(2, 1330, 470, 1270, 1420, 84, 1.1, 2),
-      enemySpawn(3, 1730, 350, 1680, 1830, -80, 1.65, 3),
-      enemySpawn(4, 2140, 440, 2080, 2240, 86, 2.2, 4),
-      enemySpawn(5, 2590, 340, 2530, 2690, -82, 2.75, 5),
-      enemySpawn(6, 3090, 450, 3030, 3190, 88, 3.3, 6),
-      enemySpawn(7, 3490, 330, 3430, 3590, -84, 3.85, 7),
-      enemySpawn(8, 3980, 430, 3920, 4080, 88, 4.4, 8),
-      enemySpawn(9, 4470, 340, 4400, 4560, -86, 4.95, 9),
+      enemySpawn(1, 900, 606, 790, 1080, -82, 0.55, 1),
+      enemySpawn(2, 1370, 455, 1310, 1440, 84, 1.1, 2),
+      enemySpawn(3, 2070, 440, 2020, 2180, -80, 1.65, 3),
+      enemySpawn(4, 2730, 410, 2680, 2830, 86, 2.2, 4),
+      enemySpawn(5, 3010, 480, 2980, 3100, -82, 2.75, 5),
+      enemySpawn(6, 3280, 420, 3240, 3330, 88, 3.3, 6),
+      enemySpawn(7, 4000, 390, 3960, 4110, -84, 3.85, 7),
+      enemySpawn(8, 4450, 606, 4370, 4560, 88, 4.4, 8),
+      enemySpawn(9, 4700, 606, 4630, 4740, -86, 4.95, 9),
     ],
   },
 ];
@@ -1091,6 +1159,188 @@ function drawPlatform(
       ctx.fill();
     }
   }
+
+  if (platform.motion) {
+    const centerX = x + platform.w / 2;
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.shadowColor = "#61efff";
+    ctx.shadowBlur = 12;
+    ctx.strokeStyle = "rgba(124, 244, 255, .9)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    ctx.strokeRect(x + 8, platform.y + 6, platform.w - 16, 10);
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#d9fcff";
+    ctx.beginPath();
+    if (platform.motion.axis === "x") {
+      ctx.moveTo(centerX - 22, platform.y + 17);
+      ctx.lineTo(centerX - 32, platform.y + 12);
+      ctx.lineTo(centerX - 22, platform.y + 7);
+      ctx.moveTo(centerX + 22, platform.y + 17);
+      ctx.lineTo(centerX + 32, platform.y + 12);
+      ctx.lineTo(centerX + 22, platform.y + 7);
+    } else {
+      ctx.moveTo(centerX, platform.y + 5);
+      ctx.lineTo(centerX - 6, platform.y + 12);
+      ctx.lineTo(centerX + 6, platform.y + 12);
+      ctx.moveTo(centerX, platform.y + 19);
+      ctx.lineTo(centerX - 6, platform.y + 12);
+      ctx.lineTo(centerX + 6, platform.y + 12);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function platformAtTime(platform: Platform, time: number): Platform {
+  if (!platform.motion) return platform;
+  const offset =
+    Math.sin(
+      (time / platform.motion.period) * Math.PI * 2 +
+        (platform.motion.phase ?? 0),
+    ) * platform.motion.distance;
+  return {
+    ...platform,
+    x: platform.x + (platform.motion.axis === "x" ? offset : 0),
+    y: platform.y + (platform.motion.axis === "y" ? offset : 0),
+  };
+}
+
+function energyTrapState(
+  trap: EnergyTrap,
+  time: number,
+): { mode: "idle" | "warning" | "firing"; progress: number } {
+  const cycle = ((time + trap.phase) % trap.period + trap.period) % trap.period;
+  const warningStart =
+    trap.period - trap.warningDuration - trap.firingDuration;
+  const firingStart = trap.period - trap.firingDuration;
+  if (cycle >= firingStart) {
+    return {
+      mode: "firing",
+      progress: (cycle - firingStart) / trap.firingDuration,
+    };
+  }
+  if (cycle >= warningStart) {
+    return {
+      mode: "warning",
+      progress: (cycle - warningStart) / trap.warningDuration,
+    };
+  }
+  return { mode: "idle", progress: cycle / warningStart };
+}
+
+function drawEnergyTrap(
+  ctx: CanvasRenderingContext2D,
+  trap: EnergyTrap,
+  cameraX: number,
+  time: number,
+) {
+  const x = trap.x - cameraX;
+  if (x > VIEW_W + 100 || x + trap.w < -100) return;
+  const state = energyTrapState(trap, time);
+  const centerX = x + trap.w / 2;
+  const pulse = (Math.sin(time * 14) + 1) / 2;
+
+  ctx.save();
+  const baseGradient = ctx.createLinearGradient(x, 0, x + trap.w, 0);
+  baseGradient.addColorStop(0, "#07111d");
+  baseGradient.addColorStop(
+    0.24,
+    state.mode === "firing" ? "#f7faff" : "#ff6a27",
+  );
+  baseGradient.addColorStop(
+    0.5,
+    state.mode === "idle" ? "#36dced" : "#fff4b5",
+  );
+  baseGradient.addColorStop(
+    0.76,
+    state.mode === "firing" ? "#f7faff" : "#ff6a27",
+  );
+  baseGradient.addColorStop(1, "#07111d");
+  ctx.fillStyle = baseGradient;
+  ctx.shadowColor =
+    state.mode === "firing"
+      ? "#d9fbff"
+      : state.mode === "warning"
+        ? "#ff712c"
+        : "#35ddef";
+  ctx.shadowBlur =
+    state.mode === "warning" ? 14 + pulse * 16 : state.mode === "firing" ? 28 : 8;
+  roundedRect(ctx, x, trap.y - 13, trap.w, 18, 5);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.fillStyle =
+    state.mode === "warning" ? "#fff2b0" : "rgba(206, 251, 255, .9)";
+  for (let marker = 0; marker < 3; marker++) {
+    const markerX = x + 16 + marker * ((trap.w - 32) / 2);
+    ctx.beginPath();
+    ctx.moveTo(markerX, trap.y - 10);
+    ctx.lineTo(markerX + 5, trap.y - 3);
+    ctx.lineTo(markerX - 5, trap.y - 3);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  if (state.mode === "warning") {
+    const warningAlpha = 0.3 + state.progress * 0.55 + pulse * 0.15;
+    ctx.globalCompositeOperation = "screen";
+    const warningBeam = ctx.createLinearGradient(0, 170, 0, trap.y);
+    warningBeam.addColorStop(0, "rgba(255, 110, 35, 0)");
+    warningBeam.addColorStop(
+      0.72,
+      `rgba(255, 105, 35, ${warningAlpha * 0.24})`,
+    );
+    warningBeam.addColorStop(
+      1,
+      `rgba(255, 227, 139, ${warningAlpha * 0.72})`,
+    );
+    ctx.fillStyle = warningBeam;
+    ctx.fillRect(x + 14, 170, trap.w - 28, trap.y - 170);
+    ctx.strokeStyle = `rgba(255, 235, 168, ${warningAlpha})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 12]);
+    ctx.strokeRect(x + 9, 170, trap.w - 18, trap.y - 170);
+    ctx.setLineDash([]);
+  }
+
+  if (state.mode === "firing") {
+    const beamTop = 110;
+    const surge =
+      Math.sin(state.progress * Math.PI) *
+      (0.86 + Math.sin(time * 36) * 0.12);
+    ctx.globalCompositeOperation = "screen";
+    const beam = ctx.createLinearGradient(x, 0, x + trap.w, 0);
+    beam.addColorStop(0, "rgba(32, 213, 255, 0)");
+    beam.addColorStop(0.16, `rgba(63, 221, 255, ${0.46 + surge * 0.3})`);
+    beam.addColorStop(0.42, `rgba(235, 253, 255, ${0.82 + surge * 0.16})`);
+    beam.addColorStop(0.58, `rgba(255, 255, 255, ${0.9 + surge * 0.1})`);
+    beam.addColorStop(0.84, `rgba(63, 221, 255, ${0.46 + surge * 0.3})`);
+    beam.addColorStop(1, "rgba(32, 213, 255, 0)");
+    ctx.fillStyle = beam;
+    ctx.shadowColor = "#9df6ff";
+    ctx.shadowBlur = 28 + surge * 18;
+    ctx.fillRect(x - 6, beamTop, trap.w + 12, trap.y - beamTop);
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = "rgba(255,255,255,.94)";
+    ctx.lineWidth = 3;
+    for (let arc = 0; arc < 3; arc++) {
+      ctx.beginPath();
+      ctx.moveTo(centerX, trap.y);
+      for (let py = trap.y; py >= beamTop; py -= 22) {
+        ctx.lineTo(
+          centerX +
+            Math.sin(py * 0.08 + time * (18 + arc * 2) + arc * 2.4) *
+              (10 + arc * 6),
+          py,
+        );
+      }
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
 }
 
 function drawPraxi(
@@ -1566,6 +1816,7 @@ export default function Game() {
   const bonusCrateRef = useRef<BonusCrate | null>(createBonusCrate(0));
   const bonusBurstRef = useRef<BonusBurst | null>(null);
   const safePositionRef = useRef({ x: 150, y: 516 });
+  const standingPlatformRef = useRef<number | null>(0);
   const capturedEnemyRef = useRef<Enemy | null>(null);
   const particlesRef = useRef<Particle[]>([]);
   const damageBurstRef = useRef<DamageBurst | null>(null);
@@ -1854,6 +2105,7 @@ export default function Game() {
     bonusCrateRef.current = createBonusCrate(nextLevelIndex);
     bonusBurstRef.current = null;
     safePositionRef.current = { x: 150, y: 516 };
+    standingPlatformRef.current = 0;
     capturedEnemyRef.current = null;
     particlesRef.current = [];
     damageBurstRef.current = null;
@@ -2267,8 +2519,30 @@ export default function Game() {
       const activeExitFieldX = activeLayout.exitFieldX ?? EXIT_FIELD_X;
       const activeExitFieldLeft = activeExitFieldX - 62;
       const bonusCrate = bonusCrateRef.current;
+      let activePlatforms = activeLayout.platforms.map((platform) =>
+        platformAtTime(platform, player.runClock),
+      );
       if (sceneRef.current === "playing") {
         const input = inputRef.current;
+        const nextPlatformTime = player.runClock + dt;
+        const nextPlatforms = activeLayout.platforms.map((platform) =>
+          platformAtTime(platform, nextPlatformTime),
+        );
+        const standingPlatformIndex = standingPlatformRef.current;
+        if (
+          player.grounded &&
+          standingPlatformIndex !== null &&
+          activePlatforms[standingPlatformIndex] &&
+          nextPlatforms[standingPlatformIndex]
+        ) {
+          player.x +=
+            nextPlatforms[standingPlatformIndex].x -
+            activePlatforms[standingPlatformIndex].x;
+          player.y +=
+            nextPlatforms[standingPlatformIndex].y -
+            activePlatforms[standingPlatformIndex].y;
+        }
+        activePlatforms = nextPlatforms;
         const axis = (input.right ? 1 : 0) - (input.left ? 1 : 0);
         player.vx += (axis * MOVE_SPEED - player.vx) * Math.min(1, dt * 10);
         // Preserve running momentum in the air. This is especially important for
@@ -2296,8 +2570,9 @@ export default function Game() {
           Math.min(activeWorldWidth - player.w, player.x),
         );
         player.grounded = false;
+        standingPlatformRef.current = null;
 
-        for (const platform of activeLayout.platforms) {
+        for (const [platformIndex, platform] of activePlatforms.entries()) {
           const wasAbove = previousY + player.h <= platform.y + 8;
           const crossesTop =
             player.y + player.h >= platform.y &&
@@ -2309,10 +2584,15 @@ export default function Game() {
             player.y = platform.y - player.h;
             player.vy = 0;
             player.grounded = true;
+            standingPlatformRef.current = platformIndex;
           }
         }
 
-        if (player.grounded) {
+        const standingPlatform =
+          standingPlatformRef.current === null
+            ? null
+            : activePlatforms[standingPlatformRef.current];
+        if (player.grounded && !standingPlatform?.motion) {
           safePositionRef.current = { x: player.x, y: player.y };
         }
 
@@ -2331,7 +2611,34 @@ export default function Game() {
         }
 
         player.invulnerable = Math.max(0, player.invulnerable - dt);
-        player.runClock += dt;
+        player.runClock = nextPlatformTime;
+
+        for (const trap of activeLayout.energyTraps ?? []) {
+          if (energyTrapState(trap, player.runClock).mode !== "firing") {
+            continue;
+          }
+          const overlapsBeam =
+            player.x < trap.x + trap.w &&
+            player.x + player.w > trap.x &&
+            player.y < trap.y &&
+            player.y + player.h > 110;
+          if (overlapsBeam && player.invulnerable <= 0) {
+            healthRef.current = Math.max(0, healthRef.current - 1);
+            setHealth(healthRef.current);
+            player.invulnerable = 1.4;
+            player.grounded = false;
+            standingPlatformRef.current = null;
+            triggerDamageEffect(player);
+            player.vx =
+              player.x + player.w / 2 < trap.x + trap.w / 2 ? -390 : 390;
+            player.vy = -460;
+            playTone(138, 0.27, "sawtooth");
+            if (healthRef.current <= 0) {
+              triggerGameOver();
+              break;
+            }
+          }
+        }
 
         const tailSpeed = Math.abs(player.vx);
         const tailIsMoving = tailSpeed > 55;
@@ -2580,8 +2887,16 @@ export default function Game() {
         cameraRef.current,
         artRef.current.backgrounds?.[levelIndexRef.current],
       );
-      for (const platform of activeLayout.platforms) {
+      for (const platform of activePlatforms) {
         drawPlatform(ctx, platform, cameraRef.current);
+      }
+      for (const trap of activeLayout.energyTraps ?? []) {
+        drawEnergyTrap(
+          ctx,
+          trap,
+          cameraRef.current,
+          player.runClock,
+        );
       }
       if (bonusCrate) {
         drawBonusCrate(
