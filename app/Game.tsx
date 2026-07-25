@@ -89,6 +89,14 @@ type Particle = {
   vy: number;
   life: number;
   color: string;
+  size?: number;
+};
+
+type DamageBurst = {
+  x: number;
+  y: number;
+  time: number;
+  duration: number;
 };
 
 type GameArt = {
@@ -1040,17 +1048,19 @@ function drawPraxi(
   jumpSprite?: HTMLImageElement,
 ) {
   const x = player.x - cameraX + player.w / 2;
-  const alpha =
-    player.invulnerable > 0 && Math.floor(player.invulnerable * 14) % 2 === 0
-      ? 0.35
-      : 1;
+  const damageGlow = Math.max(
+    0,
+    Math.min(1, (player.invulnerable - 0.78) / 0.62),
+  );
 
   ctx.save();
-  ctx.globalAlpha = alpha;
   ctx.translate(x, player.y + player.h);
   ctx.scale(player.facing, 1);
-  ctx.shadowColor = "rgba(255, 139, 24, .48)";
-  ctx.shadowBlur = 16;
+  ctx.shadowColor =
+    damageGlow > 0
+      ? `rgba(255, 26, 66, ${0.48 + damageGlow * 0.42})`
+      : "rgba(255, 139, 24, .48)";
+  ctx.shadowBlur = 16 + damageGlow * 22;
 
   if (!player.grounded && jumpSprite?.complete && jumpSprite.naturalWidth > 0) {
     ctx.drawImage(jumpSprite, -100, -188, 200, 200);
@@ -1065,6 +1075,49 @@ function drawPraxi(
     ctx.drawImage(readySprite, -100, -188, 200, 200);
   } else if (runFrames?.[0]?.complete) {
     ctx.drawImage(runFrames[0], -100, -188, 200, 200);
+  }
+  ctx.restore();
+}
+
+function drawDamageBurst(
+  ctx: CanvasRenderingContext2D,
+  burst: DamageBurst,
+  cameraX: number,
+) {
+  if (burst.time <= 0) return;
+  const progress = 1 - burst.time / burst.duration;
+  const alpha = Math.pow(Math.max(0, 1 - progress), 1.35);
+  const x = burst.x - cameraX;
+
+  ctx.save();
+  ctx.translate(x, burst.y);
+  ctx.globalCompositeOperation = "screen";
+
+  const glow = ctx.createRadialGradient(0, 0, 5, 0, 0, 95 + progress * 35);
+  glow.addColorStop(0, `rgba(255, 235, 240, ${alpha * 0.72})`);
+  glow.addColorStop(0.18, `rgba(255, 28, 70, ${alpha * 0.6})`);
+  glow.addColorStop(0.52, `rgba(190, 0, 38, ${alpha * 0.24})`);
+  glow.addColorStop(1, "rgba(120, 0, 28, 0)");
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(0, 0, 105 + progress * 35, 0, Math.PI * 2);
+  ctx.fill();
+
+  for (let ring = 0; ring < 2; ring++) {
+    ctx.strokeStyle =
+      ring === 0
+        ? `rgba(255, 79, 105, ${alpha * 0.9})`
+        : `rgba(255, 210, 218, ${alpha * 0.56})`;
+    ctx.lineWidth = Math.max(1.5, 8 - progress * 5 - ring * 2);
+    ctx.beginPath();
+    ctx.arc(
+      0,
+      0,
+      25 + progress * (92 + ring * 26),
+      0,
+      Math.PI * 2,
+    );
+    ctx.stroke();
   }
   ctx.restore();
 }
@@ -1416,6 +1469,7 @@ export default function Game() {
   const safePositionRef = useRef({ x: 150, y: 516 });
   const capturedEnemyRef = useRef<Enemy | null>(null);
   const particlesRef = useRef<Particle[]>([]);
+  const damageBurstRef = useRef<DamageBurst | null>(null);
   const cameraRef = useRef(0);
   const captureTimeRef = useRef(0);
   const fieldUnlockStartedRef = useRef<number | null>(null);
@@ -1474,6 +1528,32 @@ export default function Game() {
     [],
   );
 
+  const triggerDamageEffect = useCallback((player: Player) => {
+    const x = player.x + player.w / 2;
+    const y = player.y + player.h * 0.48;
+    damageBurstRef.current = {
+      x,
+      y,
+      time: 0.58,
+      duration: 0.58,
+    };
+
+    const colors = ["#ff164f", "#ff4168", "#d9003b", "#ff97aa"];
+    for (let i = 0; i < 34; i++) {
+      const angle = (Math.PI * 2 * i) / 34 + (i % 3) * 0.08;
+      const speed = 115 + (i % 7) * 23;
+      particlesRef.current.push({
+        x: x + Math.cos(angle) * (8 + (i % 4) * 3),
+        y: y + Math.sin(angle) * (8 + (i % 5) * 2),
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 45,
+        life: 0.46 + (i % 5) * 0.045,
+        color: colors[i % colors.length],
+        size: 4 + (i % 6) * 1.25,
+      });
+    }
+  }, []);
+
   const triggerGameOver = useCallback(() => {
     if (sceneRef.current !== "playing") return;
     touchPointsRef.current.clear();
@@ -1524,6 +1604,7 @@ export default function Game() {
     safePositionRef.current = { x: 150, y: 516 };
     capturedEnemyRef.current = null;
     particlesRef.current = [];
+    damageBurstRef.current = null;
     cameraRef.current = 0;
     captureTimeRef.current = 0;
     fieldUnlockStartedRef.current = null;
@@ -1867,6 +1948,7 @@ export default function Game() {
           player.invulnerable = 1.25;
           healthRef.current = Math.max(0, healthRef.current - 1);
           setHealth(healthRef.current);
+          triggerDamageEffect(player);
           playTone(110, 0.25, "sawtooth");
           if (healthRef.current <= 0) {
             triggerGameOver();
@@ -1972,6 +2054,7 @@ export default function Game() {
               healthRef.current = Math.max(0, healthRef.current - 1);
               setHealth(healthRef.current);
               player.invulnerable = 1.4;
+              triggerDamageEffect(player);
               player.vx = player.x < enemy.x ? -420 : 420;
               player.vy = -410;
               playTone(125, 0.24, "sawtooth");
@@ -2008,6 +2091,12 @@ export default function Game() {
           bonusBurstRef.current.time -= dt;
           if (bonusBurstRef.current.time <= 0) {
             bonusBurstRef.current = null;
+          }
+        }
+        if (damageBurstRef.current) {
+          damageBurstRef.current.time -= dt;
+          if (damageBurstRef.current.time <= 0) {
+            damageBurstRef.current = null;
           }
         }
         particlesRef.current = particlesRef.current
@@ -2106,6 +2195,9 @@ export default function Game() {
           captureTimeRef.current,
         );
       }
+      if (damageBurstRef.current) {
+        drawDamageBurst(ctx, damageBurstRef.current, cameraRef.current);
+      }
       drawPraxi(
         ctx,
         player,
@@ -2124,7 +2216,7 @@ export default function Game() {
           ctx,
           particle.x - cameraRef.current,
           particle.y,
-          3,
+          particle.size ?? 3,
           particle.color,
         );
       }
@@ -2137,7 +2229,7 @@ export default function Game() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [playTone, triggerGameOver]);
+  }, [playTone, triggerDamageEffect, triggerGameOver]);
 
   const syncTouchDirection = useCallback(() => {
     let left = false;
