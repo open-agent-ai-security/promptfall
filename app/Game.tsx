@@ -1543,6 +1543,7 @@ export default function Game() {
     ),
   );
   const musicFadeRef = useRef(new Map<MusicTrackKey, number>());
+  const titleTransitionTimerRef = useRef<number | null>(null);
 
   const setMusicEnvelope = useCallback(
     (key: MusicTrackKey, volume: number) => {
@@ -1814,6 +1815,10 @@ export default function Game() {
   }, []);
 
   const startLevel = useCallback((nextLevelIndex: number) => {
+    if (titleTransitionTimerRef.current !== null) {
+      window.clearTimeout(titleTransitionTimerRef.current);
+      titleTransitionTimerRef.current = null;
+    }
     resetGame(nextLevelIndex);
     levelIndexRef.current = nextLevelIndex;
     setLevelIndex(nextLevelIndex);
@@ -1830,12 +1835,15 @@ export default function Game() {
     if (sceneRef.current !== "splash") return;
     transitionMusic("title", {
       fadeOut: 0,
-      fadeIn: 700,
+      fadeIn: 420,
       restart: true,
     });
     unlockMusic();
     sceneRef.current = "title";
-    setScene("title");
+    titleTransitionTimerRef.current = window.setTimeout(() => {
+      titleTransitionTimerRef.current = null;
+      setScene("title");
+    }, 160);
   }, [transitionMusic, unlockMusic]);
 
   const advanceCampaign = useCallback(() => {
@@ -1880,6 +1888,10 @@ export default function Game() {
     musicRef.current = tracks;
 
     return () => {
+      if (titleTransitionTimerRef.current !== null) {
+        window.clearTimeout(titleTransitionTimerRef.current);
+        titleTransitionTimerRef.current = null;
+      }
       musicFadeRef.current.forEach((frame) =>
         window.cancelAnimationFrame(frame),
       );
