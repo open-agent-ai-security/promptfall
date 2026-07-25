@@ -74,6 +74,10 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /worldWidth: 5390/i);
   assert.match(gameSource, /motion:\s*\{\s*axis:/i);
   assert.match(gameSource, /energyTraps:/i);
+  assert.match(gameSource, /llm08-you-drew-me-a-map\.mp3/i);
+  assert.match(gameSource, /llm09-close-enough-to-be-dangerous\.mp3/i);
+  assert.match(gameSource, /llm10-passed-without-question\.mp3/i);
+  assert.match(gameSource, /l11-promptfall-reprise\.mp3/i);
   assert.match(gameSource, /ALL TEN RISKS CONTAINED/i);
   assert.match(gameSource, /YOUR AGENT/i);
   assert.match(gameSource, /IS SECURE!/i);

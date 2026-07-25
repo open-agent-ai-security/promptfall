@@ -139,6 +139,10 @@ type MusicTrackKey =
   | "levelFive"
   | "levelSix"
   | "levelSeven"
+  | "levelEight"
+  | "levelNine"
+  | "levelTen"
+  | "levelEleven"
   | "gameOver";
 
 type GameArt = {
@@ -170,6 +174,10 @@ const MUSIC_SOURCES: Record<MusicTrackKey, string> = {
   levelFive: "./assets/music/llm05-raised-on-a-lie.mp3",
   levelSix: "./assets/music/llm06-again-and-again.mp3",
   levelSeven: "./assets/music/llm07-beautifully-wrong.mp3",
+  levelEight: "./assets/music/llm08-you-drew-me-a-map.mp3",
+  levelNine: "./assets/music/llm09-close-enough-to-be-dangerous.mp3",
+  levelTen: "./assets/music/llm10-passed-without-question.mp3",
+  levelEleven: "./assets/music/l11-promptfall-reprise.mp3",
   gameOver: "./assets/music/game-over.mp3",
 };
 const AVAILABLE_LEVEL_MUSIC: MusicTrackKey[] = [
@@ -180,10 +188,14 @@ const AVAILABLE_LEVEL_MUSIC: MusicTrackKey[] = [
   "levelFive",
   "levelSix",
   "levelSeven",
+  "levelEight",
+  "levelNine",
+  "levelTen",
+  "levelEleven",
 ];
 
 function musicForLevel(levelIndex: number): MusicTrackKey {
-  // Use each risk's dedicated theme, then rotate only for levels still awaiting one.
+  // Every campaign level has its own dedicated theme.
   return (
     AVAILABLE_LEVEL_MUSIC[levelIndex] ??
     AVAILABLE_LEVEL_MUSIC[levelIndex % AVAILABLE_LEVEL_MUSIC.length]
