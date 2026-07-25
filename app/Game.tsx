@@ -99,6 +99,8 @@ type DamageBurst = {
   duration: number;
 };
 
+type MusicTrackKey = "title" | "levelOne" | "levelTwo" | "gameOver";
+
 type GameArt = {
   backgrounds?: HTMLImageElement[];
   runFrames?: HTMLImageElement[];
@@ -118,6 +120,19 @@ const JUMP_SPEED = 820;
 const STARTING_INTEGRITY = 3;
 const BONUS_INTEGRITY_CAP = 4;
 const BONUS_LEVEL_INTERVAL = 3;
+const MUSIC_VOLUME = 0.34;
+const MUSIC_SOURCES: Record<MusicTrackKey, string> = {
+  title: "./assets/music/promptfall-title.mp3",
+  levelOne: "./assets/music/llm01-borrowed-hands.mp3",
+  levelTwo: "./assets/music/llm02-everything-you-told-me.mp3",
+  gameOver: "./assets/music/game-over.mp3",
+};
+const AVAILABLE_LEVEL_MUSIC: MusicTrackKey[] = ["levelOne", "levelTwo"];
+
+function musicForLevel(levelIndex: number): MusicTrackKey {
+  // Rotate the available themes until each later level receives its own track.
+  return AVAILABLE_LEVEL_MUSIC[levelIndex % AVAILABLE_LEVEL_MUSIC.length];
+}
 
 const PROMPT_INJECTION_LESSONS = [
   {
@@ -1493,6 +1508,155 @@ export default function Game() {
   const [muted, setMuted] = useState(false);
   const mutedRef = useRef(false);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const musicRef = useRef<Partial<Record<MusicTrackKey, HTMLAudioElement>>>({});
+  const activeMusicRef = useRef<MusicTrackKey | null>(null);
+  const desiredMusicRef = useRef<MusicTrackKey | null>(null);
+  const musicPrimedRef = useRef(false);
+  const musicEnvelopeRef = useRef(
+    new Map<MusicTrackKey, number>(
+      (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).map((key) => [key, 0]),
+    ),
+  );
+  const musicFadeRef = useRef(new Map<MusicTrackKey, number>());
+
+  const setMusicEnvelope = useCallback(
+    (key: MusicTrackKey, volume: number) => {
+      const clampedVolume = Math.max(0, Math.min(1, volume));
+      musicEnvelopeRef.current.set(key, clampedVolume);
+      const track = musicRef.current[key];
+      if (track) {
+        track.volume = mutedRef.current ? 0 : clampedVolume;
+      }
+    },
+    [],
+  );
+
+  const fadeMusic = useCallback(
+    (
+      key: MusicTrackKey,
+      targetVolume: number,
+      duration: number,
+      onComplete?: () => void,
+    ) => {
+      const existingFade = musicFadeRef.current.get(key);
+      if (existingFade !== undefined) {
+        window.cancelAnimationFrame(existingFade);
+      }
+
+      const startingVolume = musicEnvelopeRef.current.get(key) ?? 0;
+      if (duration <= 0) {
+        setMusicEnvelope(key, targetVolume);
+        musicFadeRef.current.delete(key);
+        onComplete?.();
+        return;
+      }
+
+      const startedAt = performance.now();
+      const tick = (now: number) => {
+        const progress = Math.min(1, (now - startedAt) / duration);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        setMusicEnvelope(
+          key,
+          startingVolume + (targetVolume - startingVolume) * easedProgress,
+        );
+        if (progress < 1) {
+          musicFadeRef.current.set(key, window.requestAnimationFrame(tick));
+          return;
+        }
+        musicFadeRef.current.delete(key);
+        onComplete?.();
+      };
+
+      musicFadeRef.current.set(key, window.requestAnimationFrame(tick));
+    },
+    [setMusicEnvelope],
+  );
+
+  const transitionMusic = useCallback(
+    (
+      nextTrack: MusicTrackKey | null,
+      options: {
+        fadeOut?: number;
+        fadeIn?: number;
+        restart?: boolean;
+      } = {},
+    ) => {
+      const {
+        fadeOut = 850,
+        fadeIn = 900,
+        restart = false,
+      } = options;
+      const previousTrack = activeMusicRef.current;
+      desiredMusicRef.current = nextTrack;
+
+      if (previousTrack && previousTrack !== nextTrack) {
+        const previousAudio = musicRef.current[previousTrack];
+        fadeMusic(previousTrack, 0, fadeOut, () => {
+          if (desiredMusicRef.current !== previousTrack) {
+            previousAudio?.pause();
+          }
+        });
+      }
+
+      if (!nextTrack) {
+        activeMusicRef.current = null;
+        return;
+      }
+
+      const nextAudio = musicRef.current[nextTrack];
+      if (!nextAudio) return;
+      const isNewTrack = previousTrack !== nextTrack;
+      if (restart) {
+        nextAudio.currentTime = 0;
+      }
+      if (isNewTrack || restart) {
+        setMusicEnvelope(nextTrack, 0);
+      }
+      activeMusicRef.current = nextTrack;
+      void nextAudio.play().catch(() => {
+        // Browsers may wait for the first key press or tap before allowing music.
+      });
+      fadeMusic(nextTrack, MUSIC_VOLUME, fadeIn);
+    },
+    [fadeMusic, setMusicEnvelope],
+  );
+
+  const unlockMusic = useCallback(() => {
+    const desiredTrack = desiredMusicRef.current;
+    if (!desiredTrack || mutedRef.current) return;
+    const desiredAudio = musicRef.current[desiredTrack];
+    if (!desiredAudio) return;
+
+    if (!musicPrimedRef.current) {
+      musicPrimedRef.current = true;
+      (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
+        if (key === desiredTrack) return;
+        const track = musicRef.current[key];
+        if (!track) return;
+        track.volume = 0;
+        void track
+          .play()
+          .then(() => {
+            if (desiredMusicRef.current !== key) {
+              track.pause();
+              track.currentTime = 0;
+            }
+            track.volume = mutedRef.current
+              ? 0
+              : (musicEnvelopeRef.current.get(key) ?? 0);
+          })
+          .catch(() => {
+            // A later interaction can retry if this browser is stricter.
+            musicPrimedRef.current = false;
+          });
+      });
+    }
+
+    if (!desiredAudio.paused) return;
+    void desiredAudio.play().catch(() => {
+      // Audio remains optional if the browser declines playback.
+    });
+  }, []);
 
   const playTone = useCallback(
     (frequency: number, duration: number, type: OscillatorType = "sine") => {
@@ -1662,6 +1826,36 @@ export default function Game() {
   }, [scene]);
 
   useEffect(() => {
+    const tracks = Object.fromEntries(
+      (Object.entries(MUSIC_SOURCES) as [MusicTrackKey, string][]).map(
+        ([key, source]) => {
+          const track = new Audio();
+          track.loop = true;
+          track.preload =
+            key === "title" || key === "levelOne" ? "auto" : "metadata";
+          track.volume = 0;
+          track.src = source;
+          return [key, track];
+        },
+      ),
+    ) as Record<MusicTrackKey, HTMLAudioElement>;
+    musicRef.current = tracks;
+
+    return () => {
+      musicFadeRef.current.forEach((frame) =>
+        window.cancelAnimationFrame(frame),
+      );
+      musicFadeRef.current.clear();
+      Object.values(tracks).forEach((track) => {
+        track.pause();
+        track.removeAttribute("src");
+        track.load();
+      });
+      musicRef.current = {};
+    };
+  }, []);
+
+  useEffect(() => {
     const load = (src: string) => {
       const image = new Image();
       image.decoding = "async";
@@ -1682,7 +1876,71 @@ export default function Game() {
 
   useEffect(() => {
     mutedRef.current = muted;
-  }, [muted]);
+    (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
+      const track = musicRef.current[key];
+      if (track) {
+        track.volume = muted
+          ? 0
+          : (musicEnvelopeRef.current.get(key) ?? 0);
+      }
+    });
+    if (!muted) unlockMusic();
+  }, [muted, unlockMusic]);
+
+  useEffect(() => {
+    const handleMusicUnlock = () => unlockMusic();
+    window.addEventListener("keydown", handleMusicUnlock, { capture: true });
+    window.addEventListener("pointerdown", handleMusicUnlock, {
+      capture: true,
+      passive: true,
+    });
+    return () => {
+      window.removeEventListener("keydown", handleMusicUnlock, {
+        capture: true,
+      });
+      window.removeEventListener("pointerdown", handleMusicUnlock, {
+        capture: true,
+      });
+    };
+  }, [unlockMusic]);
+
+  useEffect(() => {
+    if (scene === "splash" || scene === "title") {
+      transitionMusic("title", {
+        fadeOut: 650,
+        fadeIn: 1100,
+        restart: scene === "splash" || activeMusicRef.current !== "title",
+      });
+      return;
+    }
+    if (scene === "levelIntro") {
+      transitionMusic(musicForLevel(levelIndex), {
+        fadeOut: 900,
+        fadeIn: 1100,
+        restart: true,
+      });
+      return;
+    }
+    if (scene === "playing") {
+      transitionMusic(musicForLevel(levelIndex), {
+        fadeOut: 700,
+        fadeIn: 500,
+      });
+      return;
+    }
+    if (scene === "complete" || scene === "winner") {
+      transitionMusic(null, { fadeOut: 900 });
+      return;
+    }
+    if (scene === "gameOver") {
+      transitionMusic("gameOver", {
+        fadeOut: 950,
+        fadeIn: 900,
+        restart: true,
+      });
+    }
+    // The Praxen screen keeps the Game Over song if that was the route here.
+  }, [levelIndex, scene, transitionMusic]);
 
   useEffect(
     () => () => {
