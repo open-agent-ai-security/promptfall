@@ -1835,7 +1835,7 @@ export default function Game() {
     if (sceneRef.current !== "splash") return;
     transitionMusic("title", {
       fadeOut: 0,
-      fadeIn: 420,
+      fadeIn: 0,
       restart: true,
     });
     unlockMusic();
