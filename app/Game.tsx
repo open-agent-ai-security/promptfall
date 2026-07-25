@@ -1801,6 +1801,18 @@ export default function Game() {
     startLevel(0);
   }, [startLevel]);
 
+  const enterTitle = useCallback(() => {
+    if (sceneRef.current !== "splash") return;
+    transitionMusic("title", {
+      fadeOut: 0,
+      fadeIn: 700,
+      restart: true,
+    });
+    unlockMusic();
+    sceneRef.current = "title";
+    setScene("title");
+  }, [transitionMusic, unlockMusic]);
+
   const advanceCampaign = useCallback(() => {
     const nextLevelIndex = levelIndexRef.current + 1;
     if (nextLevelIndex < LEVELS.length) {
@@ -1906,11 +1918,15 @@ export default function Game() {
   }, [unlockMusic]);
 
   useEffect(() => {
-    if (scene === "splash" || scene === "title") {
+    if (scene === "splash") {
+      transitionMusic(null, { fadeOut: 0 });
+      return;
+    }
+    if (scene === "title") {
       transitionMusic("title", {
         fadeOut: 650,
         fadeIn: 1100,
-        restart: scene === "splash" || activeMusicRef.current !== "title",
+        restart: activeMusicRef.current !== "title",
       });
       return;
     }
@@ -1951,16 +1967,6 @@ export default function Game() {
     },
     [],
   );
-
-  useEffect(() => {
-    const splashTimer = window.setTimeout(() => {
-      if (sceneRef.current === "splash") {
-        sceneRef.current = "title";
-        setScene("title");
-      }
-    }, 4200);
-    return () => window.clearTimeout(splashTimer);
-  }, []);
 
   useEffect(() => {
     if (scene !== "levelIntro") return;
@@ -2065,6 +2071,14 @@ export default function Game() {
         event.preventDefault();
       }
       if (
+        sceneRef.current === "splash" &&
+        (event.code === "Space" || event.code === "Enter")
+      ) {
+        event.preventDefault();
+        if (!event.repeat) enterTitle();
+        return;
+      }
+      if (
         sceneRef.current === "title" &&
         (event.code === "Space" || event.code === "Enter")
       ) {
@@ -2137,7 +2151,7 @@ export default function Game() {
       window.removeEventListener("keyup", keyUp);
       window.removeEventListener("blur", releaseInputs);
     };
-  }, [advanceCampaign, startCampaign, startLevel]);
+  }, [advanceCampaign, enterTitle, startCampaign, startLevel]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -2639,6 +2653,17 @@ export default function Game() {
                 PRESENTS A CYBER DEFENSE ADVENTURE
                 <span />
               </div>
+              <button
+                type="button"
+                className="sponsor-start"
+                onClick={enterTitle}
+                data-testid="sponsor-start"
+              >
+                <span className="desktop-start-copy">
+                  PRESS SPACE / CLICK TO START
+                </span>
+                <span className="touch-start-copy">TAP TO START</span>
+              </button>
             </div>
           </div>
         )}

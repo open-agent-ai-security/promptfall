@@ -223,6 +223,57 @@ button {
   transform: scaleX(-1);
 }
 
+.sponsor-start {
+  margin-top: clamp(18px, 3.2vh, 34px);
+  padding: 10px clamp(22px, 3vw, 42px);
+  border: 2px solid rgba(95, 230, 255, 0.72);
+  color: #fff3a4;
+  background:
+    linear-gradient(135deg, rgba(10, 71, 116, 0.86), rgba(6, 18, 39, 0.92) 52%, rgba(116, 48, 8, 0.88));
+  box-shadow:
+    0 0 0 2px rgba(0, 8, 20, 0.9),
+    0 0 24px rgba(46, 218, 255, 0.32),
+    inset 0 0 20px rgba(255, 160, 32, 0.13);
+  clip-path: polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0 50%);
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(17px, 2vw, 29px);
+  font-style: italic;
+  letter-spacing: 0.11em;
+  line-height: 1;
+  text-shadow:
+    3px 3px 0 #84210d,
+    -2px -2px 0 #064d9b,
+    0 0 14px rgba(255, 173, 38, 0.85);
+  cursor: pointer;
+  animation: sponsor-start-pulse 1.05s 1.05s ease-in-out infinite;
+}
+
+.sponsor-start::before,
+.sponsor-start::after {
+  color: var(--orange);
+  font-size: 0.68em;
+}
+
+.sponsor-start::before {
+  content: "▶";
+  margin-right: 0.7em;
+}
+
+.sponsor-start::after {
+  content: "◀";
+  margin-left: 0.7em;
+}
+
+.sponsor-start:hover {
+  border-color: #fff1a1;
+  filter: brightness(1.28);
+}
+
+.sponsor-start:focus-visible {
+  outline: 3px solid #fff4a8;
+  outline-offset: 5px;
+}
+
 .screen--title {
   overflow: hidden;
   background: #020815;
@@ -1860,6 +1911,24 @@ kbd {
 @keyframes warp-spin {
   to {
     transform: rotate(1turn) scale(1.08);
+  }
+}
+
+@keyframes sponsor-start-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+    box-shadow:
+      0 0 0 2px rgba(0, 8, 20, 0.9),
+      0 0 22px rgba(46, 218, 255, 0.28),
+      inset 0 0 20px rgba(255, 160, 32, 0.13);
+  }
+  50% {
+    filter: brightness(1.24);
+    box-shadow:
+      0 0 0 2px rgba(0, 8, 20, 0.9),
+      0 0 38px rgba(46, 218, 255, 0.5),
+      inset 0 0 28px rgba(255, 160, 32, 0.28);
   }
 }
 
