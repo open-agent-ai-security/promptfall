@@ -725,7 +725,7 @@ const enemySpawn = (
 
 const LEVEL_LAYOUTS: LevelLayout[] = [
   {
-    // Give new players generous opening jumps before introducing precision.
+    // Keep Level 1 forgiving while players learn momentum and stomp timing.
     platforms: [
       { x: 0, y: 606, w: 620, h: 114, kind: "floor" },
       { x: 680, y: 606, w: 510, h: 114, kind: "floor" },
@@ -734,18 +734,18 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       { x: 2500, y: 606, w: 580, h: 114, kind: "floor" },
       { x: 430, y: 490, w: 230, h: 24, kind: "ledge" },
       { x: 800, y: 485, w: 250, h: 24, kind: "ledge" },
-      { x: 1220, y: 490, w: 230, h: 24, kind: "ledge" },
-      { x: 1690, y: 368, w: 250, h: 24, kind: "ledge" },
-      { x: 2180, y: 464, w: 220, h: 24, kind: "ledge" },
-      { x: 2580, y: 402, w: 260, h: 24, kind: "ledge" },
+      { x: 1220, y: 445, w: 230, h: 24, kind: "ledge" },
+      { x: 1580, y: 370, w: 280, h: 24, kind: "ledge" },
+      { x: 2020, y: 450, w: 260, h: 24, kind: "ledge" },
+      { x: 2420, y: 400, w: 300, h: 24, kind: "ledge" },
     ],
     enemies: [
       enemySpawn(0, 735, 606, 700, 820, 72, 0),
       enemySpawn(1, 900, 485, 835, 965, -78, 0.7),
-      enemySpawn(2, 1310, 490, 1250, 1365, 82, 1.4),
-      enemySpawn(3, 1770, 368, 1715, 1850, -74, 2.1),
-      enemySpawn(4, 2240, 464, 2195, 2310, 78, 2.8),
-      enemySpawn(5, 2670, 402, 2600, 2750, -80, 3.5),
+      enemySpawn(2, 1310, 445, 1250, 1365, 82, 1.4),
+      enemySpawn(3, 1690, 370, 1610, 1760, -74, 2.1),
+      enemySpawn(4, 2110, 450, 2050, 2170, 78, 2.8),
+      enemySpawn(5, 2530, 400, 2450, 2600, -80, 3.5),
     ],
   },
   {
