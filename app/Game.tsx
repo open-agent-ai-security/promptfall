@@ -52,6 +52,7 @@ type Player = {
 type Enemy = {
   lessonIndex: number;
   artIndex?: number;
+  ridingPlatformIndex?: number;
   x: number;
   y: number;
   vx: number;
@@ -646,9 +647,11 @@ const enemySpawn = (
   vx: number,
   pulse: number,
   artIndex?: number,
+  ridingPlatformIndex?: number,
 ): EnemySpawn => ({
   lessonIndex,
   artIndex,
+  ridingPlatformIndex,
   x,
   y: platformY - 66,
   vx,
@@ -899,18 +902,19 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
     ],
   },
   {
-    worldWidth: 5390,
-    exitFieldX: 5055,
+    worldWidth: 6000,
+    exitFieldX: 5700,
     platforms: [
       { x: 0, y: 606, w: 650, h: 114, kind: "floor" },
       { x: 730, y: 606, w: 490, h: 114, kind: "floor" },
-      { x: 1310, y: 606, w: 500, h: 114, kind: "floor" },
-      { x: 1880, y: 606, w: 470, h: 114, kind: "floor" },
-      { x: 2570, y: 606, w: 530, h: 114, kind: "floor" },
-      { x: 3180, y: 606, w: 370, h: 114, kind: "floor" },
-      { x: 3790, y: 606, w: 460, h: 114, kind: "floor" },
-      { x: 4330, y: 606, w: 450, h: 114, kind: "floor" },
-      { x: 4860, y: 606, w: 530, h: 114, kind: "floor" },
+      { x: 1310, y: 606, w: 330, h: 114, kind: "floor" },
+      { x: 1900, y: 606, w: 480, h: 114, kind: "floor" },
+      { x: 2480, y: 606, w: 530, h: 114, kind: "floor" },
+      { x: 3090, y: 606, w: 430, h: 114, kind: "floor" },
+      { x: 3970, y: 606, w: 480, h: 114, kind: "floor" },
+      { x: 4530, y: 606, w: 470, h: 114, kind: "floor" },
+      { x: 5080, y: 606, w: 420, h: 114, kind: "floor" },
+      { x: 5580, y: 606, w: 420, h: 114, kind: "floor" },
       { x: 380, y: 470, w: 260, h: 24, kind: "ledge" },
       {
         x: 820,
@@ -921,41 +925,80 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
         motion: { axis: "y", distance: 70, period: 3.8, phase: 0.8 },
       },
       { x: 1280, y: 455, w: 250, h: 24, kind: "ledge" },
-      { x: 1640, y: 350, w: 250, h: 24, kind: "ledge" },
-      { x: 2050, y: 440, w: 250, h: 24, kind: "ledge" },
       {
-        x: 2375,
+        x: 1665,
         y: 520,
-        w: 150,
+        w: 125,
         h: 24,
         kind: "ledge",
-        motion: { axis: "x", distance: 70, period: 3.2, phase: -1.2 },
+        motion: { axis: "y", distance: 45, period: 3.45, phase: 0.4 },
       },
-      { x: 2650, y: 410, w: 260, h: 24, kind: "ledge" },
-      { x: 2960, y: 480, w: 220, h: 24, kind: "ledge" },
-      { x: 3220, y: 420, w: 190, h: 24, kind: "ledge" },
       {
-        x: 3575,
+        x: 1790,
+        y: 485,
+        w: 130,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "x", distance: 35, period: 3.1, phase: -0.9 },
+      },
+      { x: 2050, y: 440, w: 250, h: 24, kind: "ledge" },
+      {
+        x: 2395,
         y: 510,
         w: 150,
         h: 24,
         kind: "ledge",
-        motion: { axis: "x", distance: 66, period: 3.45, phase: 1.1 },
+        motion: { axis: "x", distance: 48, period: 3.25, phase: 1.2 },
       },
-      { x: 3930, y: 390, w: 250, h: 24, kind: "ledge" },
+      { x: 2600, y: 410, w: 260, h: 24, kind: "ledge" },
       {
-        x: 4410,
+        x: 2960,
+        y: 485,
+        w: 220,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "y", distance: 45, period: 3.75, phase: 1.8 },
+      },
+      { x: 3200, y: 420, w: 190, h: 24, kind: "ledge" },
+      {
+        x: 3550,
+        y: 515,
+        w: 145,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "y", distance: 52, period: 3.6, phase: -0.2 },
+      },
+      {
+        x: 3750,
+        y: 480,
+        w: 150,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "x", distance: 55, period: 3.25, phase: 1.15 },
+      },
+      { x: 4070, y: 390, w: 250, h: 24, kind: "ledge" },
+      {
+        x: 4620,
         y: 465,
         w: 220,
         h: 24,
         kind: "ledge",
         motion: { axis: "y", distance: 62, period: 4.1, phase: 2.2 },
       },
-      { x: 4880, y: 430, w: 260, h: 24, kind: "ledge" },
+      {
+        x: 5020,
+        y: 505,
+        w: 150,
+        h: 24,
+        kind: "ledge",
+        motion: { axis: "x", distance: 42, period: 3.3, phase: -1.5 },
+      },
+      { x: 5200, y: 430, w: 250, h: 24, kind: "ledge" },
+      { x: 5600, y: 430, w: 260, h: 24, kind: "ledge" },
     ],
     energyTraps: [
       {
-        x: 1570,
+        x: 1550,
         y: 606,
         w: 76,
         period: 3.4,
@@ -964,7 +1007,7 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
         phase: 0.25,
       },
       {
-        x: 3425,
+        x: 3415,
         y: 606,
         w: 76,
         period: 3.65,
@@ -975,24 +1018,38 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
     ],
     enemies: [
       enemySpawn(0, 470, 470, 420, 550, 78, 0, 0),
-      enemySpawn(1, 900, 606, 790, 1080, -82, 0.55, 1),
+      enemySpawn(1, 900, 470, 850, 960, -82, 0.55, 1, 11),
       enemySpawn(2, 1370, 455, 1310, 1440, 84, 1.1, 2),
-      enemySpawn(3, 2070, 440, 2020, 2180, -80, 1.65, 3),
-      enemySpawn(4, 2730, 410, 2680, 2830, 86, 2.2, 4),
-      enemySpawn(5, 3010, 480, 2980, 3100, -82, 2.75, 5),
-      enemySpawn(6, 3280, 420, 3240, 3330, 88, 3.3, 6),
-      enemySpawn(7, 4000, 390, 3960, 4110, -84, 3.85, 7),
-      enemySpawn(8, 4450, 606, 4370, 4560, 88, 4.4, 8),
-      enemySpawn(9, 4700, 606, 4630, 4740, -86, 4.95, 9),
+      enemySpawn(3, 2110, 440, 2070, 2220, -80, 1.65, 3),
+      enemySpawn(4, 2680, 410, 2640, 2790, 86, 2.2, 4),
+      enemySpawn(5, 3030, 485, 2990, 3090, -82, 2.75, 5, 18),
+      enemySpawn(6, 3250, 420, 3220, 3320, 88, 3.3, 6),
+      enemySpawn(7, 4130, 390, 4090, 4240, -84, 3.85, 7),
+      enemySpawn(8, 4690, 465, 4650, 4760, 88, 4.4, 8, 23),
+      enemySpawn(9, 5670, 430, 5630, 5780, -86, 4.95, 9),
     ],
   },
 ];
 
 const createEnemies = (levelIndex = 0): Enemy[] =>
-  LEVEL_LAYOUTS[levelIndex].enemies.map((enemy) => ({
-    ...enemy,
-    active: true,
-  }));
+  LEVEL_LAYOUTS[levelIndex].enemies.map((enemy) => {
+    const platformIndex = enemy.ridingPlatformIndex;
+    if (platformIndex === undefined) {
+      return { ...enemy, active: true };
+    }
+    const basePlatform = LEVEL_LAYOUTS[levelIndex].platforms[platformIndex];
+    const resolvedPlatform = platformAtTime(basePlatform, 0);
+    const dx = resolvedPlatform.x - basePlatform.x;
+    const dy = resolvedPlatform.y - basePlatform.y;
+    return {
+      ...enemy,
+      x: enemy.x + dx,
+      y: enemy.y + dy,
+      minX: enemy.minX + dx,
+      maxX: enemy.maxX + dx,
+      active: true,
+    };
+  });
 
 const createBonusCrate = (levelIndex = 0): BonusCrate | null =>
   LEVELS[levelIndex].number % BONUS_LEVEL_INTERVAL === 0
@@ -2546,6 +2603,7 @@ export default function Game() {
       );
       if (sceneRef.current === "playing") {
         const input = inputRef.current;
+        const previousPlatforms = activePlatforms;
         const nextPlatformTime = player.runClock + dt;
         const nextPlatforms = activeLayout.platforms.map((platform) =>
           platformAtTime(platform, nextPlatformTime),
@@ -2756,8 +2814,21 @@ export default function Game() {
 
         for (const enemy of enemies) {
           if (sceneRef.current !== "playing") break;
-          if (!enemy.active) continue;
 
+          if (enemy.ridingPlatformIndex !== undefined) {
+            const previousPlatform =
+              previousPlatforms[enemy.ridingPlatformIndex];
+            const nextPlatform = activePlatforms[enemy.ridingPlatformIndex];
+            if (previousPlatform && nextPlatform) {
+              const platformDx = nextPlatform.x - previousPlatform.x;
+              const platformDy = nextPlatform.y - previousPlatform.y;
+              enemy.x += platformDx;
+              enemy.y += platformDy;
+              enemy.minX += platformDx;
+              enemy.maxX += platformDx;
+            }
+          }
+          if (!enemy.active) continue;
           enemy.x += enemy.vx * dt;
           if (enemy.x < enemy.minX || enemy.x > enemy.maxX) {
             enemy.vx *= -1;
