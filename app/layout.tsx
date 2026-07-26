@@ -80,6 +80,16 @@ export default function RootLayout({
           type="audio/mpeg"
           fetchPriority="high"
         />
+        <script
+          data-goatcounter="https://open-agent-ai-security.goatcounter.com/count"
+          async
+          src="/assets/count.js"
+        />
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "223642421cad463daf91bd9429a5f9a0"}'
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

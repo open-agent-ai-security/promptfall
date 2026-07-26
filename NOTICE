@@ -44,6 +44,13 @@ The Praxen lockup in public/assets/praxen-lockup-dark-background.png is reused
 from the Praxen project (https://github.com/open-agent-ai-security/praxen).
 Copyright 2026 Exabeam, Inc. It is used under the Apache License, Version 2.0.
 
+The public website loads GoatCounter's count.js
+(https://www.goatcounter.com/, ISC License) for cookieless pageview analytics.
+The script is vendored at public/assets/count.js with its license header
+retained and is served from the Promptfall site. The website also loads the
+Cloudflare Web Analytics beacon from static.cloudflareinsights.com. These
+counters are limited to public pageviews; Promptfall sends no gameplay events.
+
 Except for the third-party material identified above, Promptfall source code,
 original game artwork, and original documentation are licensed under the
 Apache License, Version 2.0.

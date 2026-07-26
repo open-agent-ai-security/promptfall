@@ -23,9 +23,11 @@ Applications 2026 into a playable campaign. Guide Praxi through eleven
 high-tech environments, stomp animated threats, and catch concise definitions,
 examples, defenses, and key insights without stopping the action.
 
-There is no account, backend, installation, or telemetry. The entire game runs
-from static files and can be played directly on
-[GitHub Pages](https://open-agent-ai-security.github.io/promptfall/).
+There is no account, backend, or installation. The entire game runs from static
+files and can be played directly on
+[GitHub Pages](https://open-agent-ai-security.github.io/promptfall/). The public
+site uses cookieless GoatCounter and Cloudflare Web Analytics pageview counters;
+it does not record controls, game progress, or educational responses.
 
 ---
 

@@ -59,6 +59,36 @@ test("keeps gameplay lessons concise and easy to scan", async () => {
   assert.doesNotMatch(lessonTexts.join("\n"), /—/);
 });
 
+test("ships community pageview counters without gameplay telemetry", async () => {
+  const response = await render();
+  const html = await response.text();
+  const staticEntry = await readFile(
+    new URL("../static/index.html", import.meta.url),
+    "utf8",
+  );
+  const counterClient = await readFile(
+    new URL("../public/assets/count.js", import.meta.url),
+    "utf8",
+  );
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+
+  for (const entry of [html, staticEntry]) {
+    assert.match(
+      entry,
+      /open-agent-ai-security\.goatcounter\.com\/count/i,
+    );
+    assert.match(entry, /assets\/count\.js/i);
+    assert.match(entry, /static\.cloudflareinsights\.com\/beacon\.min\.js/i);
+    assert.match(entry, /data-cf-beacon/i);
+  }
+
+  assert.match(counterClient, /ISC License/i);
+  assert.doesNotMatch(gameSource, /goatcounter|cloudflareinsights/i);
+});
+
 test("ships social metadata and accessible controls", async () => {
   const response = await render();
   const html = await response.text();
