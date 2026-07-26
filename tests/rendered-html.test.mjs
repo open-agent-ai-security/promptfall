@@ -149,6 +149,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.doesNotMatch(gameSource, /musicPrimedRef/i);
   assert.match(gameSource, /sfx-next-level\.mp3/i);
   assert.match(gameSource, /sfx-player-hit\.mp3/i);
+  assert.match(gameSource, /PLAYER_INVULNERABILITY_SECONDS = 1\.8/i);
   assert.match(gameSource, /sfx-level-complete\.mp3/i);
   assert.match(gameSource, /sfx-laser\.mp3/i);
   assert.match(gameSource, /sfx-gameover\.mp3/i);

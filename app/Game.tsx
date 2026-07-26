@@ -176,6 +176,7 @@ const JUMP_SPEED = 820;
 const STARTING_INTEGRITY = 3;
 const BONUS_INTEGRITY_CAP = 4;
 const BONUS_LEVEL_INTERVAL = 3;
+const PLAYER_INVULNERABILITY_SECONDS = 1.8;
 const MUSIC_VOLUME = 0.34;
 const MUSIC_SOURCES: Record<MusicTrackKey, string> = {
   title: "./assets/music/promptfall-title.mp3",
@@ -1630,10 +1631,10 @@ function drawPraxi(
   jumpSprite?: HTMLImageElement,
 ) {
   const x = player.x - cameraX + player.w / 2;
-  const damageGlow = Math.max(
-    0,
-    Math.min(1, (player.invulnerable - 0.45) / 0.75),
-  );
+  const damageGlow =
+    player.invulnerable > 0
+      ? Math.max(0.38, Math.min(1, player.invulnerable / 0.85))
+      : 0;
   const damagePulse =
     damageGlow * (0.86 + Math.sin(player.runClock * 28) * 0.14);
 
@@ -2893,7 +2894,7 @@ export default function Game() {
           player.x = safePositionRef.current.x;
           player.y = safePositionRef.current.y - 24;
           player.vy = -320;
-          player.invulnerable = 1.25;
+          player.invulnerable = PLAYER_INVULNERABILITY_SECONDS;
           healthRef.current = Math.max(0, healthRef.current - 1);
           setHealth(healthRef.current);
           triggerDamageEffect(player);
@@ -2934,7 +2935,7 @@ export default function Game() {
           if (overlapsBeam && player.invulnerable <= 0) {
             healthRef.current = Math.max(0, healthRef.current - 1);
             setHealth(healthRef.current);
-            player.invulnerable = 1.4;
+            player.invulnerable = PLAYER_INVULNERABILITY_SECONDS;
             player.grounded = false;
             standingPlatformRef.current = null;
             triggerDamageEffect(player);
@@ -3112,7 +3113,7 @@ export default function Game() {
             } else if (player.invulnerable <= 0) {
               healthRef.current = Math.max(0, healthRef.current - 1);
               setHealth(healthRef.current);
-              player.invulnerable = 1.4;
+              player.invulnerable = PLAYER_INVULNERABILITY_SECONDS;
               triggerDamageEffect(player);
               player.vx = player.x < enemy.x ? -420 : 420;
               player.vy = -410;
