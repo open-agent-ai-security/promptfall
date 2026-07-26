@@ -272,11 +272,11 @@ const PROMPT_INJECTION_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Keep credentials and dangerous powers in application code. Grant only the access each operation needs.",
+    text: "Keep credentials and privileged actions outside the model. Give each tool only the access required for its task.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Require human approval before privileged, irreversible, or publicly visible actions.",
+    text: "Require human approval before privileged, irreversible, or public actions.",
   },
 ] as const;
 
@@ -299,11 +299,11 @@ const SENSITIVE_INFORMATION_DISCLOSURE_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Authorize data before retrieval, isolate customers, and give the model only fields required for its task.",
+    text: "Limit model permissions and access to only the data needed for its task. Keep each customer's data separate.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Classify and redact every output channel before data leaves the trusted boundary.",
+    text: "Scan responses, logs, traces, and tool calls for sensitive data. Remove it before anything is shared.",
   },
 ] as const;
 
@@ -326,11 +326,11 @@ const EXCESSIVE_AGENCY_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Offer only task-specific tools, enforce strict inputs, and validate every argument.",
+    text: "Give agents only the tools their task requires. Restrict what each tool can accept and do.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Use least privilege and the user's security context. Independently authorize every high-impact action.",
+    text: "Use the current user's permissions and require separate approval for high-impact actions.",
   },
 ] as const;
 
@@ -353,11 +353,11 @@ const SUPPLY_CHAIN_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Verify suppliers and inventory every AI component. Lock approved versions so they cannot change.",
+    text: "Verify suppliers, track every model and dependency, and pin approved versions so they cannot change unexpectedly.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Signatures and scanners do not prove safety. Patch loaders, secure releases, and test deployed behavior.",
+    text: "Treat signatures and scanners as safeguards, not proof. Update software that loads models and test deployed behavior for tampering.",
   },
 ] as const;
 
@@ -380,7 +380,7 @@ const DATA_MODEL_POISONING_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Track signed data and model history, verify incoming data, and preserve known-good versions for recovery.",
+    text: "Track where training data and models came from. Verify new data and keep clean versions for recovery.",
   },
   {
     kind: "DEFENSE 2",
@@ -407,11 +407,11 @@ const UNBOUNDED_CONSUMPTION_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Estimate costs before execution. Enforce token, action, and spending limits that actually stop workloads.",
+    text: "Set hard limits on tokens, actions, time, and spending before an agent starts work.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Stop agents that run too long, repeat themselves, or spend too much.",
+    text: "Automatically stop agents that run too long, repeat themselves, or spend too much.",
   },
 ] as const;
 
@@ -434,11 +434,11 @@ const MISINFORMATION_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Ground claims in authoritative sources. Verify the evidence before any system acts on it.",
+    text: "Require trustworthy sources for important claims. Verify the evidence before people or systems act on it.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Check authorization, required conditions, and current state before high-impact actions. Require structured inputs and approval.",
+    text: "Before high-impact actions, recheck identity, authorization, required conditions, and current system state. Require human approval.",
   },
 ] as const;
 
@@ -461,11 +461,11 @@ const HIDDEN_CONTEXT_EXPOSURE_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Never put secrets or security settings in model context. Store them where the model cannot access them.",
+    text: "Assume hidden instructions and tool details can be revealed. Enforce permissions in application code, not model instructions.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Enforce authorization and least privilege with auditable controls outside the model.",
+    text: "Never place passwords, API keys, or other secrets in model context. Store them where the model cannot access them.",
   },
 ] as const;
 
@@ -488,11 +488,11 @@ const VECTOR_EMBEDDING_WEAKNESSES_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Enforce user and document permissions inside each search. Separate indexes by trust level.",
+    text: "Check user and document permissions during every search. Keep data from different users and trust levels separated.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Track each embedding's source, detect unusual vectors, and protect them like the original data.",
+    text: "Record where every embedding came from, flag unusual changes, and protect vector stores like the original documents.",
   },
 ] as const;
 
@@ -515,11 +515,11 @@ const IMPROPER_OUTPUT_HANDLING_LESSONS = [
   },
   {
     kind: "DEFENSE 1",
-    text: "Treat model output as untrusted input. Validate it strictly and authorize every downstream action.",
+    text: "Treat model output as untrusted. Check its format and content before displaying, storing, or acting on it.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Encode output for its destination and block automatic network requests from rendered content.",
+    text: "Clean model output before placing it in web pages, commands, or databases. Never load links or images without checking them.",
   },
 ] as const;
 
