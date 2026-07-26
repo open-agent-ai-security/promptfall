@@ -146,6 +146,15 @@ type MusicTrackKey =
   | "levelEleven"
   | "gameOver";
 
+type SfxKey =
+  | "nextLevel"
+  | "playerHit"
+  | "levelComplete"
+  | "laser"
+  | "gameOver"
+  | "powerUp"
+  | "enemyHit";
+
 type GameArt = {
   backgrounds?: HTMLImageElement[];
   runFrames?: HTMLImageElement[];
@@ -180,6 +189,36 @@ const MUSIC_SOURCES: Record<MusicTrackKey, string> = {
   levelTen: "./assets/music/llm10-passed-without-question.mp3",
   levelEleven: "./assets/music/l11-promptfall-reprise.mp3",
   gameOver: "./assets/music/game-over.mp3",
+};
+const SFX_SOURCES: Record<SfxKey, { source: string; volume: number }> = {
+  nextLevel: {
+    source: "./assets/sfx/sfx-next-level.mp3",
+    volume: 0.58,
+  },
+  playerHit: {
+    source: "./assets/sfx/sfx-player-hit.mp3",
+    volume: 0.72,
+  },
+  levelComplete: {
+    source: "./assets/sfx/sfx-level-complete.mp3",
+    volume: 0.62,
+  },
+  laser: {
+    source: "./assets/sfx/sfx-laser.mp3",
+    volume: 0.54,
+  },
+  gameOver: {
+    source: "./assets/sfx/sfx-gameover.mp3",
+    volume: 0.66,
+  },
+  powerUp: {
+    source: "./assets/sfx/sfx-powerup.mp3",
+    volume: 0.64,
+  },
+  enemyHit: {
+    source: "./assets/sfx/sfx-enemy-hit.mp3",
+    volume: 0.66,
+  },
 };
 const AVAILABLE_LEVEL_MUSIC: MusicTrackKey[] = [
   "levelOne",
@@ -1905,8 +1944,10 @@ export default function Game() {
   const [factLessonIndex, setFactLessonIndex] = useState(0);
   const [muted, setMuted] = useState(false);
   const mutedRef = useRef(false);
-  const audioContextRef = useRef<AudioContext | null>(null);
   const musicRef = useRef<Partial<Record<MusicTrackKey, HTMLAudioElement>>>({});
+  const sfxRef = useRef<Partial<Record<SfxKey, HTMLAudioElement>>>({});
+  const activeSfxRef = useRef(new Map<HTMLAudioElement, SfxKey>());
+  const laserFiringRef = useRef<boolean[]>([]);
   const activeMusicRef = useRef<MusicTrackKey | null>(null);
   const desiredMusicRef = useRef<MusicTrackKey | null>(null);
   const musicPrimedRef = useRef(false);
@@ -2057,48 +2098,24 @@ export default function Game() {
     });
   }, []);
 
-  const playTone = useCallback(
-    (frequency: number, duration: number, type: OscillatorType = "sine") => {
-      if (mutedRef.current || typeof window === "undefined") return;
-      try {
-        const AudioCtx =
-          window.AudioContext ||
-          (
-            window as typeof window & {
-              webkitAudioContext?: typeof AudioContext;
-            }
-          ).webkitAudioContext;
-        if (!AudioCtx) return;
-        const audio = audioContextRef.current ?? new AudioCtx();
-        audioContextRef.current = audio;
-        if (audio.state === "suspended") {
-          void audio.resume();
-        }
-        const oscillator = audio.createOscillator();
-        const gain = audio.createGain();
-        const startAt = audio.currentTime + 0.01;
-        oscillator.type = type;
-        oscillator.frequency.value = frequency;
-        gain.gain.setValueAtTime(0.0001, startAt);
-        gain.gain.exponentialRampToValueAtTime(0.08, startAt + 0.015);
-        gain.gain.exponentialRampToValueAtTime(
-          0.0001,
-          startAt + duration,
-        );
-        oscillator.connect(gain);
-        gain.connect(audio.destination);
-        oscillator.start(startAt);
-        oscillator.stop(startAt + duration);
-        oscillator.addEventListener("ended", () => {
-          oscillator.disconnect();
-          gain.disconnect();
-        });
-      } catch {
-        // Audio is enhancement-only.
-      }
-    },
-    [],
-  );
+  const playSfx = useCallback((key: SfxKey) => {
+    if (mutedRef.current || typeof window === "undefined") return;
+    const source = sfxRef.current[key];
+    if (!source) return;
+
+    const voice = source.cloneNode(true) as HTMLAudioElement;
+    voice.preload = "auto";
+    voice.volume = SFX_SOURCES[key].volume;
+    const releaseVoice = () => {
+      activeSfxRef.current.delete(voice);
+      voice.removeEventListener("ended", releaseVoice);
+      voice.removeEventListener("error", releaseVoice);
+    };
+    voice.addEventListener("ended", releaseVoice);
+    voice.addEventListener("error", releaseVoice);
+    activeSfxRef.current.set(voice, key);
+    void voice.play().catch(releaseVoice);
+  }, []);
 
   const triggerDamageEffect = useCallback((player: Player) => {
     const x = player.x + player.w / 2;
@@ -2142,8 +2159,8 @@ export default function Game() {
     }
     sceneRef.current = "gameOver";
     setScene("gameOver");
-    playTone(92, 0.42, "sawtooth");
-  }, [playTone]);
+    playSfx("gameOver");
+  }, [playSfx]);
 
   const resetGame = useCallback((nextLevelIndex = 0) => {
     if (factTimerRef.current !== null) {
@@ -2181,6 +2198,7 @@ export default function Game() {
     tailDustRef.current = [];
     tailDustClockRef.current = 0;
     tailDustSerialRef.current = 0;
+    laserFiringRef.current = [];
     cameraRef.current = 0;
     captureTimeRef.current = 0;
     fieldUnlockStartedRef.current = null;
@@ -2201,8 +2219,8 @@ export default function Game() {
     setLevelIndex(nextLevelIndex);
     sceneRef.current = "levelIntro";
     setScene("levelIntro");
-    playTone(220, 0.12, "square");
-  }, [playTone, resetGame]);
+    playSfx("nextLevel");
+  }, [playSfx, resetGame]);
 
   const startCampaign = useCallback(() => {
     startLevel(0);
@@ -2283,6 +2301,37 @@ export default function Game() {
   }, []);
 
   useEffect(() => {
+    const clips = Object.fromEntries(
+      (Object.entries(SFX_SOURCES) as [
+        SfxKey,
+        { source: string; volume: number },
+      ][]).map(([key, config]) => {
+        const clip = new Audio();
+        clip.preload = "auto";
+        clip.src = config.source;
+        clip.load();
+        return [key, clip];
+      }),
+    ) as Record<SfxKey, HTMLAudioElement>;
+    sfxRef.current = clips;
+
+    return () => {
+      activeSfxRef.current.forEach((_key, voice) => {
+        voice.pause();
+        voice.removeAttribute("src");
+        voice.load();
+      });
+      activeSfxRef.current.clear();
+      Object.values(clips).forEach((clip) => {
+        clip.pause();
+        clip.removeAttribute("src");
+        clip.load();
+      });
+      sfxRef.current = {};
+    };
+  }, []);
+
+  useEffect(() => {
     const load = (src: string) => {
       const image = new Image();
       image.decoding = "async";
@@ -2310,6 +2359,9 @@ export default function Game() {
           ? 0
           : (musicEnvelopeRef.current.get(key) ?? 0);
       }
+    });
+    activeSfxRef.current.forEach((key, voice) => {
+      voice.volume = muted ? 0 : SFX_SOURCES[key].volume;
     });
     if (!muted) unlockMusic();
   }, [muted, unlockMusic]);
@@ -2383,98 +2435,44 @@ export default function Game() {
     // theme after a loss, or the Gauntlet reprise after a campaign victory.
   }, [levelIndex, scene, transitionMusic]);
 
-  useEffect(
-    () => () => {
-      if (audioContextRef.current) {
-        void audioContextRef.current.close();
-      }
-    },
-    [],
-  );
-
   useEffect(() => {
     if (scene !== "levelIntro") return;
 
-    const secondBeat = window.setTimeout(
-      () => playTone(275, 0.1, "square"),
-      720,
-    );
-    const thirdBeat = window.setTimeout(
-      () => playTone(330, 0.12, "square"),
-      1440,
-    );
-    const goBeat = window.setTimeout(
-      () => playTone(760, 0.18, "triangle"),
-      2320,
-    );
     const beginLevel = window.setTimeout(() => {
       sceneRef.current = "playing";
       setScene("playing");
     }, 3400);
 
     return () => {
-      window.clearTimeout(secondBeat);
-      window.clearTimeout(thirdBeat);
-      window.clearTimeout(goBeat);
       window.clearTimeout(beginLevel);
     };
-  }, [playTone, scene]);
+  }, [scene]);
 
   useEffect(() => {
     if (scene !== "gameOver") return;
 
-    const pulseOne = window.setTimeout(
-      () => playTone(132, 0.16, "square"),
-      900,
-    );
-    const pulseTwo = window.setTimeout(
-      () => playTone(116, 0.16, "square"),
-      1510,
-    );
-    const pulseThree = window.setTimeout(
-      () => playTone(98, 0.22, "square"),
-      2120,
-    );
     const showPraxen = window.setTimeout(() => {
       sceneRef.current = "praxenAd";
       setScene("praxenAd");
-      playTone(310, 0.18, "triangle");
-      window.setTimeout(() => playTone(465, 0.22, "sine"), 120);
     }, 3450);
 
     return () => {
-      window.clearTimeout(pulseOne);
-      window.clearTimeout(pulseTwo);
-      window.clearTimeout(pulseThree);
       window.clearTimeout(showPraxen);
     };
-  }, [playTone, scene]);
+  }, [scene]);
 
   useEffect(() => {
     if (scene !== "winner") return;
 
-    const celebrationTones = [
-      window.setTimeout(() => playTone(523, 0.18, "triangle"), 120),
-      window.setTimeout(() => playTone(659, 0.18, "triangle"), 320),
-      window.setTimeout(() => playTone(784, 0.22, "triangle"), 520),
-      window.setTimeout(() => playTone(1047, 0.28, "sine"), 760),
-      window.setTimeout(() => playTone(784, 0.18, "triangle"), 1900),
-      window.setTimeout(() => playTone(1047, 0.24, "sine"), 2140),
-      window.setTimeout(() => playTone(1319, 0.3, "sine"), 2380),
-      window.setTimeout(() => playTone(1568, 0.35, "sine"), 3600),
-    ];
     const showPraxen = window.setTimeout(() => {
       sceneRef.current = "praxenAd";
       setScene("praxenAd");
-      playTone(310, 0.18, "triangle");
-      window.setTimeout(() => playTone(465, 0.22, "sine"), 120);
     }, 5600);
 
     return () => {
-      celebrationTones.forEach((timer) => window.clearTimeout(timer));
       window.clearTimeout(showPraxen);
     };
-  }, [playTone, scene]);
+  }, [scene]);
 
   useEffect(() => {
     const keyDown = (event: KeyboardEvent) => {
@@ -2636,7 +2634,6 @@ export default function Game() {
           player.vy = -JUMP_SPEED;
           player.grounded = false;
           jumpLatchRef.current = true;
-          playTone(520, 0.11, "square");
         }
         if (!input.jump) jumpLatchRef.current = false;
         if (!input.jump && player.vy < -260) player.vy *= Math.pow(0.018, dt);
@@ -2684,7 +2681,7 @@ export default function Game() {
           healthRef.current = Math.max(0, healthRef.current - 1);
           setHealth(healthRef.current);
           triggerDamageEffect(player);
-          playTone(110, 0.25, "sawtooth");
+          playSfx("playerHit");
           if (healthRef.current <= 0) {
             triggerGameOver();
           }
@@ -2693,7 +2690,23 @@ export default function Game() {
         player.invulnerable = Math.max(0, player.invulnerable - dt);
         player.runClock = nextPlatformTime;
 
-        for (const trap of activeLayout.energyTraps ?? []) {
+        const activeTraps = activeLayout.energyTraps ?? [];
+        const firingTraps = activeTraps.map((trap) => {
+          const screenX = trap.x - cameraRef.current;
+          const isAudible = screenX > -120 && screenX < VIEW_W + 120;
+          return (
+            isAudible &&
+            energyTrapState(trap, player.runClock).mode === "firing"
+          );
+        });
+        firingTraps.forEach((isFiring, trapIndex) => {
+          if (isFiring && !laserFiringRef.current[trapIndex]) {
+            playSfx("laser");
+          }
+        });
+        laserFiringRef.current = firingTraps;
+
+        for (const trap of activeTraps) {
           if (energyTrapState(trap, player.runClock).mode !== "firing") {
             continue;
           }
@@ -2712,7 +2725,7 @@ export default function Game() {
             player.vx =
               player.x + player.w / 2 < trap.x + trap.w / 2 ? -390 : 390;
             player.vy = -460;
-            playTone(138, 0.27, "sawtooth");
+            playSfx("playerHit");
             if (healthRef.current <= 0) {
               triggerGameOver();
               break;
@@ -2796,8 +2809,7 @@ export default function Game() {
               y: bonusCrate.y - 12,
               time: 1.5,
             };
-            playTone(880, 0.13, "triangle");
-            window.setTimeout(() => playTone(1180, 0.2, "sine"), 90);
+            playSfx("powerUp");
             for (let i = 0; i < 22; i++) {
               const a = (Math.PI * 2 * i) / 22;
               particlesRef.current.push({
@@ -2869,8 +2881,7 @@ export default function Game() {
                 setCallout(false);
                 factTimerRef.current = null;
               }, 6100);
-              playTone(760, 0.16, "triangle");
-              window.setTimeout(() => playTone(1040, 0.2, "sine"), 90);
+              playSfx("enemyHit");
               for (let i = 0; i < 28; i++) {
                 const a = (Math.PI * 2 * i) / 28;
                 particlesRef.current.push({
@@ -2889,7 +2900,7 @@ export default function Game() {
               triggerDamageEffect(player);
               player.vx = player.x < enemy.x ? -420 : 420;
               player.vy = -410;
-              playTone(125, 0.24, "sawtooth");
+              playSfx("playerHit");
               if (healthRef.current <= 0) {
                 triggerGameOver();
                 break;
@@ -2970,8 +2981,7 @@ export default function Game() {
             levelIndexRef.current === LEVELS.length - 1;
           sceneRef.current = completedCampaign ? "winner" : "complete";
           setScene(completedCampaign ? "winner" : "complete");
-          playTone(660, 0.15, "triangle");
-          window.setTimeout(() => playTone(880, 0.23, "triangle"), 120);
+          playSfx("levelComplete");
         }
       }
 
@@ -3071,7 +3081,7 @@ export default function Game() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [playTone, triggerDamageEffect, triggerGameOver]);
+  }, [playSfx, triggerDamageEffect, triggerGameOver]);
 
   const syncTouchDirection = useCallback(() => {
     let left = false;
