@@ -144,8 +144,9 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /llm09-close-enough-to-be-dangerous\.mp3/i);
   assert.match(gameSource, /llm10-passed-without-question\.mp3/i);
   assert.match(gameSource, /l11-promptfall-reprise\.mp3/i);
-  assert.match(gameSource, /track\.muted = true/i);
-  assert.match(gameSource, /track\.muted = false/i);
+  assert.match(gameSource, /inactiveAudio\.muted = true/i);
+  assert.match(gameSource, /desiredAudio\.muted = false/i);
+  assert.doesNotMatch(gameSource, /musicPrimedRef/i);
   assert.match(gameSource, /sfx-next-level\.mp3/i);
   assert.match(gameSource, /sfx-player-hit\.mp3/i);
   assert.match(gameSource, /sfx-level-complete\.mp3/i);

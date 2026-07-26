@@ -3196,7 +3196,9 @@ kbd {
   }
 }
 
-@media (hover: none) and (max-height: 500px),
+@media (max-width: 600px),
+  (hover: none) and (max-width: 1200px),
+  (pointer: coarse) and (max-width: 1200px),
   (max-width: 1000px) and (max-height: 500px) {
   .desktop-start-copy,
   .desktop-control-copy,

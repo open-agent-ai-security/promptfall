@@ -2120,7 +2120,6 @@ export default function Game() {
   const laserFiringRef = useRef<boolean[]>([]);
   const activeMusicRef = useRef<MusicTrackKey | null>(null);
   const desiredMusicRef = useRef<MusicTrackKey | null>(null);
-  const musicPrimedRef = useRef(false);
   const musicEnvelopeRef = useRef(
     new Map<MusicTrackKey, number>(
       (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).map((key) => [key, 0]),
@@ -2199,11 +2198,30 @@ export default function Game() {
       const previousTrack = activeMusicRef.current;
       desiredMusicRef.current = nextTrack;
 
+      // Enforce a one-transition-at-a-time mixer. Any track that is neither
+      // the outgoing nor incoming song is stopped and muted immediately.
+      (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
+        if (key === previousTrack || key === nextTrack) return;
+        const inactiveAudio = musicRef.current[key];
+        const inactiveFade = musicFadeRef.current.get(key);
+        if (inactiveFade !== undefined) {
+          window.cancelAnimationFrame(inactiveFade);
+          musicFadeRef.current.delete(key);
+        }
+        inactiveAudio?.pause();
+        if (inactiveAudio) {
+          inactiveAudio.currentTime = 0;
+          inactiveAudio.muted = true;
+        }
+        setMusicEnvelope(key, 0);
+      });
+
       if (previousTrack && previousTrack !== nextTrack) {
         const previousAudio = musicRef.current[previousTrack];
         fadeMusic(previousTrack, 0, fadeOut, () => {
           if (desiredMusicRef.current !== previousTrack) {
             previousAudio?.pause();
+            if (previousAudio) previousAudio.muted = true;
           }
         });
       }
@@ -2215,6 +2233,7 @@ export default function Game() {
 
       const nextAudio = musicRef.current[nextTrack];
       if (!nextAudio) return;
+      nextAudio.muted = false;
       const isNewTrack = previousTrack !== nextTrack;
       if (restart) {
         nextAudio.currentTime = 0;
@@ -2237,37 +2256,21 @@ export default function Game() {
     const desiredAudio = musicRef.current[desiredTrack];
     if (!desiredAudio) return;
 
-    if (!musicPrimedRef.current) {
-      musicPrimedRef.current = true;
-      (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
-        if (key === desiredTrack) return;
-        const track = musicRef.current[key];
-        if (!track) return;
-        // Mobile Safari may ignore programmatic volume changes. Use the media
-        // element's mute flag while priming so preloaded tracks cannot leak.
+    // Never start background tracks merely to unlock them. Mobile Safari can
+    // make those supposedly silent elements audible. Only the desired song is
+    // allowed to play; everything else is stopped and held muted.
+    (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
+      if (key === desiredTrack) return;
+      const track = musicRef.current[key];
+      track?.pause();
+      if (track) {
+        track.currentTime = 0;
         track.muted = true;
-        track.volume = 0;
-        void track
-          .play()
-          .then(() => {
-            if (desiredMusicRef.current !== key) {
-              track.pause();
-              track.currentTime = 0;
-            }
-            track.muted = false;
-            track.volume = mutedRef.current
-              ? 0
-              : (musicEnvelopeRef.current.get(key) ?? 0);
-          })
-          .catch(() => {
-            track.pause();
-            track.muted = false;
-            // A later interaction can retry if this browser is stricter.
-            musicPrimedRef.current = false;
-          });
-      });
-    }
+      }
+      musicEnvelopeRef.current.set(key, 0);
+    });
 
+    desiredAudio.muted = false;
     if (!desiredAudio.paused) return;
     void desiredAudio.play().catch(() => {
       // Audio remains optional if the browser declines playback.
@@ -2391,12 +2394,17 @@ export default function Game() {
       titleTransitionTimerRef.current = null;
     }
     resetGame(nextLevelIndex);
+    transitionMusic(musicForLevel(nextLevelIndex), {
+      fadeOut: 900,
+      fadeIn: 1100,
+      restart: true,
+    });
     levelIndexRef.current = nextLevelIndex;
     setLevelIndex(nextLevelIndex);
     sceneRef.current = "levelIntro";
     setScene("levelIntro");
     playSfx("nextLevel");
-  }, [playSfx, resetGame]);
+  }, [playSfx, resetGame, transitionMusic]);
 
   const startCampaign = useCallback(() => {
     startLevel(0);
@@ -2583,11 +2591,14 @@ export default function Game() {
       return;
     }
     if (scene === "levelIntro") {
-      transitionMusic(musicForLevel(levelIndex), {
-        fadeOut: 900,
-        fadeIn: 1100,
-        restart: true,
-      });
+      const levelTrack = musicForLevel(levelIndex);
+      if (activeMusicRef.current !== levelTrack) {
+        transitionMusic(levelTrack, {
+          fadeOut: 900,
+          fadeIn: 1100,
+          restart: false,
+        });
+      }
       return;
     }
     if (scene === "playing") {
