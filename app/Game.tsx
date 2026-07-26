@@ -3545,21 +3545,6 @@ export default function Game() {
               </div>
             </div>
 
-            <div className="objective">
-              <span
-                className={
-                  captured === currentLevel.lessons.length
-                    ? "objective-dot complete"
-                    : "objective-dot"
-                }
-              />
-              {captured === currentLevel.lessons.length
-                ? "Cross the open force field"
-                : currentLevel.number === 11
-                  ? `Defeat all ten OWASP threats • ${captured}/${encounterCount}`
-                  : `Contain all ${encounterCount} ${currentLevel.objectiveName} encounters • ${captured}/${encounterCount}`}
-            </div>
-
             {scene === "playing" && (
               <>
                 <div

@@ -999,37 +999,6 @@ kbd {
   cursor: pointer;
 }
 
-.objective {
-  position: absolute;
-  z-index: 4;
-  top: 13%;
-  left: 2.4%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: clamp(6px, 0.6vw, 10px) clamp(9px, 0.9vw, 14px);
-  border-left: 2px solid rgba(74, 227, 255, 0.8);
-  color: rgba(212, 244, 255, 0.74);
-  background: linear-gradient(90deg, rgba(4, 19, 31, 0.75), transparent);
-  font-family: var(--font-geist-mono), monospace;
-  font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(12px, 1.05vw, 17px);
-  letter-spacing: 0.04em;
-}
-
-.objective-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--orange);
-  box-shadow: 0 0 10px var(--orange);
-}
-
-.objective-dot.complete {
-  background: var(--cyan);
-  box-shadow: 0 0 10px var(--cyan);
-}
-
 .fact-callout {
   position: absolute;
   z-index: 6;
@@ -2706,10 +2675,6 @@ kbd {
   .touch-controls,
   .touch-playfield {
     display: flex;
-  }
-
-  .objective {
-    top: 12.5%;
   }
 
   .desktop-start-copy,
