@@ -3568,12 +3568,20 @@ export default function Game() {
                 <div>
                   <h2>MOVE + JUMP</h2>
                   <p className="desktop-instruction-copy">
-                    <kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> to move
-                    <b> • </b><kbd>SPACE</kbd> / <kbd>W</kbd> / <kbd>↑</kbd> to jump
+                    <span className="instruction-control-line">
+                      <strong>MOVE</strong> <kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd>
+                    </span>
+                    <span className="instruction-control-line">
+                      <strong>JUMP</strong> <kbd>SPACE</kbd> / <kbd>W</kbd> / <kbd>↑</kbd>
+                    </span>
                   </p>
                   <p className="touch-instruction-copy">
-                    Hold the left or right side to move. While holding one
-                    side, tap the other side to jump.
+                    <span className="instruction-control-line">
+                      <strong>MOVE</strong> Hold the left or right side.
+                    </span>
+                    <span className="instruction-control-line">
+                      <strong>JUMP</strong> Hold one side and tap the other.
+                    </span>
                   </p>
                 </div>
               </section>
@@ -3601,13 +3609,15 @@ export default function Game() {
               </section>
 
               <section className="instruction-panel instruction-panel--learning">
-                <span className="instruction-number">!</span>
                 <div>
                   <h2>LEARNING TIPS</h2>
                   <p>
-                    <strong>1.</strong> Pause to read the intel after capturing
-                    enemies. <strong>2.</strong> Pay attention to the lyrics for
-                    relevant insights on each level!
+                    <span className="learning-tip-line">
+                      <strong>1.</strong> Pause to read the intel after capturing enemies.
+                    </span>
+                    <span className="learning-tip-line">
+                      <strong>2.</strong> Listen for relevant insights in each level&apos;s lyrics.
+                    </span>
                   </p>
                 </div>
               </section>
