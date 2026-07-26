@@ -3360,6 +3360,53 @@ kbd {
     font-size: clamp(12px, 1.35vw, 17px);
   }
 
+  .level-intro-title,
+  .level-complete-burst {
+    width: 86%;
+    max-width: 86%;
+    justify-self: center;
+  }
+
+  .level-intro-title::before,
+  .level-complete-burst::before {
+    width: 116%;
+  }
+
+  .level-intro-title span,
+  .level-complete-burst span {
+    font-size: clamp(18px, 3.4vw, 38px);
+    letter-spacing: 0.1em;
+  }
+
+  .level-intro-title strong,
+  .level-complete-burst strong {
+    max-width: 100%;
+    font-size: clamp(31px, 5.8vw, 64px);
+    line-height: 0.9;
+    white-space: normal;
+    text-wrap: balance;
+  }
+
+  .level-intro-title--long {
+    width: 88%;
+    max-width: 88%;
+  }
+
+  .level-intro-title--long strong {
+    max-width: 100%;
+    font-size: clamp(25px, 4.8vw, 53px);
+  }
+
+  .level-complete-burst strong {
+    font-size: clamp(38px, 7.4vw, 80px);
+  }
+
+  .arcade-next {
+    top: calc(100% + clamp(18px, 4vh, 34px));
+    font-size: clamp(13px, 1.8vw, 20px);
+    letter-spacing: 0.08em;
+  }
+
   .praxen-ad-content {
     width: 90%;
     gap: 3px;

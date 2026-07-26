@@ -208,6 +208,8 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /open-agent-ai-security\.github\.io\/praxen/i);
   assert.match(gameSource, /praxen-lockup-dark-background\.png/i);
   assert.match(gameSource, /PRESS SPACE TO START/i);
+  assert.match(gameSource, /TAP FOR NEXT LEVEL/i);
+  assert.match(gameSource, /TAP FOR TITLE/i);
   assert.match(gameSource, /HOW TO PLAY/i);
   assert.match(gameSource, /MISSION BRIEFING/i);
   assert.match(gameSource, /MEET PRAXI/i);

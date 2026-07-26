@@ -3769,7 +3769,12 @@ export default function Game() {
               <span>LEVEL</span>
               <strong>COMPLETE!</strong>
               <button type="button" className="arcade-next" onClick={advanceCampaign}>
-                {isFinalLevel ? "PRESS SPACE FOR TITLE" : "PRESS SPACE FOR NEXT LEVEL"}
+                <span className="desktop-start-copy">
+                  {isFinalLevel ? "PRESS SPACE FOR TITLE" : "PRESS SPACE FOR NEXT LEVEL"}
+                </span>
+                <span className="touch-start-copy">
+                  {isFinalLevel ? "TAP FOR TITLE" : "TAP FOR NEXT LEVEL"}
+                </span>
               </button>
             </div>
           </div>
@@ -3865,8 +3870,8 @@ export default function Game() {
             ? `Level ${currentLevel.number} active. ${captured} of ${encounterCount} encounters cleared. ${health} integrity remaining.`
           : scene === "complete"
             ? isFinalLevel
-              ? "Level complete. Press Space to return to the title."
-              : "Level complete. Press Space for the next level."
+              ? "Level complete. Return to the title."
+              : "Level complete. Continue to the next level."
           : scene === "gameOver"
             ? "Game over."
           : scene === "winner"
