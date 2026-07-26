@@ -222,7 +222,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /DIRECT LEVEL SELECT/i);
   assert.match(gameSource, /1–9 \/ 0 \/ G/i);
   assert.match(gameSource, /aria-label="Touch controls: hold the left or right half/i);
-  assert.match(gameSource, /TAP WITH SECOND FINGER TO JUMP/i);
+  assert.match(gameSource, /TAP OTHER SIDE TO JUMP/i);
   assert.match(gameSource, /pointerType !== "touch"/i);
   assert.match(gameSource, /Move Praxi right and jump on each threat/i);
 });

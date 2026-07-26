@@ -3507,7 +3507,7 @@ export default function Game() {
                   ← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP
                 </span>
                 <span className="touch-control-copy">
-                  HOLD LEFT / RIGHT&nbsp;&nbsp;•&nbsp;&nbsp;TAP WITH SECOND FINGER TO JUMP
+                  HOLD LEFT / RIGHT&nbsp;&nbsp;•&nbsp;&nbsp;TAP OTHER SIDE TO JUMP
                 </span>
                 <span className="arcade-level-select">
                   1–9 / 0 / G&nbsp;&nbsp;DIRECT LEVEL SELECT
@@ -3583,10 +3583,10 @@ export default function Game() {
                   </p>
                   <p className="touch-instruction-copy">
                     <span className="instruction-control-line">
-                      <strong>MOVE</strong> Hold the left or right side.
+                      <strong>MOVE</strong> Hold left or right.
                     </span>
                     <span className="instruction-control-line">
-                      <strong>JUMP</strong> Hold one side and tap the other.
+                      <strong>JUMP</strong> Tap the other side.
                     </span>
                   </p>
                 </div>

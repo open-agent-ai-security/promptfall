@@ -3125,6 +3125,14 @@ kbd {
   .desktop-instruction-copy {
     display: none;
   }
+
+  .instruction-panel--codes {
+    display: none;
+  }
+
+  .instructions-grid {
+    grid-template-rows: 0.9fr 1fr 0.95fr;
+  }
 }
 
 @media (max-aspect-ratio: 4 / 5) {
@@ -3188,12 +3196,166 @@ kbd {
   }
 }
 
-@media (hover: none) and (max-height: 500px) {
+@media (hover: none) and (max-height: 500px),
+  (max-width: 1000px) and (max-height: 500px) {
+  .desktop-start-copy,
+  .desktop-control-copy,
+  .desktop-instruction-copy,
+  .arcade-level-select {
+    display: none;
+  }
+
+  .touch-start-copy,
+  .touch-control-copy,
+  .touch-instruction-copy {
+    display: inline;
+  }
+
+  .instruction-panel--codes {
+    display: none;
+  }
+
+  .instructions-grid {
+    grid-template-rows: 0.9fr 1fr 0.95fr;
+  }
+
+  .screen--title .versus-mark {
+    display: none;
+  }
+
+  .title-lockup {
+    top: 5%;
+    width: min(68%, 820px);
+  }
+
+  .title-main-word {
+    font-size: clamp(52px, 8.5vw, 108px);
+  }
+
+  .title-subtitle {
+    width: min(69%, 850px);
+    font-size: clamp(17px, 2.55vw, 34px);
+  }
+
+  .title-subtitle--one {
+    top: 26.5%;
+  }
+
+  .title-subtitle--two {
+    top: 36.5%;
+    width: min(66%, 810px);
+    font-size: clamp(14px, 2vw, 27px);
+  }
+
+  .title-praxi-stage {
+    left: 5%;
+    bottom: 4%;
+    width: 24%;
+  }
+
+  .title-enemy {
+    right: 5%;
+    bottom: 7%;
+    width: 23%;
+  }
+
+  .title-cta {
+    right: 27%;
+    bottom: 2%;
+    left: 27%;
+    gap: 2px;
+  }
+
+  .arcade-start {
+    padding: 3px 10px;
+    font-size: clamp(15px, 2vw, 22px);
+  }
+
+  .arcade-instructions {
+    gap: 6px;
+    padding: 1px 10px 2px 6px;
+    font-size: clamp(9px, 0.9vw, 12px);
+  }
+
+  .arcade-instructions-key {
+    width: 21px;
+    height: 21px;
+    font-size: 14px;
+  }
+
+  .arcade-controls {
+    gap: 4px;
+    font-size: clamp(7px, 0.72vw, 10px);
+  }
+
   .opensource-link {
-    right: 1%;
-    bottom: 1%;
-    scale: 0.76;
+    right: 0.2%;
+    bottom: 0.2%;
+    scale: 0.54;
     transform-origin: right bottom;
+  }
+
+  .instructions-header {
+    top: 3%;
+    left: 3.5%;
+    column-gap: 10px;
+  }
+
+  .instructions-header > span {
+    font-size: clamp(6px, 0.64vw, 9px);
+  }
+
+  .instructions-header h1 {
+    font-size: clamp(27px, 4.1vw, 48px);
+  }
+
+  .instructions-header strong {
+    font-size: clamp(14px, 1.85vw, 23px);
+  }
+
+  .instructions-praxi {
+    left: 1%;
+    bottom: 4%;
+    width: 24%;
+  }
+
+  .instructions-grid {
+    top: 19%;
+    right: 2.2%;
+    bottom: 11%;
+    left: 24.5%;
+    gap: 5px;
+  }
+
+  .instruction-panel {
+    gap: 6px;
+    padding: 5px 8px;
+  }
+
+  .instruction-number {
+    font-size: clamp(18px, 2.2vw, 28px);
+  }
+
+  .instruction-panel h2 {
+    margin-bottom: 2px;
+    font-size: clamp(12px, 1.35vw, 17px);
+  }
+
+  .instruction-panel p {
+    font-size: clamp(8px, 0.82vw, 11px);
+    line-height: 1.15;
+  }
+
+  .instruction-control-line {
+    min-height: 1.35em;
+  }
+
+  .instructions-return {
+    right: 28%;
+    bottom: 1.5%;
+    left: 28%;
+    padding: 3px 8px;
+    font-size: clamp(12px, 1.35vw, 17px);
   }
 
   .praxen-ad-content {
