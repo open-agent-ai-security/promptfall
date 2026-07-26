@@ -1055,7 +1055,7 @@ kbd {
   margin: 0;
   color: #fff;
   font-family: "Arial Black", Arial, sans-serif;
-  font-size: clamp(16px, 1.42vw, 23px);
+  font-size: clamp(17px, 1.5vw, 24px);
   font-weight: 900;
   line-height: 1.28;
   text-shadow:
@@ -1064,19 +1064,19 @@ kbd {
     0 0 11px #000;
 }
 
-.fact-copy p strong {
-  color: #ffca54;
+.fact-copy > strong {
+  display: block;
+  margin-bottom: 0.16em;
+  color: #fff35c;
   font-family: Impact, "Arial Black", sans-serif;
-  font-size: 0.82em;
+  font-size: clamp(18px, 1.58vw, 26px);
   font-style: italic;
-  letter-spacing: 0.035em;
+  letter-spacing: 0.045em;
+  line-height: 1;
   text-shadow:
     2px 2px 0 #6b2108,
-    0 0 12px rgba(255, 145, 28, 0.72);
-}
-
-.fact-copy p span {
-  color: #fff;
+    0 0 8px #ffb000,
+    0 0 16px rgba(255, 218, 50, 0.95);
 }
 
 .touch-controls {

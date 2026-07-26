@@ -3538,10 +3538,8 @@ export default function Game() {
               aria-live="polite"
             >
               <div className="fact-copy">
-                <p>
-                  <strong>{formatLessonKind(factLesson.kind)}:</strong>{" "}
-                  <span>{factLesson.text}</span>
-                </p>
+                <strong>{formatLessonKind(factLesson.kind)}:</strong>
+                <p>{factLesson.text}</p>
               </div>
             </div>
 
