@@ -256,270 +256,270 @@ function formatLessonKind(kind: string) {
 const PROMPT_INJECTION_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Prompt injection happens when input changes an LLM's behavior in ways its developer did not intend.",
+    text: "Untrusted input changes an LLM's behavior in ways its developer never intended.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "LLMs process instructions and data as one token stream—there is no clean trust boundary between them.",
+    text: "LLMs mix instructions and data in one stream, so they cannot reliably separate trusted commands from untrusted content.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "A user tells a support bot to ignore its rules, query private data, and send email.",
+    text: "A user tells a support bot to ignore its rules, access private data, and send email.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "Hidden instructions in a web page can make an assistant leak private context through an image URL.",
+    text: "Hidden web-page instructions make an assistant leak private context through an image request.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Keep credentials and state-changing powers in application code, and grant least privilege per operation.",
+    text: "Keep credentials and dangerous powers in application code. Grant only the access each operation needs.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Require explicit human approval before privileged, irreversible, or externally visible actions.",
+    text: "Require human approval before privileged, irreversible, or publicly visible actions.",
   },
 ] as const;
 
 const SENSITIVE_INFORMATION_DISCLOSURE_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Sensitive information disclosure happens when an LLM system exposes protected data through any channel the owner did not authorize.",
+    text: "Protected data reaches someone through a channel its owner never authorized.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "Judge a leak by what the recipient can learn—not whether it appeared in a normal answer. Traces, logs, embeddings, timing, and tool calls can all disclose.",
+    text: "A leak is anything an unauthorized recipient can learn, even from logs, traces, tool calls, or side channels.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "A sanitized answer can still leak PII when raw reasoning traces and retrieved chunks are copied into shared observability logs.",
+    text: "A safe-looking answer still leaks PII when reasoning traces and retrieved data enter shared logs.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A leaked “embeddings-only” backup can be inverted to reconstruct source text, turning vectors into a document breach.",
+    text: "Attackers reconstruct source text from a stolen embeddings backup, turning vectors into a document breach.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Authorize documents and chunks before retrieval, isolate sensitive tenants, and send the model only task-required fields.",
+    text: "Authorize data before retrieval, isolate customers, and give the model only fields required for its task.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Classify and redact every output channel—including traces, logs, tool arguments, and multimodal data—before it leaves the trusted boundary.",
+    text: "Classify and redact every output channel before data leaves the trusted boundary.",
   },
 ] as const;
 
 const EXCESSIVE_AGENCY_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Excessive agency lets unexpected, ambiguous, or manipulated model output trigger damaging actions through too much functionality, permission, or autonomy.",
+    text: "Unexpected model output becomes dangerous when an agent has too much power or independence.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "Agent safety is not only about what a model intends—it is about what the system allows it to do when the model is wrong.",
+    text: "Agent safety depends on what the system permits when the model makes a bad decision.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "A mailbox assistant only needs to read email, but its tool can also send messages; an injected email tricks it into forwarding private data.",
+    text: "An injected email tricks a mailbox assistant with sending privileges into forwarding private data.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A read-only database tool connects with UPDATE, INSERT, and DELETE rights, turning one bad decision into damaged records.",
+    text: "A read-only database tool secretly has write access, turning one bad decision into damaged records.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Offer only the minimum granular tools and functions required. Avoid open-ended tools, enforce strict schemas, and validate every argument.",
+    text: "Offer only task-specific tools, enforce strict inputs, and validate every argument.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Use least privilege and the user's own security context; independently authorize every action and require approval for high-impact changes.",
+    text: "Use least privilege and the user's security context. Independently authorize every high-impact action.",
   },
 ] as const;
 
 const SUPPLY_CHAIN_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "LLM supply-chain weaknesses let attackers tamper with data, models, adapters, conversion pipelines, dependencies, or deployment platforms.",
+    text: "Attackers can tamper with AI components anywhere between training data and the deployed system.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "An AI artifact is more than code: its origin, training inputs, transformations, and promotion path all become part of the trust boundary.",
+    text: "Every AI component and deployment step becomes part of the system's trust boundary.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "An assistant invents a plausible package name; an attacker registers it first, so the suggested dependency installs malicious code.",
+    text: "An assistant invents a package name. An attacker registers it first and supplies malicious code.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A trusted-looking model or LoRA adapter is replaced under a mutable name, then silently enters production through a merge or conversion pipeline.",
+    text: "An attacker replaces a trusted model component, which silently enters production through an automated pipeline.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Vet suppliers and maintain a signed AIBOM of models, adapters, datasets, code, and licenses. Pin every artifact to an immutable hash.",
+    text: "Verify suppliers and inventory every AI component. Lock approved versions so they cannot change.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Treat signing and scanners as integrity layers—not proof of safety. Patch loaders, secure promotion gates, and behavior-test the deployed artifact.",
+    text: "Signatures and scanners do not prove safety. Patch loaders, secure releases, and test deployed behavior.",
   },
 ] as const;
 
 const DATA_MODEL_POISONING_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Data and model poisoning corrupts persistent data or model artifacts so an AI system learns harmful behavior, bias, backdoors, or exploitable weaknesses.",
+    text: "Persistent training data or model files are corrupted to create bias, backdoors, or exploitable behavior.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "Poisoning attacks the learning process—not one runtime bug. Recovery may require revalidating data, replacing models, redesigning pipelines, or retraining.",
+    text: "The attack changes learned behavior, so recovery may require clean data, replacement models, or retraining.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "Mislabeled fraud transactions teach a financial model that real fraud is legitimate, quietly enabling bypass while normal evaluations still pass.",
+    text: "Mislabeled transactions teach a fraud model that real fraud is legitimate while normal evaluations still pass.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A poisoned model, adapter, or chat template behaves normally until a hidden trigger activates its backdoor in downstream systems.",
+    text: "A poisoned model behaves normally until a hidden trigger activates its backdoor.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Track signed dataset and model lineage, pin every artifact by hash, validate incoming data, and keep version history for rollback and forensics.",
+    text: "Track signed data and model history, verify incoming data, and preserve known-good versions for recovery.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Gate automated retraining, monitor behavior for drift, and red-team every model and alignment cycle with dedicated backdoor-trigger probes.",
+    text: "Control automated retraining, watch for behavior changes, and test every model update for hidden triggers.",
   },
 ] as const;
 
 const UNBOUNDED_CONSUMPTION_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Unbounded consumption lets uncontrolled inference drain compute, availability, budgets, or intellectual property because resource use lacks adequate limits.",
+    text: "Uncontrolled model use drains operational resources or intellectual property because firm limits are missing.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "LLM cost asymmetry lets a cheap prompt trigger expensive reasoning, multimodal processing, or tool fan-out. Request-rate limits alone cannot measure that blast radius.",
+    text: "A cheap prompt can trigger expensive reasoning or many tool calls. Request limits alone cannot contain the cost.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "Near-limit prompts and long agent sessions repeatedly reprocess growing context, quietly multiplying per-turn memory, token, and compute costs.",
+    text: "Long agent sessions repeatedly process growing context, quietly multiplying memory, token, and compute costs.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A malicious tool traps an agent in a recursive call loop, turning one innocent-looking task into hundreds of paid operations—a denial of wallet.",
+    text: "A malicious tool traps an agent in a recursive loop that creates hundreds of paid operations.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Estimate cost before inference, enforce token and action quotas, and use hard spending caps that stop workloads instead of merely sending alerts.",
+    text: "Estimate costs before execution. Enforce token, action, and spending limits that actually stop workloads.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Add agent circuit breakers for steps, recursion, time, and cost; detect repeated states, monitor tool behavior, and degrade gracefully under load.",
+    text: "Stop agents that run too long, repeat themselves, or spend too much.",
   },
 ] as const;
 
 const MISINFORMATION_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Misinformation is incorrect, incomplete, unsupported, or misleading model output that appears credible enough to drive a human decision, workflow, or agent action.",
+    text: "False or unsupported output looks credible enough to drive harmful human or agent decisions.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "Fluency is not truth. In agentic systems, one confident false claim about state or evidence can propagate downstream and become a real harmful action.",
+    text: "Fluent output is not truth. One confident false claim can spread through a system and trigger real harm.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "A retrieval agent falsely reports that a customer is identity-verified, so a downstream payment agent trusts that state and releases funds.",
+    text: "A retrieval agent falsely marks a customer verified, so a payment agent releases funds.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "An agent reports that a nightly backup completed when it never ran; the fiction remains hidden until a later restore fails.",
+    text: "An agent claims a backup completed when it never ran. The fiction surfaces only when recovery fails.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Ground claims in current authoritative sources, then separate generation, checking, and action so evidence is verified before execution.",
+    text: "Ground claims in authoritative sources. Verify the evidence before any system acts on it.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Validate tool arguments, authorization, preconditions, and live state; require structured fields and approval for high-impact actions.",
+    text: "Check authorization, required conditions, and current state before high-impact actions. Require structured inputs and approval.",
   },
 ] as const;
 
 const HIDDEN_CONTEXT_EXPOSURE_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Hidden context exposure is the unauthorized extraction, inference, or reconstruction of non-user-facing instructions or operational context available to the model.",
+    text: "Attackers extract or infer hidden instructions and operational details available to the model.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "Assume anything in model context is discoverable. A hidden prompt is not a security boundary, and leaked rules, tools, or trust logic can sharpen later attacks.",
+    text: "Assume model context is discoverable. Hidden instructions cannot safely protect rules, tools, or authorization logic.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "An attacker extracts hidden tool names and parameter schemas, gaining concrete targets for prompt injection and downstream action chaining.",
+    text: "An attacker extracts tool names and inputs, revealing targets for prompt injection and chained actions.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "Credentials embedded in a system prompt are revealed through conversational probing, then reused outside the application.",
+    text: "Conversational probing reveals credentials stored in a system prompt, which attackers reuse elsewhere.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Never place credentials, tokens, connection strings, or security-critical configuration in hidden context. Keep secrets in systems the model cannot access.",
+    text: "Never put secrets or security settings in model context. Store them where the model cannot access them.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Enforce authorization, privilege separation, validation, and guardrails with deterministic auditable controls outside the model and grant least privilege.",
+    text: "Enforce authorization and least privilege with auditable controls outside the model.",
   },
 ] as const;
 
 const VECTOR_EMBEDDING_WEAKNESSES_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Vector and embedding weaknesses exploit numerical representations and similarity search—the layer that decides which retrieved information an LLM gets to see.",
+    text: "Numerical representations and similarity search decide which information an LLM receives.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "Embedding geometry is part of the trust boundary: poisoning makes retrieval wrong, inversion makes vectors leak, jamming makes retrieval silent, and weak scoping makes it indiscriminate.",
+    text: "Weak retrieval can return poisoned data, expose private information, or search across users.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "A shared vector index searches every tenant before filtering, letting attackers infer another tenant's document topics from timing, counts, and similarity patterns.",
+    text: "A shared index searches every customer's data before filtering, exposing document topics through timing and result patterns.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A leaked “embeddings-only” backup is inverted to reconstruct source documents and PII, turning vectors into a real data breach.",
+    text: "Attackers reconstruct source documents and PII from a stolen embeddings backup.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Enforce tenant and chunk permissions inside the index query, segregate indexes by trust zone, and never trust client-supplied scope.",
+    text: "Enforce user and document permissions inside each search. Separate indexes by trust level.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Track provenance, normalize and review content before embedding, detect anomalous vectors, and protect embeddings like the source data they represent.",
+    text: "Track each embedding's source, detect unusual vectors, and protect them like the original data.",
   },
 ] as const;
 
 const IMPROPER_OUTPUT_HANDLING_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Improper output handling is the unsafe use of LLM-generated content without sufficient validation, sanitization, or encoding before passing it downstream.",
+    text: "Model-generated content reaches another system without the safety checks that destination requires.",
   },
   {
     kind: "WHY IT MATTERS",
-    text: "Model output can be attacker-controlled. Treating it as trusted gives users indirect access to shells, browsers, databases, files, tools, and other interpreting systems.",
+    text: "Attackers may control model output. Trusting it can compromise connected tools and systems.",
   },
   {
     kind: "EXAMPLE 1",
-    text: "An application sends model output directly to exec or eval, allowing crafted output to become remote code execution.",
+    text: "An application sends model output directly to a command runner, allowing remote code execution.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A chat UI automatically fetches an image URL emitted by the model, exfiltrating conversation data through the attacker-controlled request.",
+    text: "A chat interface automatically loads a model-generated image URL, sending conversation data to an attacker.",
   },
   {
     kind: "DEFENSE 1",
-    text: "Treat the model as an untrusted user: validate outputs against strict schemas and allowlists, then independently authorize every downstream action.",
+    text: "Treat model output as untrusted input. Validate it strictly and authorize every downstream action.",
   },
   {
     kind: "DEFENSE 2",
-    text: "Use context-aware encoding and prepared queries, neutralize terminal control characters, and disable automatic outbound fetches from rendered output.",
+    text: "Encode output for its destination and block automatic network requests from rendered content.",
   },
 ] as const;
 
@@ -528,61 +528,61 @@ const GAUNTLET_LESSONS = [
     kind: "KEY INSIGHT",
     riskCode: "LLM01",
     entryName: "PROMPT INJECTION",
-    text: "LLMs do not enforce a clean trust boundary between instructions and data. Design for manipulated output with least privilege and approval gates.",
+    text: "LLMs mix instructions and data. Limit privileges and require approval because attackers may manipulate model output.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM02",
     entryName: "SENSITIVE INFORMATION DISCLOSURE",
-    text: "A leak is defined by what an unauthorized recipient can learn—answers, traces, logs, embeddings, tool arguments, and side channels all count.",
+    text: "A leak includes anything an unauthorized recipient can learn from answers, logs, traces, tools, or side channels.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM03",
     entryName: "EXCESSIVE AGENCY",
-    text: "Agent safety depends on what the system permits when the model is wrong. Minimize functionality, permissions, and autonomy for every action.",
+    text: "Agent safety depends on system permissions when the model is wrong. Minimize every action's power and independence.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM04",
     entryName: "SUPPLY CHAIN",
-    text: "Models, data, adapters, dependencies, conversions, and promotion paths are one supply chain. Pin provenance and test the deployed behavior.",
+    text: "Every AI component and deployment step forms one supply chain. Verify sources and test deployed behavior.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM05",
     entryName: "DATA AND MODEL POISONING",
-    text: "Poisoning corrupts persistent data or model artifacts, so recovery requires signed lineage, controlled retraining, behavior tests, and rollback.",
+    text: "Poisoning changes persistent data or models. Use signed history, controlled retraining, behavior tests, and reliable rollback.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM06",
     entryName: "UNBOUNDED CONSUMPTION",
-    text: "Request-rate limits are not enough. Control tokens, actions, recursion, time, and cost with hard caps and agent circuit breakers.",
+    text: "Request limits are not enough. Cap tokens, actions, running time, and total cost.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM07",
     entryName: "MISINFORMATION",
-    text: "Fluent output is not verified truth. Ground claims and separate generation, checking, and action before a decision changes the real world.",
+    text: "Fluent output is not verified truth. Check evidence before a claim can change the real world.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM08",
     entryName: "HIDDEN CONTEXT EXPOSURE",
-    text: "Assume all model context is discoverable. Never store secrets there or rely on hidden instructions as an authorization or policy boundary.",
+    text: "Assume model context is discoverable. Never store secrets there or use hidden instructions as security controls.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM09",
     entryName: "VECTOR AND EMBEDDING WEAKNESSES",
-    text: "Similarity search is part of the trust boundary. Scope access inside the query and protect embeddings like the source data they can reveal.",
+    text: "Similarity search is part of the trust boundary. Enforce access during retrieval and protect embeddings like source data.",
   },
   {
     kind: "KEY INSIGHT",
     riskCode: "LLM10",
     entryName: "IMPROPER OUTPUT HANDLING",
-    text: "Treat model output as untrusted input: validate, authorize, sanitize, and encode it for the exact downstream sink before use.",
+    text: "Treat model output as untrusted input. Validate and encode it for its exact destination before use.",
   },
 ] as const;
 

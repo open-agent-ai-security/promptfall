@@ -36,6 +36,29 @@ test("server-renders the Promptfall game shell", async () => {
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
 
+test("keeps gameplay lessons concise and easy to scan", async () => {
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+  const lessonBlocks = [
+    ...gameSource.matchAll(
+      /const [A-Z_]+_LESSONS = \[([\s\S]*?)\] as const;/g,
+    ),
+  ];
+  const lessonTexts = lessonBlocks.flatMap(([, block]) =>
+    [...block.matchAll(/text: "([^"]+)"/g)].map(([, text]) => text),
+  );
+
+  assert.equal(lessonBlocks.length, 11);
+  assert.equal(lessonTexts.length, 70);
+  assert.deepEqual(
+    lessonTexts.filter((text) => text.trim().split(/\s+/).length > 20),
+    [],
+  );
+  assert.doesNotMatch(lessonTexts.join("\n"), /—/);
+});
+
 test("ships social metadata and accessible controls", async () => {
   const response = await render();
   const html = await response.text();
