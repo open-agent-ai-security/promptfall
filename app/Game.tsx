@@ -283,7 +283,7 @@ const PROMPT_INJECTION_LESSONS = [
 const SENSITIVE_INFORMATION_DISCLOSURE_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Protected data reaches someone through a channel its owner never authorized.",
+    text: "Sensitive data is exposed through model responses, logs, tools, or other system channels.",
   },
   {
     kind: "WHY IT MATTERS",
@@ -310,7 +310,7 @@ const SENSITIVE_INFORMATION_DISCLOSURE_LESSONS = [
 const EXCESSIVE_AGENCY_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Unexpected model output becomes dangerous when an agent has too much power or independence.",
+    text: "An agent can cause harm because it has more permissions, tools, or autonomy than its task requires.",
   },
   {
     kind: "WHY IT MATTERS",
@@ -337,7 +337,7 @@ const EXCESSIVE_AGENCY_LESSONS = [
 const SUPPLY_CHAIN_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Attackers can tamper with AI components anywhere between training data and the deployed system.",
+    text: "Risk enters through compromised models, datasets, software, or services supplied by outside sources.",
   },
   {
     kind: "WHY IT MATTERS",
@@ -364,7 +364,7 @@ const SUPPLY_CHAIN_LESSONS = [
 const DATA_MODEL_POISONING_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Persistent training data or model files are corrupted to create bias, backdoors, or exploitable behavior.",
+    text: "Attackers corrupt training data or model files to create bias, backdoors, or harmful behavior.",
   },
   {
     kind: "WHY IT MATTERS",
@@ -391,7 +391,7 @@ const DATA_MODEL_POISONING_LESSONS = [
 const UNBOUNDED_CONSUMPTION_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Uncontrolled model use drains operational resources or intellectual property because firm limits are missing.",
+    text: "Missing limits let attackers exhaust compute, inflate costs, disrupt service, or copy the model.",
   },
   {
     kind: "WHY IT MATTERS",
@@ -418,7 +418,7 @@ const UNBOUNDED_CONSUMPTION_LESSONS = [
 const MISINFORMATION_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "False or unsupported output looks credible enough to drive harmful human or agent decisions.",
+    text: "False or unsupported model output appears trustworthy and leads people or agents to make harmful decisions.",
   },
   {
     kind: "WHY IT MATTERS",
@@ -445,7 +445,7 @@ const MISINFORMATION_LESSONS = [
 const HIDDEN_CONTEXT_EXPOSURE_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Attackers extract or infer hidden instructions and operational details available to the model.",
+    text: "Hidden instructions, retrieved context, or system details are exposed to users who should not see them.",
   },
   {
     kind: "WHY IT MATTERS",
@@ -472,7 +472,7 @@ const HIDDEN_CONTEXT_EXPOSURE_LESSONS = [
 const VECTOR_EMBEDDING_WEAKNESSES_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Numerical representations and similarity search decide which information an LLM receives.",
+    text: "Flaws in embeddings, vector stores, or similarity search expose data or feed the model unsafe context.",
   },
   {
     kind: "WHY IT MATTERS",
@@ -499,7 +499,7 @@ const VECTOR_EMBEDDING_WEAKNESSES_LESSONS = [
 const IMPROPER_OUTPUT_HANDLING_LESSONS = [
   {
     kind: "DEFINITION",
-    text: "Model-generated content reaches another system without the safety checks that destination requires.",
+    text: "Model output is passed to another system without being checked or handled safely.",
   },
   {
     kind: "WHY IT MATTERS",
