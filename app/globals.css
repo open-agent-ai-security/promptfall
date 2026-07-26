@@ -760,6 +760,53 @@ button {
   outline-offset: 3px;
 }
 
+.arcade-instructions {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 2px 14px 3px 8px;
+  border: 1px solid rgba(91, 225, 255, 0.65);
+  color: #dff9ff;
+  background: linear-gradient(105deg, rgba(4, 21, 39, 0.9), rgba(8, 48, 67, 0.82));
+  box-shadow:
+    inset 0 0 10px rgba(75, 220, 255, 0.08),
+    0 0 12px rgba(75, 220, 255, 0.18);
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(11px, 1vw, 15px);
+  font-style: italic;
+  letter-spacing: 0.12em;
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+  cursor: pointer;
+  transition:
+    filter 140ms ease,
+    transform 140ms ease;
+}
+
+.arcade-instructions:hover,
+.arcade-instructions:focus-visible {
+  filter: brightness(1.35);
+  transform: scale(1.04);
+  outline: 2px solid #ffe06c;
+  outline-offset: 3px;
+}
+
+.arcade-instructions-key {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 2px solid #ffe36e;
+  color: #11151d;
+  background: linear-gradient(#fff7a9, #ff9d24);
+  box-shadow:
+    2px 2px 0 #7c210c,
+    0 0 9px rgba(255, 178, 42, 0.7);
+  font-size: 17px;
+  font-style: normal;
+  line-height: 1;
+}
+
 .arcade-controls {
   display: flex;
   justify-content: center;
@@ -775,6 +822,321 @@ button {
 
 .arcade-level-select {
   color: rgba(255, 177, 52, 0.88);
+}
+
+.screen--instructions {
+  overflow: hidden;
+  background: #020815;
+}
+
+.screen--instructions::before {
+  content: "";
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 42%, white 50%, transparent 58%),
+    radial-gradient(circle, white, rgba(78, 219, 255, 0.5) 15%, transparent 54%);
+  mix-blend-mode: screen;
+  animation: impact-flash 620ms ease-out both;
+}
+
+.screen--instructions .title-background {
+  filter: saturate(0.76) brightness(0.58);
+  animation-duration: 18s;
+}
+
+.screen--instructions .title-grid {
+  opacity: 0.3;
+}
+
+.instructions-scanlines {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 4px,
+    rgba(92, 227, 255, 0.13) 5px,
+    transparent 6px
+  );
+}
+
+.instructions-header {
+  position: absolute;
+  z-index: 4;
+  top: 4.5%;
+  left: 4.5%;
+  display: grid;
+  align-items: end;
+  grid-template-columns: auto auto;
+  column-gap: 18px;
+  animation: instructions-header-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.instructions-header::after {
+  content: "";
+  position: absolute;
+  right: -8vw;
+  bottom: -8px;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #53e7ff 0 46%, #ff9f24 72%, transparent);
+  box-shadow:
+    0 0 9px rgba(83, 231, 255, 0.76),
+    0 0 16px rgba(255, 159, 36, 0.38);
+}
+
+.instructions-header > span {
+  grid-column: 1 / -1;
+  margin-bottom: 2px;
+  color: #7deaff;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(8px, 0.78vw, 12px);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+}
+
+.instructions-header h1 {
+  margin: 0;
+  color: #f5fdff;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(35px, 5vw, 72px);
+  font-style: italic;
+  letter-spacing: 0.035em;
+  line-height: 0.82;
+  -webkit-text-stroke: 1px #07518a;
+  text-shadow:
+    5px 5px 0 #03172b,
+    0 0 18px rgba(65, 220, 255, 0.65);
+}
+
+.instructions-header strong {
+  padding-bottom: 2px;
+  color: #ffe36d;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(18px, 2.4vw, 36px);
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-shadow:
+    3px 3px 0 #7d210c,
+    0 0 14px rgba(255, 151, 28, 0.72);
+}
+
+.instructions-praxi {
+  position: absolute;
+  z-index: 3;
+  left: 1%;
+  bottom: 6%;
+  width: 28%;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.72));
+  animation: instructions-praxi-in 680ms 120ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.instructions-praxi img {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+}
+
+.instructions-praxi-glow {
+  position: absolute;
+  z-index: 1;
+  right: 3%;
+  bottom: 4%;
+  left: 3%;
+  height: 17%;
+  border: 2px solid rgba(79, 228, 255, 0.68);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(43, 204, 255, 0.36), transparent 68%);
+  box-shadow:
+    0 0 22px rgba(62, 220, 255, 0.72),
+    inset 0 0 16px rgba(255, 165, 40, 0.24);
+  animation: instructions-hero-ring 1.8s ease-in-out infinite;
+}
+
+.instructions-grid {
+  position: absolute;
+  z-index: 4;
+  top: 22%;
+  right: 3.5%;
+  bottom: 11%;
+  left: 28%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 0.9fr 1fr 0.82fr 0.68fr;
+  gap: clamp(6px, 0.7vw, 11px);
+}
+
+.instruction-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1vw, 15px);
+  min-width: 0;
+  padding: clamp(7px, 0.75vw, 12px) clamp(10px, 1vw, 16px);
+  border: 1px solid rgba(85, 221, 255, 0.48);
+  color: #ebfbff;
+  background:
+    linear-gradient(110deg, rgba(4, 18, 34, 0.95), rgba(8, 43, 64, 0.86)),
+    repeating-linear-gradient(0deg, transparent 0 7px, rgba(93, 227, 255, 0.07) 8px 9px);
+  box-shadow:
+    inset 4px 0 0 rgba(72, 226, 255, 0.8),
+    inset 0 0 18px rgba(50, 207, 255, 0.07),
+    0 8px 18px rgba(0, 0, 0, 0.38);
+  clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 13px 100%, 0 calc(100% - 13px));
+  animation: instruction-panel-in 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.instruction-panel:nth-child(2) { animation-delay: 90ms; }
+.instruction-panel:nth-child(3) { animation-delay: 160ms; }
+.instruction-panel:nth-child(4) { animation-delay: 230ms; }
+.instruction-panel:nth-child(5) { animation-delay: 300ms; }
+
+.instruction-panel--hero,
+.instruction-panel:nth-child(4),
+.instruction-panel--codes {
+  grid-column: 1 / -1;
+}
+
+.instruction-panel--hero {
+  padding-right: 8%;
+  border-color: rgba(255, 167, 42, 0.55);
+  box-shadow:
+    inset 4px 0 0 rgba(255, 159, 36, 0.88),
+    inset 0 0 18px rgba(255, 159, 36, 0.08),
+    0 8px 18px rgba(0, 0, 0, 0.38);
+}
+
+.instruction-panel--codes {
+  border-color: rgba(255, 172, 42, 0.68);
+  background:
+    linear-gradient(100deg, rgba(39, 19, 6, 0.95), rgba(13, 36, 51, 0.92)),
+    repeating-linear-gradient(0deg, transparent 0 7px, rgba(255, 178, 44, 0.08) 8px 9px);
+  box-shadow:
+    inset 4px 0 0 #ff9d24,
+    inset 0 0 20px rgba(255, 152, 28, 0.1),
+    0 0 18px rgba(255, 145, 26, 0.13);
+}
+
+.instruction-number {
+  flex: 0 0 auto;
+  color: #ffad32;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(22px, 2.7vw, 40px);
+  font-style: italic;
+  line-height: 1;
+  text-shadow:
+    2px 2px 0 #6e1d0c,
+    0 0 9px rgba(255, 157, 36, 0.62);
+}
+
+.instruction-panel h2 {
+  margin: 0 0 3px;
+  color: #8becff;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(15px, 1.65vw, 25px);
+  font-style: italic;
+  letter-spacing: 0.075em;
+  line-height: 1;
+  text-shadow:
+    2px 2px 0 #073151,
+    0 0 10px rgba(74, 220, 255, 0.44);
+}
+
+.instruction-panel--hero h2,
+.instruction-panel--codes h2 {
+  color: #ffe36e;
+  text-shadow:
+    2px 2px 0 #76200d,
+    0 0 10px rgba(255, 161, 33, 0.5);
+}
+
+.instruction-panel p {
+  margin: 0;
+  color: #eafaff;
+  font-size: clamp(10px, 1.03vw, 16px);
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  line-height: 1.24;
+  text-shadow: 0 2px 5px #000;
+}
+
+.instruction-panel p strong {
+  color: #fff19a;
+}
+
+.instruction-panel kbd {
+  display: inline-block;
+  min-width: 1.65em;
+  margin: 0 2px;
+  padding: 2px 5px;
+  border: 1px solid #81eaff;
+  color: #fff;
+  background: rgba(4, 25, 42, 0.92);
+  box-shadow:
+    inset 0 -2px 0 rgba(44, 169, 207, 0.48),
+    0 0 7px rgba(68, 217, 255, 0.34);
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 0.9em;
+  font-style: normal;
+  line-height: 1;
+  text-align: center;
+}
+
+.instruction-panel--codes kbd {
+  border-color: #ffc14d;
+  color: #fff4a5;
+  box-shadow:
+    inset 0 -2px 0 rgba(177, 72, 13, 0.55),
+    0 0 7px rgba(255, 153, 30, 0.42);
+}
+
+.touch-instruction-copy {
+  display: none;
+}
+
+.instructions-return {
+  position: absolute;
+  z-index: 6;
+  right: 31%;
+  bottom: 3.4%;
+  left: 31%;
+  padding: 6px 12px;
+  border: 0;
+  color: #fff1a4;
+  background: transparent;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(15px, 1.65vw, 25px);
+  font-style: italic;
+  letter-spacing: 0.12em;
+  text-shadow:
+    3px 3px 0 #8f230e,
+    -2px -2px 0 #07519b,
+    0 0 15px rgba(255, 163, 32, 0.76);
+  cursor: pointer;
+  animation: start-blink 980ms 650ms steps(2) infinite;
+}
+
+.instructions-return::before,
+.instructions-return::after {
+  content: "▶";
+  margin: 0 0.55em;
+  color: #ff9d24;
+  font-size: 0.7em;
+}
+
+.instructions-return::after {
+  content: "◀";
+}
+
+.instructions-return:focus-visible {
+  outline: 3px solid #58e7ff;
+  outline-offset: 3px;
 }
 
 .eyebrow {
@@ -2671,6 +3033,62 @@ kbd {
   }
 }
 
+@keyframes instructions-header-in {
+  from {
+    opacity: 0;
+    transform: translateX(-80px) skewX(-8deg);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) skewX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes instructions-praxi-in {
+  from {
+    opacity: 0;
+    transform: translateX(-65%) scale(0.78);
+    filter: blur(6px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(4%) scale(1.04);
+    filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes instruction-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(90px) scaleX(0.82);
+    filter: blur(5px) brightness(1.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scaleX(1);
+    filter: blur(0) brightness(1);
+  }
+}
+
+@keyframes instructions-hero-ring {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: scaleX(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.04);
+  }
+}
+
 @media (hover: none), (pointer: coarse) {
   .touch-controls,
   .touch-playfield {
@@ -2684,8 +3102,13 @@ kbd {
   }
 
   .touch-start-copy,
-  .touch-control-copy {
+  .touch-control-copy,
+  .touch-instruction-copy {
     display: inline;
+  }
+
+  .desktop-instruction-copy {
+    display: none;
   }
 }
 

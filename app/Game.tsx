@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 type Scene =
   | "splash"
   | "title"
+  | "instructions"
   | "levelIntro"
   | "playing"
   | "complete"
@@ -2395,6 +2396,16 @@ export default function Game() {
     startLevel(0);
   }, [startLevel]);
 
+  const showInstructions = useCallback(() => {
+    sceneRef.current = "instructions";
+    setScene("instructions");
+  }, []);
+
+  const returnToTitle = useCallback(() => {
+    sceneRef.current = "title";
+    setScene("title");
+  }, []);
+
   const enterTitle = useCallback(() => {
     if (sceneRef.current !== "splash") return;
     transitionMusic("title", {
@@ -2557,10 +2568,10 @@ export default function Game() {
       transitionMusic(null, { fadeOut: 0 });
       return;
     }
-    if (scene === "title") {
+    if (scene === "title" || scene === "instructions") {
       transitionMusic("title", {
-        fadeOut: 650,
-        fadeIn: 1100,
+        fadeOut: scene === "instructions" ? 0 : 650,
+        fadeIn: scene === "instructions" ? 0 : 1100,
         restart: activeMusicRef.current !== "title",
       });
       return;
@@ -2645,6 +2656,16 @@ export default function Game() {
 
   useEffect(() => {
     const keyDown = (event: KeyboardEvent) => {
+      if (sceneRef.current === "instructions") {
+        event.preventDefault();
+        if (!event.repeat) returnToTitle();
+        return;
+      }
+      if (sceneRef.current === "title" && event.code === "KeyI") {
+        event.preventDefault();
+        if (!event.repeat) showInstructions();
+        return;
+      }
       const directLevel = /^(?:Digit|Numpad)([0-9])$/.exec(event.code);
       if (directLevel || event.code === "KeyG") {
         const selectedNumber = directLevel ? Number(directLevel[1]) : 11;
@@ -2743,7 +2764,14 @@ export default function Game() {
       window.removeEventListener("keyup", keyUp);
       window.removeEventListener("blur", releaseInputs);
     };
-  }, [advanceCampaign, enterTitle, startCampaign, startLevel]);
+  }, [
+    advanceCampaign,
+    enterTitle,
+    returnToTitle,
+    showInstructions,
+    startCampaign,
+    startLevel,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -3458,6 +3486,16 @@ export default function Game() {
                 <span className="desktop-start-copy">PRESS SPACE TO START</span>
                 <span className="touch-start-copy">TAP TO START</span>
               </button>
+              <button
+                type="button"
+                className="arcade-instructions"
+                onClick={showInstructions}
+                data-testid="show-instructions"
+                aria-label="How to play Promptfall"
+              >
+                <span className="arcade-instructions-key">I</span>
+                <span>HOW TO PLAY</span>
+              </button>
               <div className="arcade-controls">
                 <span className="desktop-control-copy">
                   ← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP
@@ -3485,6 +3523,102 @@ export default function Game() {
                 <strong>OPEN SOURCE</strong>
               </span>
             </a>
+          </div>
+        )}
+
+        {scene === "instructions" && (
+          <div
+            className="screen screen--instructions"
+            data-testid="instructions-screen"
+            aria-label="How to play Promptfall"
+          >
+            <div className="title-background" aria-hidden="true" />
+            <div className="title-grid" aria-hidden="true" />
+            <div className="instructions-scanlines" aria-hidden="true" />
+            <header className="instructions-header">
+              <span>PLAYER INTEL // OWASP TRAINING MODE</span>
+              <h1>MISSION BRIEFING</h1>
+              <strong>HOW TO PLAY</strong>
+            </header>
+
+            <div className="instructions-praxi" aria-hidden="true">
+              <div className="instructions-praxi-glow" />
+              <img src="./assets/praxi-idle-v6.png" alt="" />
+            </div>
+
+            <div className="instructions-grid">
+              <section className="instruction-panel instruction-panel--hero">
+                <span className="instruction-number">01</span>
+                <div>
+                  <h2>MEET PRAXI</h2>
+                  <p>
+                    Praxi is your tiny cyber hero. Help him defeat the
+                    <strong> OWASP Top 10 for LLM vulnerabilities.</strong>
+                  </p>
+                </div>
+              </section>
+
+              <section className="instruction-panel">
+                <span className="instruction-number">02</span>
+                <div>
+                  <h2>MOVE + JUMP</h2>
+                  <p className="desktop-instruction-copy">
+                    <kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> to move
+                    <b> • </b><kbd>SPACE</kbd> / <kbd>W</kbd> / <kbd>↑</kbd> to jump
+                  </p>
+                  <p className="touch-instruction-copy">
+                    Hold the left or right side to move. While holding one
+                    side, tap the other side to jump.
+                  </p>
+                </div>
+              </section>
+
+              <section className="instruction-panel">
+                <span className="instruction-number">03</span>
+                <div>
+                  <h2>CONTAIN THREATS</h2>
+                  <p>
+                    Jump on every enemy. Each stomp reveals a quick
+                    <strong> definition, example, or defense.</strong>
+                  </p>
+                </div>
+              </section>
+
+              <section className="instruction-panel">
+                <span className="instruction-number">04</span>
+                <div>
+                  <h2>BREAK THE BARRIER</h2>
+                  <p>
+                    Clear every encounter, then cross the retracted force
+                    field to complete the level.
+                  </p>
+                </div>
+              </section>
+
+              <section className="instruction-panel instruction-panel--codes">
+                <span className="instruction-number">★</span>
+                <div>
+                  <h2>TRAINING CODES // SKIP AHEAD</h2>
+                  <p>
+                    <kbd>1–9</kbd> LEVELS 1–9
+                    <b> • </b>
+                    <kbd>0</kbd> LEVEL 10
+                    <b> • </b>
+                    <kbd>G</kbd> THE GAUNTLET
+                  </p>
+                </div>
+              </section>
+            </div>
+
+            <button
+              type="button"
+              className="instructions-return"
+              onClick={returnToTitle}
+              data-testid="return-to-title"
+            >
+              <span className="desktop-start-copy">PRESS ANY KEY TO RETURN</span>
+              <span className="touch-start-copy">TAP TO RETURN</span>
+            </button>
           </div>
         )}
 
