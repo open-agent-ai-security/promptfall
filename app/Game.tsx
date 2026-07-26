@@ -2243,6 +2243,9 @@ export default function Game() {
         if (key === desiredTrack) return;
         const track = musicRef.current[key];
         if (!track) return;
+        // Mobile Safari may ignore programmatic volume changes. Use the media
+        // element's mute flag while priming so preloaded tracks cannot leak.
+        track.muted = true;
         track.volume = 0;
         void track
           .play()
@@ -2251,11 +2254,14 @@ export default function Game() {
               track.pause();
               track.currentTime = 0;
             }
+            track.muted = false;
             track.volume = mutedRef.current
               ? 0
               : (musicEnvelopeRef.current.get(key) ?? 0);
           })
           .catch(() => {
+            track.pause();
+            track.muted = false;
             // A later interaction can retry if this browser is stricter.
             musicPrimedRef.current = false;
           });
