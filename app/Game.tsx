@@ -3609,6 +3609,7 @@ export default function Game() {
               </section>
 
               <section className="instruction-panel instruction-panel--learning">
+                <span className="instruction-number">05</span>
                 <div>
                   <h2>LEARNING TIPS</h2>
                   <p>
