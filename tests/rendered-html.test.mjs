@@ -212,7 +212,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /instruction-control-line/i);
   assert.match(gameSource, /LEARNING TIPS/i);
   assert.match(gameSource, /instruction-number">05/i);
-  assert.match(gameSource, /Listen for relevant insights/i);
+  assert.match(gameSource, /Listen for insights/i);
   assert.match(gameSource, /PRESS ANY KEY TO RETURN/i);
   assert.match(gameSource, /TRAINING CODES \/\/ SKIP AHEAD/i);
   assert.match(gameSource, /event\.code === "KeyH"/i);

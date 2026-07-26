@@ -3614,10 +3614,10 @@ export default function Game() {
                   <h2>LEARNING TIPS</h2>
                   <p>
                     <span className="learning-tip-line">
-                      <strong>1.</strong> Pause to read the intel after capturing enemies.
+                      <strong>1.</strong> Pause to read the intel after each capture.
                     </span>
                     <span className="learning-tip-line">
-                      <strong>2.</strong> Listen for relevant insights in each level&apos;s lyrics.
+                      <strong>2.</strong> Listen for insights in each level&apos;s lyrics.
                     </span>
                   </p>
                 </div>

@@ -1085,11 +1085,6 @@ button {
   white-space: nowrap;
 }
 
-.instruction-panel--learning p {
-  font-size: clamp(8px, 0.9vw, 14px);
-  letter-spacing: 0;
-}
-
 .instruction-panel kbd {
   display: inline-block;
   min-width: 1.65em;
