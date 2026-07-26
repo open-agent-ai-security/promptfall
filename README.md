@@ -133,6 +133,17 @@ free and open-source agent behavior verifier.
 
 ---
 
+## Special thanks
+
+Special thanks to the
+[OWASP GenAI Security Project](https://genai.owasp.org/) and its worldwide
+community of contributors for everything they do to advance open, practical
+guidance for securing generative AI. Their work includes developing and
+maintaining the OWASP Top 10 for LLM Applications, which provides the
+educational foundation for Promptfall.
+
+---
+
 ## License
 
 Promptfall source code, original game artwork, and original documentation are
