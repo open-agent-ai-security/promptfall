@@ -264,11 +264,11 @@ const PROMPT_INJECTION_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "A user tells a support bot to ignore its rules, access private data, and send email.",
+    text: "A user tells a support bot to ignore its rules and reveal another customer's account data.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "Hidden web-page instructions make an assistant leak private context through an image request.",
+    text: "Hidden instructions inside a document make a summarizer ignore its task and return an attacker-chosen message.",
   },
   {
     kind: "DEFENSE 1",
@@ -291,11 +291,11 @@ const SENSITIVE_INFORMATION_DISCLOSURE_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "A safe-looking answer still leaks PII when reasoning traces and retrieved data enter shared logs.",
+    text: "A support bot writes customer names, account numbers, and private chat details into logs visible to other teams.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "Attackers reconstruct source text from a stolen embeddings backup, turning vectors into a document breach.",
+    text: "A model memorizes a patient record from training and reveals it when prompted with part of the text.",
   },
   {
     kind: "DEFENSE 1",
@@ -322,7 +322,7 @@ const EXCESSIVE_AGENCY_LESSONS = [
   },
   {
     kind: "EXAMPLE 2",
-    text: "A read-only database tool secretly has write access, turning one bad decision into damaged records.",
+    text: "A database assistant meant only to answer questions can also delete records, damaging production data.",
   },
   {
     kind: "DEFENSE 1",
@@ -345,11 +345,11 @@ const SUPPLY_CHAIN_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "An assistant invents a package name. An attacker registers it first and supplies malicious code.",
+    text: "Attackers repackage a mobile AI app with a tampered model that steers users to scam sites.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "An attacker replaces a trusted model component, which silently enters production through an automated pipeline.",
+    text: "A compromised model downloaded from a public repository passes automated checks and enters production.",
   },
   {
     kind: "DEFENSE 1",
@@ -372,7 +372,7 @@ const DATA_MODEL_POISONING_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "Mislabeled transactions teach a fraud model that real fraud is legitimate while normal evaluations still pass.",
+    text: "Attackers relabel fraudulent transactions as legitimate, teaching a fraud model to approve them.",
   },
   {
     kind: "EXAMPLE 2",
@@ -399,11 +399,11 @@ const UNBOUNDED_CONSUMPTION_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "Long agent sessions repeatedly process growing context, quietly multiplying memory, token, and compute costs.",
+    text: "Every new request makes an agent reprocess its entire conversation, driving token use and compute costs higher.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A malicious tool traps an agent in a recursive loop that creates hundreds of paid operations.",
+    text: "A malicious tool traps an agent in a loop that makes millions of costly API calls.",
   },
   {
     kind: "DEFENSE 1",
@@ -426,11 +426,11 @@ const MISINFORMATION_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "A retrieval agent falsely marks a customer verified, so a payment agent releases funds.",
+    text: "One agent falsely marks a customer as verified, so another releases payment to an impostor.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "An agent claims a backup completed when it never ran. The fiction surfaces only when recovery fails.",
+    text: "An agent reports that a backup succeeded even though it never ran. The mistake is discovered only after data loss.",
   },
   {
     kind: "DEFENSE 1",
@@ -453,11 +453,11 @@ const HIDDEN_CONTEXT_EXPOSURE_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "An attacker extracts tool names and inputs, revealing targets for prompt injection and chained actions.",
+    text: "Careful questions make an assistant reveal its hidden tools and privileged actions, giving attackers a map of the system.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "Conversational probing reveals credentials stored in a system prompt, which attackers reuse elsewhere.",
+    text: "A user tricks an assistant into repeating an API key embedded in its hidden instructions.",
   },
   {
     kind: "DEFENSE 1",
@@ -480,11 +480,11 @@ const VECTOR_EMBEDDING_WEAKNESSES_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "A shared index searches every customer's data before filtering, exposing document topics through timing and result patterns.",
+    text: "A shared vector search checks every customer's documents before filtering, leaking clues about what other customers store.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "Attackers reconstruct source documents and PII from a stolen embeddings backup.",
+    text: "Attackers steal a vector database and reconstruct private source documents from the stored embeddings.",
   },
   {
     kind: "DEFENSE 1",
@@ -507,11 +507,11 @@ const IMPROPER_OUTPUT_HANDLING_LESSONS = [
   },
   {
     kind: "EXAMPLE 1",
-    text: "An application sends model output directly to a command runner, allowing remote code execution.",
+    text: "An application runs model-generated commands without checking them, allowing an attacker to control the server.",
   },
   {
     kind: "EXAMPLE 2",
-    text: "A chat interface automatically loads a model-generated image URL, sending conversation data to an attacker.",
+    text: "An attacker makes the model put chat data in an image URL. Loading it sends the data to the attacker.",
   },
   {
     kind: "DEFENSE 1",
