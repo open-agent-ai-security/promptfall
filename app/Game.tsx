@@ -763,7 +763,7 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
       { x: 2400, y: 370, w: 260, h: 24, kind: "ledge" },
     ],
     enemies: [
-      enemySpawn(0, 790, 606, 765, 900, 72, 0),
+      enemySpawn(0, 470, 500, 400, 550, 72, 0),
       enemySpawn(1, 860, 430, 805, 950, -76, 0.7),
       enemySpawn(2, 1260, 480, 1205, 1350, 80, 1.4),
       enemySpawn(3, 1640, 390, 1570, 1720, -72, 2.1),
