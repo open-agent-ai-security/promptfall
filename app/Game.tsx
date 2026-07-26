@@ -3600,6 +3600,18 @@ export default function Game() {
                 </div>
               </section>
 
+              <section className="instruction-panel instruction-panel--learning">
+                <span className="instruction-number">!</span>
+                <div>
+                  <h2>LEARNING TIPS</h2>
+                  <p>
+                    <strong>1.</strong> Pause to read the intel after capturing
+                    enemies. <strong>2.</strong> Pay attention to the lyrics for
+                    relevant insights on each level!
+                  </p>
+                </div>
+              </section>
+
               <section className="instruction-panel instruction-panel--codes">
                 <span className="instruction-number">★</span>
                 <div>

@@ -1000,9 +1000,9 @@ button {
 .instruction-panel:nth-child(3) { animation-delay: 160ms; }
 .instruction-panel:nth-child(4) { animation-delay: 230ms; }
 .instruction-panel:nth-child(5) { animation-delay: 300ms; }
+.instruction-panel:nth-child(6) { animation-delay: 370ms; }
 
 .instruction-panel--hero,
-.instruction-panel:nth-child(4),
 .instruction-panel--codes {
   grid-column: 1 / -1;
 }
@@ -1053,6 +1053,7 @@ button {
 }
 
 .instruction-panel--hero h2,
+.instruction-panel--learning h2,
 .instruction-panel--codes h2 {
   color: #ffe36e;
   text-shadow:
