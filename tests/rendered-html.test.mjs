@@ -72,6 +72,15 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /gameplay-background-l11-gauntlet-v1\.png/i);
   assert.match(gameSource, /THE GAUNTLET/i);
   assert.match(gameSource, /worldWidth: 6000/i);
+  assert.equal(
+    [...gameSource.matchAll(/worldWidth: 3700/g)].length,
+    4,
+  );
+  assert.match(gameSource, /worldWidth: 3850/i);
+  assert.equal(
+    [...gameSource.matchAll(/energyTraps:/g)].length,
+    4,
+  );
   assert.match(gameSource, /motion:\s*\{\s*axis:/i);
   assert.match(gameSource, /ridingPlatformIndex/i);
   assert.match(gameSource, /energyTraps:/i);
