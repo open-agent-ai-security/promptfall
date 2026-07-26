@@ -210,7 +210,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /MEET PRAXI/i);
   assert.match(gameSource, /PRESS ANY KEY TO RETURN/i);
   assert.match(gameSource, /TRAINING CODES \/\/ SKIP AHEAD/i);
-  assert.match(gameSource, /event\.code === "KeyI"/i);
+  assert.match(gameSource, /event\.code === "KeyH"/i);
   assert.match(gameSource, /scene === "title" \|\| scene === "instructions"/i);
   assert.match(gameSource, /DIRECT LEVEL SELECT/i);
   assert.match(gameSource, /1–9 \/ 0 \/ G/i);

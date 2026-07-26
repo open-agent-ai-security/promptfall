@@ -2661,7 +2661,7 @@ export default function Game() {
         if (!event.repeat) returnToTitle();
         return;
       }
-      if (sceneRef.current === "title" && event.code === "KeyI") {
+      if (sceneRef.current === "title" && event.code === "KeyH") {
         event.preventDefault();
         if (!event.repeat) showInstructions();
         return;
@@ -3493,7 +3493,7 @@ export default function Game() {
                 data-testid="show-instructions"
                 aria-label="How to play Promptfall"
               >
-                <span className="arcade-instructions-key">I</span>
+                <span className="arcade-instructions-key">H</span>
                 <span>HOW TO PLAY</span>
               </button>
               <div className="arcade-controls">
