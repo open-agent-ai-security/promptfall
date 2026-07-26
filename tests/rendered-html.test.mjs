@@ -95,6 +95,10 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /sfx-gameover\.mp3/i);
   assert.match(gameSource, /sfx-powerup\.mp3/i);
   assert.match(gameSource, /sfx-enemy-hit\.mp3/i);
+  assert.match(gameSource, /sfx-jump\.mp3/i);
+  assert.match(gameSource, /SOUND TRACK:/i);
+  assert.match(gameSource, /currentLevel\.riskCode/i);
+  assert.match(gameSource, /formatLessonKind\(factLesson\.kind\)/i);
   assert.doesNotMatch(gameSource, /createOscillator|playTone/i);
   assert.match(
     gameSource,

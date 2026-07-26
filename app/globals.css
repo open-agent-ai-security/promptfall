@@ -902,6 +902,7 @@ kbd {
 }
 
 .hud-brand div,
+.hud-level-meta,
 .risk-count,
 .health {
   display: flex;
@@ -924,7 +925,46 @@ kbd {
   letter-spacing: 0.08em;
 }
 
+.hud-level-meta {
+  flex: 1;
+  min-width: 0;
+  max-width: 42%;
+  margin-left: clamp(18px, 2.5vw, 42px);
+}
+
+.hud-level-meta strong {
+  overflow: hidden;
+  color: #fff;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(14px, 1.18vw, 20px);
+  font-style: italic;
+  letter-spacing: 0.045em;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  text-shadow:
+    2px 2px 0 #061827,
+    0 0 11px rgba(69, 222, 255, 0.5);
+  white-space: nowrap;
+}
+
+.hud-level-meta small {
+  margin-top: 0.25em;
+  overflow: hidden;
+  color: rgba(255, 169, 52, 0.72);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(9px, 0.68vw, 12px);
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hud-level-meta small span {
+  color: rgba(216, 247, 255, 0.86);
+}
+
 .hud-status {
+  flex-shrink: 0;
   gap: clamp(15px, 2.2vw, 36px);
 }
 
@@ -995,14 +1035,14 @@ kbd {
   z-index: 6;
   top: 50%;
   left: 50%;
-  width: min(30%, 380px);
+  width: min(34%, 430px);
   padding: 0;
   border: 0;
   color: var(--white);
   background: transparent;
   opacity: 0;
   transform: translate(12%, -20%) scale(0.7);
-  text-align: center;
+  text-align: left;
   pointer-events: none;
   will-change: left, top, opacity, transform;
 }
@@ -1011,59 +1051,32 @@ kbd {
   animation: fact-follows-praxi 6.1s linear both;
 }
 
-.fact-copy small {
-  color: var(--cyan-soft);
-  font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(12px, 1.05vw, 17px);
-  font-style: italic;
-  font-weight: 900;
-  letter-spacing: 0.13em;
-  text-shadow:
-    3px 3px 0 #06365e,
-    0 0 14px rgba(62, 221, 255, 0.85);
-}
-
-.fact-copy small em {
-  color: #fff08e;
-  font-style: italic;
-  font-size: 1.35em;
-  -webkit-text-stroke: 1px #9a270b;
-  text-shadow:
-    3px 3px 0 #4a1408,
-    0 0 16px rgba(255, 146, 28, 0.95);
-}
-
-.fact-copy h2 {
-  margin: 0.03em 0 0.1em;
-  color: #fff;
-  font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(25px, 2.7vw, 43px);
-  font-style: italic;
-  letter-spacing: 0.025em;
-  line-height: 1;
-  -webkit-text-stroke: clamp(1px, 0.13vw, 2px) #075588;
-  text-shadow:
-    4px 4px 0 #05233c,
-    0 0 17px rgba(69, 222, 255, 0.72);
-}
-
-.fact-copy--long h2 {
-  font-size: clamp(21px, 2.1vw, 34px);
-  line-height: 0.96;
-  white-space: normal;
-}
-
 .fact-copy p {
   margin: 0;
-  color: rgba(231, 250, 255, 0.94);
+  color: #fff;
   font-family: "Arial Black", Arial, sans-serif;
-  font-size: clamp(14px, 1.24vw, 20px);
-  font-weight: 800;
-  line-height: 1.24;
+  font-size: clamp(16px, 1.42vw, 23px);
+  font-weight: 900;
+  line-height: 1.28;
   text-shadow:
-    2px 3px 0 #03101d,
-    -1px -1px 0 #03101d,
-    0 0 9px #000;
+    2px 3px 0 #020a11,
+    -2px -1px 0 #020a11,
+    0 0 11px #000;
+}
+
+.fact-copy p strong {
+  color: #ffca54;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 0.82em;
+  font-style: italic;
+  letter-spacing: 0.035em;
+  text-shadow:
+    2px 2px 0 #6b2108,
+    0 0 12px rgba(255, 145, 28, 0.72);
+}
+
+.fact-copy p span {
+  color: #fff;
 }
 
 .touch-controls {

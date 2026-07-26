@@ -147,6 +147,7 @@ type MusicTrackKey =
   | "gameOver";
 
 type SfxKey =
+  | "jump"
   | "nextLevel"
   | "playerHit"
   | "levelComplete"
@@ -191,6 +192,10 @@ const MUSIC_SOURCES: Record<MusicTrackKey, string> = {
   gameOver: "./assets/music/game-over.mp3",
 };
 const SFX_SOURCES: Record<SfxKey, { source: string; volume: number }> = {
+  jump: {
+    source: "./assets/sfx/sfx-jump.mp3",
+    volume: 0.52,
+  },
   nextLevel: {
     source: "./assets/sfx/sfx-next-level.mp3",
     volume: 0.58,
@@ -240,6 +245,12 @@ function musicForLevel(levelIndex: number): MusicTrackKey {
     AVAILABLE_LEVEL_MUSIC[levelIndex] ??
     AVAILABLE_LEVEL_MUSIC[levelIndex % AVAILABLE_LEVEL_MUSIC.length]
   );
+}
+
+function formatLessonKind(kind: string) {
+  return kind
+    .toLowerCase()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 const PROMPT_INJECTION_LESSONS = [
@@ -581,6 +592,7 @@ const LEVELS = [
     riskCode: "LLM01",
     name: "PROMPT INJECTION",
     objectiveName: "Prompt Injection",
+    soundtrack: "Borrowed Hands",
     background: "./assets/gameplay-background-v2.png",
     enemy: "./assets/enemies-game-v1/prompt-injection-v2.png",
     lessons: PROMPT_INJECTION_LESSONS,
@@ -590,6 +602,7 @@ const LEVELS = [
     riskCode: "LLM02",
     name: "SENSITIVE INFORMATION DISCLOSURE",
     objectiveName: "Sensitive Information Disclosure",
+    soundtrack: "Everything You Told Me",
     background: "./assets/gameplay-background-l2-v1.png",
     enemy: "./assets/enemies-game-v1/sensitive-disclosure-v1.png",
     lessons: SENSITIVE_INFORMATION_DISCLOSURE_LESSONS,
@@ -599,6 +612,7 @@ const LEVELS = [
     riskCode: "LLM03",
     name: "EXCESSIVE AGENCY",
     objectiveName: "Excessive Agency",
+    soundtrack: "Too Much Rope",
     background: "./assets/gameplay-background-l3-v1.png",
     enemy: "./assets/enemies-game-v1/excessive-agency-v1.png",
     lessons: EXCESSIVE_AGENCY_LESSONS,
@@ -608,6 +622,7 @@ const LEVELS = [
     riskCode: "LLM04",
     name: "SUPPLY CHAIN",
     objectiveName: "Supply Chain",
+    soundtrack: "Looks Like the Real Thing",
     background: "./assets/gameplay-background-l4-v1.png",
     enemy: "./assets/enemies-game-v1/supply-chain-v1.png",
     lessons: SUPPLY_CHAIN_LESSONS,
@@ -617,6 +632,7 @@ const LEVELS = [
     riskCode: "LLM05",
     name: "DATA AND MODEL POISONING",
     objectiveName: "Data and Model Poisoning",
+    soundtrack: "Raised on a Lie",
     background: "./assets/gameplay-background-l5-v1.png",
     enemy: "./assets/enemies-game-v1/data-model-poisoning-v1.png",
     lessons: DATA_MODEL_POISONING_LESSONS,
@@ -626,6 +642,7 @@ const LEVELS = [
     riskCode: "LLM06",
     name: "UNBOUNDED CONSUMPTION",
     objectiveName: "Unbounded Consumption",
+    soundtrack: "Again and Again",
     background: "./assets/gameplay-background-l6-v2.png",
     enemy: "./assets/enemies-game-v1/unbounded-consumption-v1.png",
     lessons: UNBOUNDED_CONSUMPTION_LESSONS,
@@ -635,6 +652,7 @@ const LEVELS = [
     riskCode: "LLM07",
     name: "MISINFORMATION",
     objectiveName: "Misinformation",
+    soundtrack: "Beautifully Wrong",
     background: "./assets/gameplay-background-l7-v2.png",
     enemy: "./assets/enemies-game-v1/misinformation-v1.png",
     lessons: MISINFORMATION_LESSONS,
@@ -644,6 +662,7 @@ const LEVELS = [
     riskCode: "LLM08",
     name: "HIDDEN CONTEXT EXPOSURE",
     objectiveName: "Hidden Context Exposure",
+    soundtrack: "You Drew Me a Map",
     background: "./assets/gameplay-background-l8-v1.png",
     enemy: "./assets/enemies-game-v1/hidden-context-exposure-v1.png",
     lessons: HIDDEN_CONTEXT_EXPOSURE_LESSONS,
@@ -653,6 +672,7 @@ const LEVELS = [
     riskCode: "LLM09",
     name: "VECTOR AND EMBEDDING WEAKNESSES",
     objectiveName: "Vector and Embedding Weaknesses",
+    soundtrack: "Close Enough to Be Dangerous",
     background: "./assets/gameplay-background-l9-v1.png",
     enemy: "./assets/enemies-game-v1/vector-embedding-weaknesses-v1.png",
     lessons: VECTOR_EMBEDDING_WEAKNESSES_LESSONS,
@@ -662,6 +682,7 @@ const LEVELS = [
     riskCode: "LLM10",
     name: "IMPROPER OUTPUT HANDLING",
     objectiveName: "Improper Output Handling",
+    soundtrack: "Passed Without Question",
     background: "./assets/gameplay-background-l10-v2.png",
     enemy: "./assets/enemies-game-v1/improper-output-handling-v1.png",
     lessons: IMPROPER_OUTPUT_HANDLING_LESSONS,
@@ -671,6 +692,7 @@ const LEVELS = [
     riskCode: "CAPSTONE",
     name: "THE GAUNTLET",
     objectiveName: "Gauntlet",
+    soundtrack: "Promptfall (Reprise)",
     background: "./assets/gameplay-background-l11-gauntlet-v1.png",
     enemy: "./assets/enemies-game-v1/prompt-injection-v2.png",
     lessons: GAUNTLET_LESSONS,
@@ -2780,6 +2802,7 @@ export default function Game() {
           player.vy = -JUMP_SPEED;
           player.grounded = false;
           jumpLatchRef.current = true;
+          playSfx("jump");
         }
         if (!input.jump) jumpLatchRef.current = false;
         if (!input.jump && player.vy < -260) player.vy *= Math.pow(0.018, dt);
@@ -3113,7 +3136,7 @@ export default function Game() {
             145,
             Math.min(410, praxiVisualTop - 16),
           );
-          factRef.current.style.left = `${(Math.max(200, Math.min(1080, playerScreenX)) / VIEW_W) * 100}%`;
+          factRef.current.style.left = `${(Math.max(260, Math.min(1020, playerScreenX)) / VIEW_W) * 100}%`;
           factRef.current.style.top = `${(factY / VIEW_H) * 100}%`;
         }
 
@@ -3333,10 +3356,6 @@ export default function Game() {
   const factLesson = currentLevel.lessons[factLessonIndex];
   const isFinalLevel = levelIndex === LEVELS.length - 1;
   const encounterCount = currentLevel.lessons.length;
-  const factRiskCode =
-    "riskCode" in factLesson ? factLesson.riskCode : currentLevel.riskCode;
-  const factEntryName =
-    "entryName" in factLesson ? factLesson.entryName : currentLevel.name;
 
   return (
     <main className="game-shell">
@@ -3477,6 +3496,14 @@ export default function Game() {
                   <strong>OWASP TOP 10</strong>
                 </div>
               </div>
+              <div className="hud-level-meta">
+                <strong>
+                  {currentLevel.riskCode}: {currentLevel.objectiveName}
+                </strong>
+                <small>
+                  SOUND TRACK: <span>{currentLevel.soundtrack}</span>
+                </small>
+              </div>
               <div className="hud-status">
                 <div className="health" aria-label={`${health} integrity remaining`}>
                   <small>INTEGRITY</small>
@@ -3510,12 +3537,11 @@ export default function Game() {
               role="status"
               aria-live="polite"
             >
-              <div
-                className={`fact-copy${factEntryName.length > 22 ? " fact-copy--long" : ""}`}
-              >
-                <small><em>{factLesson.kind}</em>&nbsp; // &nbsp;{factRiskCode}</small>
-                <h2>{factEntryName}</h2>
-                <p>{factLesson.text}</p>
+              <div className="fact-copy">
+                <p>
+                  <strong>{formatLessonKind(factLesson.kind)}:</strong>{" "}
+                  <span>{factLesson.text}</span>
+                </p>
               </div>
             </div>
 
