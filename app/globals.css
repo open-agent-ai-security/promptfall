@@ -928,7 +928,7 @@ kbd {
 .hud-level-meta {
   flex: 1;
   min-width: 0;
-  max-width: 42%;
+  max-width: 45%;
   margin-left: clamp(18px, 2.5vw, 42px);
 }
 
@@ -936,7 +936,7 @@ kbd {
   overflow: hidden;
   color: #fff;
   font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(14px, 1.18vw, 20px);
+  font-size: clamp(16px, 1.4vw, 24px);
   font-style: italic;
   letter-spacing: 0.045em;
   line-height: 1.05;
@@ -952,9 +952,9 @@ kbd {
   overflow: hidden;
   color: rgba(255, 169, 52, 0.72);
   font-family: var(--font-geist-mono), monospace;
-  font-size: clamp(9px, 0.68vw, 12px);
+  font-size: clamp(11px, 0.82vw, 15px);
   font-weight: 900;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.075em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
