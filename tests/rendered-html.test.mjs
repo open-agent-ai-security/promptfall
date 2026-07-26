@@ -124,6 +124,9 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /improper-output-handling-v1\.png/i);
   assert.match(gameSource, /gameplay-background-l11-gauntlet-v1\.png/i);
   assert.match(gameSource, /THE GAUNTLET/i);
+  assert.match(gameSource, /\(\?:Digit\|Numpad\)/i);
+  assert.match(gameSource, /event\.code === "KeyG"/i);
+  assert.doesNotMatch(gameSource, /\^F\(\[1-9\]/i);
   assert.match(gameSource, /worldWidth: 6000/i);
   assert.equal(
     [...gameSource.matchAll(/worldWidth: 3700/g)].length,
@@ -202,7 +205,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /praxen-lockup-dark-background\.png/i);
   assert.match(gameSource, /PRESS SPACE TO START/i);
   assert.match(gameSource, /DIRECT LEVEL SELECT/i);
-  assert.match(gameSource, /\^F\(\[1-9\]\|1\[01\]\)\$/i);
+  assert.match(gameSource, /1–9 \/ 0 \/ G/i);
   assert.match(gameSource, /aria-label="Touch controls: hold the left or right half/i);
   assert.match(gameSource, /TAP WITH SECOND FINGER TO JUMP/i);
   assert.match(gameSource, /pointerType !== "touch"/i);

@@ -2645,9 +2645,10 @@ export default function Game() {
 
   useEffect(() => {
     const keyDown = (event: KeyboardEvent) => {
-      const directLevel = /^F([1-9]|1[01])$/.exec(event.code);
-      if (directLevel) {
-        const targetLevel = Number(directLevel[1]) - 1;
+      const directLevel = /^(?:Digit|Numpad)([0-9])$/.exec(event.code);
+      if (directLevel || event.code === "KeyG") {
+        const selectedNumber = directLevel ? Number(directLevel[1]) : 11;
+        const targetLevel = selectedNumber === 0 ? 9 : selectedNumber - 1;
         if (targetLevel < LEVELS.length) {
           event.preventDefault();
           if (!event.repeat) startLevel(targetLevel);
@@ -3465,7 +3466,7 @@ export default function Game() {
                   HOLD LEFT / RIGHT&nbsp;&nbsp;•&nbsp;&nbsp;TAP WITH SECOND FINGER TO JUMP
                 </span>
                 <span className="arcade-level-select">
-                  F1–F{LEVELS.length}&nbsp;&nbsp;DIRECT LEVEL SELECT
+                  1–9 / 0 / G&nbsp;&nbsp;DIRECT LEVEL SELECT
                 </span>
               </div>
             </div>

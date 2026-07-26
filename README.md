@@ -64,7 +64,8 @@ unlock the campaign victory sequence.
 - Move: `A` / `D` or Left / Right Arrow
 - Jump: `W`, Up Arrow, or Space
 - Sound toggle: `M` or the on-screen sound button
-- Direct level select: `F1`–`F11` (`fn` + function key on macOS when required)
+- Direct level select: `1`–`9` for Levels 1–9, `0` for Level 10, and `G`
+  for the Gauntlet
 
 ### Mobile
 
