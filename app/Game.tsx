@@ -3544,6 +3544,11 @@ export default function Game() {
             <div className="instructions-praxi" aria-hidden="true">
               <div className="instructions-praxi-glow" />
               <img src="./assets/praxi-idle-v6.png" alt="" />
+              <div className="title-tail-generator instructions-tail-generator">
+                {Array.from({ length: 14 }, (_, index) => (
+                  <span key={index} />
+                ))}
+              </div>
             </div>
 
             <div className="instructions-grid">

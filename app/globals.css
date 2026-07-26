@@ -943,6 +943,10 @@ button {
   width: 100%;
 }
 
+.instructions-tail-generator {
+  z-index: 4;
+}
+
 .instructions-praxi-glow {
   position: absolute;
   z-index: 1;
