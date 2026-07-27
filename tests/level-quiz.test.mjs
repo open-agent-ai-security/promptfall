@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   QUIZ_FEEDBACK_MS,
   QUIZ_QUESTION_COUNT,
+  QUIZ_WRONG_FEEDBACK_MS,
   buildLevelQuiz,
 } from "../app/level-quiz.js";
 
@@ -77,8 +78,10 @@ test("balances true and false checks across the ten vulnerabilities", () => {
   assert.equal(correctAnswers.filter((answer) => answer === "FALSE").length, 5);
 });
 
-test("keeps feedback fast enough for an arcade debrief", () => {
+test("keeps correct feedback quick and gives wrong answers time to teach", () => {
   assert.equal(QUIZ_FEEDBACK_MS, 1_650);
+  assert.equal(QUIZ_WRONG_FEEDBACK_MS, 3_500);
+  assert.ok(QUIZ_WRONG_FEEDBACK_MS > QUIZ_FEEDBACK_MS * 2);
 });
 
 test("wires the quiz before level-complete and winner scenes", async () => {
@@ -91,4 +94,5 @@ test("wires the quiz before level-complete and winner scenes", async () => {
   assert.match(source, /scene === "quiz"/);
   assert.match(source, /answerQuiz/);
   assert.match(source, /QUIZ_FEEDBACK_MS/);
+  assert.match(source, /correct \? QUIZ_FEEDBACK_MS : QUIZ_WRONG_FEEDBACK_MS/);
 });

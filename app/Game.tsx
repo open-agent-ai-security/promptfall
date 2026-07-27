@@ -19,6 +19,7 @@ import {
 } from "./fact-callout.js";
 import {
   QUIZ_FEEDBACK_MS,
+  QUIZ_WRONG_FEEDBACK_MS,
   buildLevelQuiz,
 } from "./level-quiz.js";
 import { createMusicHealthMonitor } from "./music-health.js";
@@ -2580,7 +2581,7 @@ export default function Game() {
         sceneRef.current = completedCampaign ? "winner" : "complete";
         setScene(completedCampaign ? "winner" : "complete");
         playSfx("levelComplete");
-      }, QUIZ_FEEDBACK_MS);
+      }, correct ? QUIZ_FEEDBACK_MS : QUIZ_WRONG_FEEDBACK_MS);
     },
     [playSfx],
   );
