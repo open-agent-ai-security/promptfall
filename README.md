@@ -12,6 +12,7 @@
 **Ten vulnerabilities. One hero. Learn the OWASP Top 10 for LLMs.**
 
 [![Play Promptfall](https://img.shields.io/badge/play-Promptfall-ff8b1f)](https://open-agent-ai-security.github.io/promptfall/)
+[![CI](https://github.com/open-agent-ai-security/promptfall/actions/workflows/ci.yml/badge.svg)](https://github.com/open-agent-ai-security/promptfall/actions/workflows/ci.yml)
 [![Deploy Promptfall to GitHub Pages](https://github.com/open-agent-ai-security/promptfall/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/open-agent-ai-security/promptfall/actions/workflows/deploy-pages.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE)
 [![Static web game](https://img.shields.io/badge/hosting-static_web-29d9ff)](https://open-agent-ai-security.github.io/promptfall/)
