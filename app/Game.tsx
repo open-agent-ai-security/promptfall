@@ -17,6 +17,10 @@ import {
   FACT_CALLOUT_TOTAL_MS,
   shouldFastDismissFactCallout,
 } from "./fact-callout.js";
+import {
+  QUIZ_FEEDBACK_MS,
+  buildLevelQuiz,
+} from "./level-quiz.js";
 import { createMusicHealthMonitor } from "./music-health.js";
 
 type Scene =
@@ -25,6 +29,7 @@ type Scene =
   | "instructions"
   | "levelIntro"
   | "playing"
+  | "quiz"
   | "complete"
   | "winner"
   | "gameOver"
@@ -2127,6 +2132,10 @@ export default function Game() {
   const factShownAtRef = useRef(0);
   const factVisibleRef = useRef(false);
   const factDismissingRef = useRef(false);
+  const quizAdvanceTimerRef = useRef<number | null>(null);
+  const quizQuestionIndexRef = useRef(0);
+  const quizAnswerIndexRef = useRef<number | null>(null);
+  const quizScoreRef = useRef(0);
   const [scene, setScene] = useState<Scene>("splash");
   const [levelIndex, setLevelIndex] = useState(0);
   const [health, setHealth] = useState(STARTING_INTEGRITY);
@@ -2135,6 +2144,9 @@ export default function Game() {
   const [callout, setCallout] = useState(false);
   const [calloutDismissing, setCalloutDismissing] = useState(false);
   const [factLessonIndex, setFactLessonIndex] = useState(0);
+  const [quizQuestionIndex, setQuizQuestionIndex] = useState(0);
+  const [quizAnswerIndex, setQuizAnswerIndex] = useState<number | null>(null);
+  const [quizScore, setQuizScore] = useState(0);
   const [muted, setMuted] = useState(false);
   const mutedRef = useRef(false);
   const musicRef = useRef<Partial<Record<MusicTrackKey, HTMLAudioElement>>>({});
@@ -2211,6 +2223,19 @@ export default function Game() {
       setCalloutDismissing(false);
       factTimerRef.current = null;
     }, FACT_CALLOUT_DISMISS_MS);
+  }, []);
+
+  const resetQuiz = useCallback(() => {
+    if (quizAdvanceTimerRef.current !== null) {
+      window.clearTimeout(quizAdvanceTimerRef.current);
+      quizAdvanceTimerRef.current = null;
+    }
+    quizQuestionIndexRef.current = 0;
+    quizAnswerIndexRef.current = null;
+    quizScoreRef.current = 0;
+    setQuizQuestionIndex(0);
+    setQuizAnswerIndex(null);
+    setQuizScore(0);
   }, []);
 
   const setMusicEnvelope = useCallback(
@@ -2418,6 +2443,7 @@ export default function Game() {
 
   const resetGame = useCallback((nextLevelIndex = 0) => {
     clearFactCallout();
+    resetQuiz();
     releaseAllInputs();
     playerRef.current = {
       x: 150,
@@ -2450,7 +2476,7 @@ export default function Game() {
     setHealth(STARTING_INTEGRITY);
     setCaptured(0);
     setFactLessonIndex(0);
-  }, [clearFactCallout, releaseAllInputs]);
+  }, [clearFactCallout, releaseAllInputs, resetQuiz]);
 
   const startLevel = useCallback((nextLevelIndex: number) => {
     if (titleTransitionTimerRef.current !== null) {
@@ -2511,6 +2537,53 @@ export default function Game() {
     sceneRef.current = "title";
     setScene("title");
   }, [resetGame, startLevel]);
+
+  const answerQuiz = useCallback(
+    (answerIndex: number) => {
+      if (
+        sceneRef.current !== "quiz" ||
+        quizAnswerIndexRef.current !== null
+      ) {
+        return;
+      }
+      const questions = buildLevelQuiz(LEVELS, levelIndexRef.current);
+      const question = questions[quizQuestionIndexRef.current];
+      if (!question || answerIndex < 0 || answerIndex >= question.options.length) {
+        return;
+      }
+
+      quizAnswerIndexRef.current = answerIndex;
+      setQuizAnswerIndex(answerIndex);
+      const correct = answerIndex === question.correctIndex;
+      if (correct) {
+        quizScoreRef.current += 1;
+        setQuizScore(quizScoreRef.current);
+      }
+      playSfx(correct ? "powerUp" : "playerHit");
+
+      if (quizAdvanceTimerRef.current !== null) {
+        window.clearTimeout(quizAdvanceTimerRef.current);
+      }
+      quizAdvanceTimerRef.current = window.setTimeout(() => {
+        quizAdvanceTimerRef.current = null;
+        quizAnswerIndexRef.current = null;
+        setQuizAnswerIndex(null);
+        const nextQuestion = quizQuestionIndexRef.current + 1;
+        if (nextQuestion < questions.length) {
+          quizQuestionIndexRef.current = nextQuestion;
+          setQuizQuestionIndex(nextQuestion);
+          return;
+        }
+
+        const completedCampaign =
+          levelIndexRef.current === LEVELS.length - 1;
+        sceneRef.current = completedCampaign ? "winner" : "complete";
+        setScene(completedCampaign ? "winner" : "complete");
+        playSfx("levelComplete");
+      }, QUIZ_FEEDBACK_MS);
+    },
+    [playSfx],
+  );
 
   useEffect(() => {
     sceneRef.current = scene;
@@ -2696,6 +2769,14 @@ export default function Game() {
       });
       return;
     }
+    if (scene === "quiz") {
+      // Keep the level soundtrack running through the fast mission debrief.
+      transitionMusic(musicForLevel(levelIndex), {
+        fadeOut: 0,
+        fadeIn: 0,
+      });
+      return;
+    }
     if (scene === "complete") {
       transitionMusic(null, { fadeOut: 900 });
       return;
@@ -2775,6 +2856,36 @@ export default function Game() {
         if (!event.repeat) showInstructions();
         return;
       }
+      if (sceneRef.current === "quiz") {
+        if (event.code === "KeyM") {
+          event.preventDefault();
+          if (!event.repeat) setMuted((value) => !value);
+          return;
+        }
+        if (event.repeat) return;
+        const questions = buildLevelQuiz(LEVELS, levelIndexRef.current);
+        const question = questions[quizQuestionIndexRef.current];
+        let answerIndex: number | null = null;
+        const numberKey = /^(?:Digit|Numpad)([1-3])$/.exec(event.code);
+        if (numberKey) answerIndex = Number(numberKey[1]) - 1;
+        if (
+          question?.mode === "true-false" &&
+          (event.code === "KeyT" || event.code === "KeyY")
+        ) {
+          answerIndex = 0;
+        }
+        if (
+          question?.mode === "true-false" &&
+          (event.code === "KeyF" || event.code === "KeyN")
+        ) {
+          answerIndex = 1;
+        }
+        if (answerIndex !== null) {
+          event.preventDefault();
+          answerQuiz(answerIndex);
+        }
+        return;
+      }
       const directLevel = /^(?:Digit|Numpad)([0-9])$/.exec(event.code);
       if (directLevel || event.code === "KeyG") {
         const selectedNumber = directLevel ? Number(directLevel[1]) : 11;
@@ -2851,6 +2962,7 @@ export default function Game() {
     };
   }, [
     advanceCampaign,
+    answerQuiz,
     enterTitle,
     releaseAllInputs,
     returnToTitle,
@@ -3266,11 +3378,8 @@ export default function Game() {
           enemies.every((enemy) => !enemy.active) &&
           fieldUnlockProgress >= 1
         ) {
-          const completedCampaign =
-            levelIndexRef.current === LEVELS.length - 1;
-          sceneRef.current = completedCampaign ? "winner" : "complete";
-          setScene(completedCampaign ? "winner" : "complete");
-          playSfx("levelComplete");
+          sceneRef.current = "quiz";
+          setScene("quiz");
         }
       }
 
@@ -3496,6 +3605,8 @@ export default function Game() {
 
   const currentLevel = LEVELS[levelIndex];
   const factLesson = currentLevel.lessons[factLessonIndex];
+  const quizQuestions = buildLevelQuiz(LEVELS, levelIndex);
+  const quizQuestion = quizQuestions[quizQuestionIndex];
   const isFinalLevel = levelIndex === LEVELS.length - 1;
   const encounterCount = currentLevel.lessons.length;
 
@@ -3858,6 +3969,99 @@ export default function Game() {
           </div>
         )}
 
+        {scene === "quiz" && quizQuestion && (
+          <div className="quiz-screen" data-testid="level-quiz">
+            <div className="quiz-grid" aria-hidden="true" />
+            <div className="quiz-debrief">
+              <header className="quiz-header">
+                <div>
+                  <small>
+                    MISSION DEBRIEF // {currentLevel.riskCode}
+                  </small>
+                  <h2>KNOWLEDGE CHECK</h2>
+                </div>
+                <div className="quiz-score">
+                  <small>SCORE</small>
+                  <strong>
+                    {String(quizScore).padStart(2, "0")} / 03
+                  </strong>
+                </div>
+              </header>
+
+              <div className="quiz-progress" aria-label={`Question ${quizQuestionIndex + 1} of 3`}>
+                {quizQuestions.map((_question, index) => (
+                  <span
+                    key={index}
+                    className={
+                      index < quizQuestionIndex
+                        ? "is-complete"
+                        : index === quizQuestionIndex
+                          ? "is-active"
+                          : ""
+                    }
+                  />
+                ))}
+              </div>
+
+              <section
+                key={`${levelIndex}-${quizQuestionIndex}`}
+                className="quiz-question"
+                aria-live="polite"
+              >
+                <div className="quiz-mode">
+                  QUESTION {quizQuestionIndex + 1}
+                  {" // "}
+                  {quizQuestion.mode === "true-false"
+                    ? "TRUE OR FALSE"
+                    : "MULTIPLE CHOICE"}
+                </div>
+                <h3>{quizQuestion.prompt}</h3>
+                <div
+                  className={`quiz-answers${quizQuestion.options.length === 2 ? " quiz-answers--binary" : ""}`}
+                >
+                  {quizQuestion.options.map((option, index) => {
+                    const answered = quizAnswerIndex !== null;
+                    const correct = index === quizQuestion.correctIndex;
+                    const selected = index === quizAnswerIndex;
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        className={`quiz-answer${answered && correct ? " is-correct" : ""}${answered && selected && !correct ? " is-wrong" : ""}`}
+                        onClick={() => answerQuiz(index)}
+                        disabled={answered}
+                      >
+                        <kbd>{index + 1}</kbd>
+                        <span>{option}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div
+                  className={`quiz-feedback${quizAnswerIndex === null ? "" : quizAnswerIndex === quizQuestion.correctIndex ? " is-correct" : " is-wrong"}`}
+                  aria-live="assertive"
+                >
+                  {quizAnswerIndex === null ? (
+                    <span>
+                      PRESS 1–3 OR TAP YOUR ANSWER
+                      {quizQuestion.mode === "true-false"
+                        ? " // T/F ALSO WORK"
+                        : ""}
+                    </span>
+                  ) : quizAnswerIndex === quizQuestion.correctIndex ? (
+                    <strong>CORRECT! {quizQuestion.explanation}</strong>
+                  ) : (
+                    <strong>
+                      NOT QUITE. ANSWER:{" "}
+                      {quizQuestion.options[quizQuestion.correctIndex]}
+                    </strong>
+                  )}
+                </div>
+              </section>
+            </div>
+          </div>
+        )}
+
         {scene === "complete" && (
           <div className="arcade-complete-screen" data-testid="mission-complete">
             <div className="level-complete-burst">
@@ -3963,6 +4167,8 @@ export default function Game() {
           ? `Level ${currentLevel.number}: ${currentLevel.name}. Get ready.`
           : scene === "playing"
             ? `Level ${currentLevel.number} active. ${captured} of ${encounterCount} encounters cleared. ${health} integrity remaining.`
+          : scene === "quiz"
+            ? `Level ${currentLevel.number} knowledge check. Question ${quizQuestionIndex + 1} of three. ${quizQuestion?.prompt ?? ""}`
           : scene === "complete"
             ? isFinalLevel
               ? "Level complete. Return to the title."
