@@ -7,61 +7,74 @@ import {
   buildLevelQuiz,
 } from "../app/level-quiz.js";
 
-const LEVEL_FIXTURES = Array.from({ length: 10 }, (_, index) => ({
-  objectiveName: `Risk ${index + 1}`,
-  lessons: [
-    { kind: "DEFINITION", text: `Definition ${index + 1}` },
-    { kind: "EXAMPLE 1", text: `Example ${index + 1}` },
-    { kind: "DEFENSE 1", text: `Defense ${index + 1}` },
-  ],
-}));
-
-const GAUNTLET_FIXTURE = {
-  objectiveName: "Gauntlet",
-  lessons: Array.from({ length: 10 }, (_, index) => ({
-    kind: "KEY INSIGHT",
+const LEVEL_FIXTURES = [
+  ...Array.from({ length: 10 }, (_, index) => ({
     riskCode: `LLM${String(index + 1).padStart(2, "0")}`,
-    entryName: `RISK ${index + 1}`,
-    text: `Insight ${index + 1}`,
   })),
-};
+  { riskCode: "CAPSTONE" },
+];
 
-test("builds three answerable questions for every level", () => {
-  const levels = [...LEVEL_FIXTURES, GAUNTLET_FIXTURE];
-
-  levels.forEach((_level, levelIndex) => {
-    const questions = buildLevelQuiz(levels, levelIndex);
+test("provides three answerable conceptual questions for every stage", () => {
+  LEVEL_FIXTURES.forEach((_level, levelIndex) => {
+    const questions = buildLevelQuiz(LEVEL_FIXTURES, levelIndex);
     assert.equal(questions.length, QUIZ_QUESTION_COUNT);
     questions.forEach((question) => {
-      assert.ok(question.prompt.length > 10);
+      assert.ok(question.prompt.length > 20);
       assert.ok(question.options.length === 2 || question.options.length === 3);
       assert.ok(question.correctIndex >= 0);
       assert.ok(question.correctIndex < question.options.length);
-      assert.ok(question.explanation.length > 5);
+      assert.ok(question.explanation.length > 10);
     });
   });
 });
 
-test("uses exact level intel for examples and defenses", () => {
-  const levels = [...LEVEL_FIXTURES, GAUNTLET_FIXTURE];
-  const questions = buildLevelQuiz(levels, 4);
+test("avoids lesson-recall and stage-label language", () => {
+  const forbidden = /\b(?:intel|info blocks?|thought bubbles?|level|gauntlet)\b/i;
 
-  assert.ok(questions[1].options.includes("Example 5"));
-  assert.equal(
-    questions[1].options[questions[1].correctIndex],
-    "Example 5",
-  );
-  assert.ok(questions[2].options.includes("Defense 5"));
-  assert.equal(
-    questions[2].options[questions[2].correctIndex],
-    "Defense 5",
-  );
+  LEVEL_FIXTURES.forEach((_level, levelIndex) => {
+    buildLevelQuiz(LEVEL_FIXTURES, levelIndex).forEach((question) => {
+      [question.prompt, ...question.options, question.explanation].forEach(
+        (text) => assert.doesNotMatch(text, forbidden),
+      );
+    });
+  });
 });
 
-test("mixes true and false definition checks across campaign levels", () => {
-  const levels = [...LEVEL_FIXTURES, GAUNTLET_FIXTURE];
-  assert.equal(buildLevelQuiz(levels, 0)[0].correctIndex, 0);
-  assert.equal(buildLevelQuiz(levels, 1)[0].correctIndex, 1);
+test("keeps answer choices concise enough for an arcade screen", () => {
+  LEVEL_FIXTURES.forEach((_level, levelIndex) => {
+    buildLevelQuiz(LEVEL_FIXTURES, levelIndex).forEach((question) => {
+      question.options.forEach((option) => {
+        assert.ok(
+          option.length <= 72,
+          `Answer is too long (${option.length} characters): ${option}`,
+        );
+      });
+    });
+  });
+});
+
+test("includes both true-false and multiple-choice questions", () => {
+  const modes = new Set(
+    LEVEL_FIXTURES.flatMap((_level, levelIndex) =>
+      buildLevelQuiz(LEVEL_FIXTURES, levelIndex).map(
+        (question) => question.mode,
+      ),
+    ),
+  );
+
+  assert.deepEqual(modes, new Set(["true-false", "multiple-choice"]));
+});
+
+test("balances true and false checks across the ten vulnerabilities", () => {
+  const correctAnswers = LEVEL_FIXTURES.slice(0, 10).map(
+    (_level, levelIndex) =>
+      buildLevelQuiz(LEVEL_FIXTURES, levelIndex)[0].options[
+        buildLevelQuiz(LEVEL_FIXTURES, levelIndex)[0].correctIndex
+      ],
+  );
+
+  assert.equal(correctAnswers.filter((answer) => answer === "TRUE").length, 5);
+  assert.equal(correctAnswers.filter((answer) => answer === "FALSE").length, 5);
 });
 
 test("keeps feedback fast enough for an arcade debrief", () => {
