@@ -1675,7 +1675,7 @@ kbd {
 }
 
 .level-intro-title span,
-.level-complete-burst span {
+.level-complete-burst > span {
   color: #d9f9ff;
   font-family: Impact, "Arial Black", sans-serif;
   font-size: clamp(25px, 4.8vw, 72px);
@@ -1750,7 +1750,7 @@ kbd {
     complete-throb 680ms 900ms ease-in-out 3;
 }
 
-.level-complete-burst span {
+.level-complete-burst > span {
   font-size: clamp(30px, 6vw, 92px);
 }
 
@@ -1758,26 +1758,58 @@ kbd {
   font-size: clamp(58px, 12vw, 180px);
 }
 
-.arcade-next {
+.level-complete-score {
+  margin-top: clamp(10px, 1.5vh, 18px);
+  color: #b9f4ff;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(16px, 2vw, 30px);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  line-height: 1;
+  text-shadow:
+    3px 3px 0 #09365d,
+    0 0 18px rgba(68, 225, 255, 0.7);
+}
+
+.level-complete-actions {
   position: absolute;
   top: calc(100% + clamp(38px, 6vh, 72px));
+  display: flex;
+  gap: clamp(10px, 2vw, 26px);
+  justify-content: center;
+  width: max-content;
+  pointer-events: auto;
+  animation: next-prompt-enter 320ms 1.55s ease-out both;
+}
+
+.arcade-next {
   min-width: max-content;
-  padding: 0;
-  border: 0;
+  padding: 0.42em 0.8em;
+  border: 1px solid rgba(81, 222, 255, 0.58);
   color: #eafcff;
-  background: transparent;
+  background: linear-gradient(145deg, rgba(8, 48, 76, 0.92), rgba(4, 20, 37, 0.94));
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
   font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(17px, 2.6vw, 38px);
+  font-size: clamp(15px, 2vw, 30px);
   font-style: italic;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.08em;
   text-shadow:
     3px 3px 0 #09365d,
     0 0 20px rgba(68, 225, 255, 0.82);
   cursor: pointer;
   pointer-events: auto;
-  animation:
-    next-prompt-enter 320ms 1.55s ease-out both,
-    start-blink 880ms 1.9s steps(2) infinite;
+  animation: start-blink 880ms 1.9s steps(2) infinite;
+}
+
+.arcade-replay {
+  border-color: rgba(255, 168, 48, 0.7);
+  color: #fff0b5;
+  background: linear-gradient(145deg, rgba(83, 39, 8, 0.92), rgba(36, 16, 4, 0.94));
+  text-shadow:
+    3px 3px 0 #5f2706,
+    0 0 20px rgba(255, 158, 32, 0.72);
+  animation: none;
 }
 
 .arcade-next::before,
@@ -3751,7 +3783,7 @@ kbd {
   }
 
   .level-intro-title span,
-  .level-complete-burst span {
+  .level-complete-burst > span {
     font-size: clamp(18px, 3.4vw, 38px);
     letter-spacing: 0.1em;
   }
@@ -3779,10 +3811,21 @@ kbd {
     font-size: clamp(38px, 7.4vw, 80px);
   }
 
-  .arcade-next {
+  .level-complete-score {
+    margin-top: 7px;
+    font-size: clamp(11px, 1.45vw, 16px);
+  }
+
+  .level-complete-actions {
     top: calc(100% + clamp(18px, 4vh, 34px));
+    gap: clamp(6px, 1.2vw, 12px);
+  }
+
+  .arcade-next {
+    min-height: 40px;
+    padding: 0.48em 0.72em;
     font-size: clamp(13px, 1.8vw, 20px);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
   }
 
   .quiz-debrief {

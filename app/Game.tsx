@@ -2539,6 +2539,10 @@ export default function Game() {
     setScene("title");
   }, [resetGame, startLevel]);
 
+  const replayCurrentLevel = useCallback(() => {
+    startLevel(levelIndexRef.current);
+  }, [startLevel]);
+
   const answerQuiz = useCallback(
     (answerIndex: number) => {
       if (
@@ -2917,12 +2921,18 @@ export default function Game() {
         return;
       }
       if (
-        sceneRef.current === "complete" &&
-        (event.code === "Space" || event.code === "Enter")
+        sceneRef.current === "complete"
       ) {
-        event.preventDefault();
-        advanceCampaign();
-        return;
+        if (event.code === "Space" || event.code === "Enter") {
+          event.preventDefault();
+          if (!event.repeat) advanceCampaign();
+          return;
+        }
+        if (event.code === "KeyR") {
+          event.preventDefault();
+          if (!event.repeat) replayCurrentLevel();
+          return;
+        }
       }
       if (
         sceneRef.current === "praxenAd" &&
@@ -2966,6 +2976,7 @@ export default function Game() {
     answerQuiz,
     enterTitle,
     releaseAllInputs,
+    replayCurrentLevel,
     returnToTitle,
     showInstructions,
     syncInputFromSources,
@@ -4068,14 +4079,29 @@ export default function Game() {
             <div className="level-complete-burst">
               <span>LEVEL</span>
               <strong>COMPLETE!</strong>
-              <button type="button" className="arcade-next" onClick={advanceCampaign}>
-                <span className="desktop-start-copy">
-                  {isFinalLevel ? "PRESS SPACE FOR TITLE" : "PRESS SPACE FOR NEXT LEVEL"}
-                </span>
-                <span className="touch-start-copy">
-                  {isFinalLevel ? "TAP FOR TITLE" : "TAP FOR NEXT LEVEL"}
-                </span>
-              </button>
+              <em className="level-complete-score">
+                KNOWLEDGE CHECK {String(quizScore).padStart(2, "0")} / 03
+              </em>
+              <div className="level-complete-actions">
+                <button
+                  type="button"
+                  className="arcade-next"
+                  onClick={advanceCampaign}
+                >
+                  <span className="desktop-start-copy">
+                    PRESS SPACE: NEXT LEVEL
+                  </span>
+                  <span className="touch-start-copy">NEXT LEVEL</span>
+                </button>
+                <button
+                  type="button"
+                  className="arcade-next arcade-replay"
+                  onClick={replayCurrentLevel}
+                >
+                  <span className="desktop-start-copy">PRESS R: REPLAY LEVEL</span>
+                  <span className="touch-start-copy">REPLAY LEVEL</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -4173,7 +4199,7 @@ export default function Game() {
           : scene === "complete"
             ? isFinalLevel
               ? "Level complete. Return to the title."
-              : "Level complete. Continue to the next level."
+              : `Level complete. Knowledge check score ${quizScore} of three. Continue to the next level, or replay this level.`
           : scene === "gameOver"
             ? "Game over."
           : scene === "winner"

@@ -96,3 +96,17 @@ test("wires the quiz before level-complete and winner scenes", async () => {
   assert.match(source, /QUIZ_FEEDBACK_MS/);
   assert.match(source, /correct \? QUIZ_FEEDBACK_MS : QUIZ_WRONG_FEEDBACK_MS/);
 });
+
+test("offers keyboard and touch-friendly continue or replay actions", async () => {
+  const source = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /event\.code === "KeyR"/);
+  assert.match(source, /replayCurrentLevel/);
+  assert.match(source, /PRESS SPACE: NEXT LEVEL/);
+  assert.match(source, /PRESS R: REPLAY LEVEL/);
+  assert.match(source, />NEXT LEVEL</);
+  assert.match(source, />REPLAY LEVEL</);
+});
