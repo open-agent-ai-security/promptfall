@@ -80,8 +80,8 @@ test("balances true and false checks across the ten vulnerabilities", () => {
 
 test("keeps correct feedback quick and gives wrong answers time to teach", () => {
   assert.equal(QUIZ_FEEDBACK_MS, 1_650);
-  assert.equal(QUIZ_WRONG_FEEDBACK_MS, 3_500);
-  assert.ok(QUIZ_WRONG_FEEDBACK_MS > QUIZ_FEEDBACK_MS * 2);
+  assert.equal(QUIZ_WRONG_FEEDBACK_MS, 5_000);
+  assert.ok(QUIZ_WRONG_FEEDBACK_MS > QUIZ_FEEDBACK_MS * 3);
 });
 
 test("wires the quiz before level-complete and winner scenes", async () => {
@@ -109,4 +109,17 @@ test("offers keyboard and touch-friendly continue or replay actions", async () =
   assert.match(source, /PRESS R: REPLAY LEVEL/);
   assert.match(source, />NEXT LEVEL</);
   assert.match(source, />REPLAY LEVEL</);
+});
+
+test("uses a smooth next-level prompt instead of a stepped flash", async () => {
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    styles,
+    /animation: next-button-breathe 2\.2s 1\.9s ease-in-out infinite/,
+  );
+  assert.match(styles, /@keyframes next-button-breathe/);
 });

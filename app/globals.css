@@ -1799,7 +1799,8 @@ kbd {
     0 0 20px rgba(68, 225, 255, 0.82);
   cursor: pointer;
   pointer-events: auto;
-  animation: start-blink 880ms 1.9s steps(2) infinite;
+  will-change: opacity;
+  animation: next-button-breathe 2.2s 1.9s ease-in-out infinite;
 }
 
 .arcade-replay {
@@ -2918,6 +2919,12 @@ kbd {
   50% {
     opacity: 0.32;
     filter: brightness(1.7);
+  }
+}
+
+@keyframes next-button-breathe {
+  50% {
+    opacity: 0.62;
   }
 }
 
