@@ -1394,7 +1394,11 @@ kbd {
 }
 
 .fact-callout.is-visible {
-  animation: fact-follows-praxi 6.1s linear both;
+  animation: fact-follows-praxi 8.1s linear both;
+}
+
+.fact-callout.is-visible.is-dismissing {
+  animation: fact-dismisses-early 1s ease-in both;
 }
 
 .fact-copy p {
@@ -3026,22 +3030,35 @@ kbd {
     transform: translate(-50%, -62%) scale(0.76);
     filter: blur(6px) brightness(1.7);
   }
-  11% {
+  8.3% {
     opacity: 1;
     transform: translate(-50%, -108%) scale(1.05);
     filter: blur(0) brightness(1.28);
   }
-  18% {
+  13.6% {
     opacity: 1;
     transform: translate(-50%, -100%) scale(1);
     filter: brightness(1);
   }
-  84% {
+  87.7% {
     opacity: 1;
     transform: translate(-50%, -100%) scale(1);
     filter: brightness(1);
   }
   100% {
+    opacity: 0;
+    transform: translate(-50%, -150%) scale(0.96);
+    filter: blur(3px) brightness(1.18);
+  }
+}
+
+@keyframes fact-dismisses-early {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+    filter: blur(0) brightness(1);
+  }
+  to {
     opacity: 0;
     transform: translate(-50%, -150%) scale(0.96);
     filter: blur(3px) brightness(1.18);

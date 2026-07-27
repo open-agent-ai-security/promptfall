@@ -12,6 +12,12 @@ import {
   setTouchDirection,
   setTouchJump,
 } from "../app/input-state.js";
+import {
+  FACT_CALLOUT_DISMISS_MS,
+  FACT_CALLOUT_GRACE_MS,
+  FACT_CALLOUT_TOTAL_MS,
+  shouldFastDismissFactCallout,
+} from "../app/fact-callout.js";
 
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -134,6 +140,26 @@ test("keeps a directional hold active throughout a second-finger jump", () => {
     right: true,
     jump: false,
   });
+});
+
+test("holds learning callouts unless gameplay resumes after the grace period", () => {
+  const idle = { left: false, right: false, jump: false };
+  const moving = { left: false, right: true, jump: false };
+
+  assert.equal(FACT_CALLOUT_GRACE_MS, 2_000);
+  assert.equal(FACT_CALLOUT_TOTAL_MS, 8_100);
+  assert.equal(FACT_CALLOUT_DISMISS_MS, 1_000);
+  assert.equal(shouldFastDismissFactCallout(1_999, moving), false);
+  assert.equal(shouldFastDismissFactCallout(2_000, idle), false);
+  assert.equal(shouldFastDismissFactCallout(2_000, moving), true);
+  assert.equal(
+    shouldFastDismissFactCallout(4_000, {
+      left: false,
+      right: false,
+      jump: true,
+    }),
+    true,
+  );
 });
 
 test("ships community pageview counters without gameplay telemetry", async () => {

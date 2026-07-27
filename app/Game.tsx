@@ -12,6 +12,11 @@ import {
   setTouchDirection,
   setTouchJump,
 } from "./input-state.js";
+import {
+  FACT_CALLOUT_DISMISS_MS,
+  FACT_CALLOUT_TOTAL_MS,
+  shouldFastDismissFactCallout,
+} from "./fact-callout.js";
 
 type Scene =
   | "splash"
@@ -2118,12 +2123,16 @@ export default function Game() {
   const captureTimeRef = useRef(0);
   const fieldUnlockStartedRef = useRef<number | null>(null);
   const factTimerRef = useRef<number | null>(null);
+  const factShownAtRef = useRef(0);
+  const factVisibleRef = useRef(false);
+  const factDismissingRef = useRef(false);
   const [scene, setScene] = useState<Scene>("splash");
   const [levelIndex, setLevelIndex] = useState(0);
   const [health, setHealth] = useState(STARTING_INTEGRITY);
   const healthRef = useRef(STARTING_INTEGRITY);
   const [captured, setCaptured] = useState(0);
   const [callout, setCallout] = useState(false);
+  const [calloutDismissing, setCalloutDismissing] = useState(false);
   const [factLessonIndex, setFactLessonIndex] = useState(0);
   const [muted, setMuted] = useState(false);
   const mutedRef = useRef(false);
@@ -2155,6 +2164,49 @@ export default function Game() {
       window.clearTimeout(jumpReleaseTimerRef.current);
       jumpReleaseTimerRef.current = null;
     }
+  }, []);
+
+  const clearFactCallout = useCallback(() => {
+    if (factTimerRef.current !== null) {
+      window.clearTimeout(factTimerRef.current);
+      factTimerRef.current = null;
+    }
+    factVisibleRef.current = false;
+    factDismissingRef.current = false;
+    setCallout(false);
+    setCalloutDismissing(false);
+  }, []);
+
+  const showFactCallout = useCallback(() => {
+    if (factTimerRef.current !== null) {
+      window.clearTimeout(factTimerRef.current);
+    }
+    factShownAtRef.current = performance.now();
+    factVisibleRef.current = true;
+    factDismissingRef.current = false;
+    setCalloutDismissing(false);
+    setCallout(true);
+    factTimerRef.current = window.setTimeout(() => {
+      factVisibleRef.current = false;
+      setCallout(false);
+      factTimerRef.current = null;
+    }, FACT_CALLOUT_TOTAL_MS);
+  }, []);
+
+  const dismissFactCalloutForMovement = useCallback(() => {
+    if (!factVisibleRef.current || factDismissingRef.current) return;
+    if (factTimerRef.current !== null) {
+      window.clearTimeout(factTimerRef.current);
+    }
+    factDismissingRef.current = true;
+    setCalloutDismissing(true);
+    factTimerRef.current = window.setTimeout(() => {
+      factVisibleRef.current = false;
+      factDismissingRef.current = false;
+      setCallout(false);
+      setCalloutDismissing(false);
+      factTimerRef.current = null;
+    }, FACT_CALLOUT_DISMISS_MS);
   }, []);
 
   const setMusicEnvelope = useCallback(
@@ -2354,21 +2406,14 @@ export default function Game() {
   const triggerGameOver = useCallback(() => {
     if (sceneRef.current !== "playing") return;
     releaseAllInputs();
-    setCallout(false);
-    if (factTimerRef.current !== null) {
-      window.clearTimeout(factTimerRef.current);
-      factTimerRef.current = null;
-    }
+    clearFactCallout();
     sceneRef.current = "gameOver";
     setScene("gameOver");
     playSfx("gameOver");
-  }, [playSfx, releaseAllInputs]);
+  }, [clearFactCallout, playSfx, releaseAllInputs]);
 
   const resetGame = useCallback((nextLevelIndex = 0) => {
-    if (factTimerRef.current !== null) {
-      window.clearTimeout(factTimerRef.current);
-      factTimerRef.current = null;
-    }
+    clearFactCallout();
     releaseAllInputs();
     playerRef.current = {
       x: 150,
@@ -2400,9 +2445,8 @@ export default function Game() {
     healthRef.current = STARTING_INTEGRITY;
     setHealth(STARTING_INTEGRITY);
     setCaptured(0);
-    setCallout(false);
     setFactLessonIndex(0);
-  }, [releaseAllInputs]);
+  }, [clearFactCallout, releaseAllInputs]);
 
   const startLevel = useCallback((nextLevelIndex: number) => {
     if (titleTransitionTimerRef.current !== null) {
@@ -2831,6 +2875,16 @@ export default function Game() {
         }
         activePlatforms = nextPlatforms;
         const axis = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        if (
+          factVisibleRef.current &&
+          !factDismissingRef.current &&
+          shouldFastDismissFactCallout(
+            now - factShownAtRef.current,
+            input,
+          )
+        ) {
+          dismissFactCalloutForMovement();
+        }
         player.vx += (axis * MOVE_SPEED - player.vx) * Math.min(1, dt * 10);
         // Preserve running momentum in the air. This is especially important for
         // touch jumps, where the second tap naturally ends before Praxi lands.
@@ -3083,14 +3137,7 @@ export default function Game() {
               }
               setCaptured(securedCount);
               setFactLessonIndex(enemy.lessonIndex);
-              setCallout(true);
-              if (factTimerRef.current !== null) {
-                window.clearTimeout(factTimerRef.current);
-              }
-              factTimerRef.current = window.setTimeout(() => {
-                setCallout(false);
-                factTimerRef.current = null;
-              }, 6100);
+              showFactCallout();
               playSfx("enemyHit");
               for (let i = 0; i < 28; i++) {
                 const a = (Math.PI * 2 * i) / 28;
@@ -3291,7 +3338,13 @@ export default function Game() {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [playSfx, triggerDamageEffect, triggerGameOver]);
+  }, [
+    dismissFactCalloutForMovement,
+    playSfx,
+    showFactCallout,
+    triggerDamageEffect,
+    triggerGameOver,
+  ]);
 
   const syncTouchDirection = useCallback(() => {
     syncInputFromSources();
@@ -3724,7 +3777,7 @@ export default function Game() {
             <div
               key={`fact-${levelIndex}-${captured}`}
               ref={factRef}
-              className={`fact-callout ${callout ? "is-visible" : ""}`}
+              className={`fact-callout ${callout ? "is-visible" : ""}${calloutDismissing ? " is-dismissing" : ""}`}
               role="status"
               aria-live="polite"
             >
