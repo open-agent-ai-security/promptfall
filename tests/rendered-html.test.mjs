@@ -1,6 +1,17 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import {
+  clearControlState,
+  createControlState,
+  getControlInput,
+  isGameplayControlCode,
+  pressControlKey,
+  releaseControlKey,
+  releaseTouchDirection,
+  setTouchDirection,
+  setTouchJump,
+} from "../app/input-state.js";
 
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -57,6 +68,72 @@ test("keeps gameplay lessons concise and easy to scan", async () => {
     [],
   );
   assert.doesNotMatch(lessonTexts.join("\n"), /—/);
+});
+
+test("keeps simultaneous keyboard controls independent", () => {
+  const controls = createControlState();
+  pressControlKey(controls, "ArrowRight");
+  pressControlKey(controls, "KeyD");
+  releaseControlKey(controls, "ArrowRight");
+
+  assert.deepEqual(getControlInput(controls), {
+    left: false,
+    right: true,
+    jump: false,
+  });
+
+  releaseControlKey(controls, "KeyD");
+  assert.equal(getControlInput(controls).right, false);
+});
+
+test("combines keyboard and touch without either source erasing the other", () => {
+  const controls = createControlState();
+  pressControlKey(controls, "KeyD");
+  setTouchDirection(controls, 17, "right");
+  releaseTouchDirection(controls, 17);
+  assert.equal(getControlInput(controls).right, true);
+
+  setTouchDirection(controls, 18, "left");
+  releaseControlKey(controls, "KeyD");
+  assert.deepEqual(getControlInput(controls), {
+    left: true,
+    right: false,
+    jump: false,
+  });
+});
+
+test("clears interrupted controls and recognizes Space as gameplay input", () => {
+  const controls = createControlState();
+  pressControlKey(controls, "ArrowRight");
+  setTouchDirection(controls, 7, "right");
+  setTouchJump(controls, true);
+  clearControlState(controls);
+
+  assert.deepEqual(getControlInput(controls), {
+    left: false,
+    right: false,
+    jump: false,
+  });
+  assert.equal(isGameplayControlCode("Space"), true);
+  assert.equal(isGameplayControlCode(" "), false);
+});
+
+test("keeps a directional hold active throughout a second-finger jump", () => {
+  const controls = createControlState();
+  setTouchDirection(controls, 1, "right");
+  setTouchJump(controls, true);
+  assert.deepEqual(getControlInput(controls), {
+    left: false,
+    right: true,
+    jump: true,
+  });
+
+  setTouchJump(controls, false);
+  assert.deepEqual(getControlInput(controls), {
+    left: false,
+    right: true,
+    jump: false,
+  });
 });
 
 test("ships community pageview counters without gameplay telemetry", async () => {
@@ -228,5 +305,10 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /aria-label="Touch controls: hold the left or right half/i);
   assert.match(gameSource, /TAP OTHER SIDE TO JUMP/i);
   assert.match(gameSource, /pointerType !== "touch"/i);
+  assert.match(gameSource, /onLostPointerCapture/i);
+  assert.match(gameSource, /visibilitychange/i);
+  assert.match(gameSource, /pagehide/i);
+  assert.match(gameSource, /releaseAllInputs/i);
+  assert.match(gameSource, /event\.metaKey \|\| event\.ctrlKey \|\| event\.altKey/i);
   assert.match(gameSource, /Move Praxi right and jump on each threat/i);
 });

@@ -1,6 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  clearControlState,
+  createControlState,
+  getControlInput,
+  isGameplayControlCode,
+  pressControlKey,
+  releaseControlKey,
+  releaseTouchDirection,
+  setTouchDirection,
+  setTouchJump,
+} from "./input-state.js";
 
 type Scene =
   | "splash"
@@ -2075,6 +2086,7 @@ export default function Game() {
   const sceneRef = useRef<Scene>("splash");
   const levelIndexRef = useRef(0);
   const inputRef = useRef({ left: false, right: false, jump: false });
+  const controlStateRef = useRef(createControlState());
   const jumpLatchRef = useRef(false);
   const touchPointsRef = useRef<Map<number, TouchPoint>>(new Map());
   const lastTapRef = useRef({ time: 0, x: 0, y: 0 });
@@ -2128,6 +2140,22 @@ export default function Game() {
   );
   const musicFadeRef = useRef(new Map<MusicTrackKey, number>());
   const titleTransitionTimerRef = useRef<number | null>(null);
+
+  const syncInputFromSources = useCallback(() => {
+    inputRef.current = getControlInput(controlStateRef.current);
+  }, []);
+
+  const releaseAllInputs = useCallback(() => {
+    clearControlState(controlStateRef.current);
+    touchPointsRef.current.clear();
+    lastTapRef.current.time = 0;
+    inputRef.current = { left: false, right: false, jump: false };
+    jumpLatchRef.current = false;
+    if (jumpReleaseTimerRef.current !== null) {
+      window.clearTimeout(jumpReleaseTimerRef.current);
+      jumpReleaseTimerRef.current = null;
+    }
+  }, []);
 
   const setMusicEnvelope = useCallback(
     (key: MusicTrackKey, volume: number) => {
@@ -2325,13 +2353,7 @@ export default function Game() {
 
   const triggerGameOver = useCallback(() => {
     if (sceneRef.current !== "playing") return;
-    touchPointsRef.current.clear();
-    lastTapRef.current.time = 0;
-    if (jumpReleaseTimerRef.current !== null) {
-      window.clearTimeout(jumpReleaseTimerRef.current);
-      jumpReleaseTimerRef.current = null;
-    }
-    inputRef.current = { left: false, right: false, jump: false };
+    releaseAllInputs();
     setCallout(false);
     if (factTimerRef.current !== null) {
       window.clearTimeout(factTimerRef.current);
@@ -2340,21 +2362,14 @@ export default function Game() {
     sceneRef.current = "gameOver";
     setScene("gameOver");
     playSfx("gameOver");
-  }, [playSfx]);
+  }, [playSfx, releaseAllInputs]);
 
   const resetGame = useCallback((nextLevelIndex = 0) => {
     if (factTimerRef.current !== null) {
       window.clearTimeout(factTimerRef.current);
       factTimerRef.current = null;
     }
-    touchPointsRef.current.clear();
-    lastTapRef.current.time = 0;
-    if (jumpReleaseTimerRef.current !== null) {
-      window.clearTimeout(jumpReleaseTimerRef.current);
-      jumpReleaseTimerRef.current = null;
-    }
-    inputRef.current = { left: false, right: false, jump: false };
-    jumpLatchRef.current = false;
+    releaseAllInputs();
     playerRef.current = {
       x: 150,
       y: 516,
@@ -2387,7 +2402,7 @@ export default function Game() {
     setCaptured(0);
     setCallout(false);
     setFactLessonIndex(0);
-  }, []);
+  }, [releaseAllInputs]);
 
   const startLevel = useCallback((nextLevelIndex: number) => {
     if (titleTransitionTimerRef.current !== null) {
@@ -2449,16 +2464,10 @@ export default function Game() {
     setScene("title");
   }, [resetGame, startLevel]);
 
-  const setInput = useCallback(
-    (key: "left" | "right" | "jump", active: boolean) => {
-      inputRef.current[key] = active;
-    },
-    [],
-  );
-
   useEffect(() => {
     sceneRef.current = scene;
-  }, [scene]);
+    if (scene !== "playing") releaseAllInputs();
+  }, [releaseAllInputs, scene]);
 
   useEffect(() => {
     const tracks = Object.fromEntries(
@@ -2674,6 +2683,10 @@ export default function Game() {
 
   useEffect(() => {
     const keyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        if (sceneRef.current === "playing") releaseAllInputs();
+        return;
+      }
       if (sceneRef.current === "instructions") {
         event.preventDefault();
         if (!event.repeat) returnToTitle();
@@ -2694,11 +2707,7 @@ export default function Game() {
           return;
         }
       }
-      if (
-        ["ArrowLeft", "ArrowRight", "ArrowUp", " ", "KeyA", "KeyD", "KeyW"].includes(
-          event.code,
-        )
-      ) {
+      if (isGameplayControlCode(event.code)) {
         event.preventDefault();
       }
       if (
@@ -2713,6 +2722,7 @@ export default function Game() {
         sceneRef.current === "title" &&
         (event.code === "Space" || event.code === "Enter")
       ) {
+        event.preventDefault();
         startCampaign();
         return;
       }
@@ -2720,6 +2730,7 @@ export default function Game() {
         sceneRef.current === "complete" &&
         (event.code === "Space" || event.code === "Enter")
       ) {
+        event.preventDefault();
         advanceCampaign();
         return;
       }
@@ -2735,58 +2746,38 @@ export default function Game() {
         startCampaign();
         return;
       }
-      if (event.code === "ArrowLeft" || event.code === "KeyA") {
-        inputRef.current.left = true;
-      }
-      if (event.code === "ArrowRight" || event.code === "KeyD") {
-        inputRef.current.right = true;
-      }
-      if (
-        event.code === "ArrowUp" ||
-        event.code === "KeyW" ||
-        event.code === "Space"
-      ) {
-        inputRef.current.jump = true;
-      }
       if (event.code === "KeyM") setMuted((value) => !value);
+      if (sceneRef.current !== "playing") return;
+      pressControlKey(controlStateRef.current, event.code);
+      syncInputFromSources();
     };
     const keyUp = (event: KeyboardEvent) => {
-      if (event.code === "ArrowLeft" || event.code === "KeyA") {
-        inputRef.current.left = false;
-      }
-      if (event.code === "ArrowRight" || event.code === "KeyD") {
-        inputRef.current.right = false;
-      }
-      if (
-        event.code === "ArrowUp" ||
-        event.code === "KeyW" ||
-        event.code === "Space"
-      ) {
-        inputRef.current.jump = false;
-      }
+      releaseControlKey(controlStateRef.current, event.code);
+      syncInputFromSources();
     };
-    const releaseInputs = () => {
-      touchPointsRef.current.clear();
-      lastTapRef.current.time = 0;
-      inputRef.current = { left: false, right: false, jump: false };
-      if (jumpReleaseTimerRef.current !== null) {
-        window.clearTimeout(jumpReleaseTimerRef.current);
-        jumpReleaseTimerRef.current = null;
-      }
+    const releaseIfHidden = () => {
+      if (document.visibilityState !== "visible") releaseAllInputs();
     };
     window.addEventListener("keydown", keyDown, { passive: false });
     window.addEventListener("keyup", keyUp);
-    window.addEventListener("blur", releaseInputs);
+    window.addEventListener("blur", releaseAllInputs);
+    window.addEventListener("pagehide", releaseAllInputs);
+    document.addEventListener("visibilitychange", releaseIfHidden);
     return () => {
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
-      window.removeEventListener("blur", releaseInputs);
+      window.removeEventListener("blur", releaseAllInputs);
+      window.removeEventListener("pagehide", releaseAllInputs);
+      document.removeEventListener("visibilitychange", releaseIfHidden);
+      releaseAllInputs();
     };
   }, [
     advanceCampaign,
     enterTitle,
+    releaseAllInputs,
     returnToTitle,
     showInstructions,
+    syncInputFromSources,
     startCampaign,
     startLevel,
   ]);
@@ -3301,27 +3292,32 @@ export default function Game() {
   }, [playSfx, triggerDamageEffect, triggerGameOver]);
 
   const syncTouchDirection = useCallback(() => {
-    let left = false;
-    let right = false;
-    touchPointsRef.current.forEach((point) => {
-      if (!point.controlsDirection) return;
-      if (point.side === "left") left = true;
-      if (point.side === "right") right = true;
-    });
-    setInput("left", left);
-    setInput("right", right);
-  }, [setInput]);
+    syncInputFromSources();
+  }, [syncInputFromSources]);
 
   const pulseTouchJump = useCallback(() => {
     if (jumpReleaseTimerRef.current !== null) {
       window.clearTimeout(jumpReleaseTimerRef.current);
     }
-    setInput("jump", true);
+    setTouchJump(controlStateRef.current, true);
+    syncInputFromSources();
     jumpReleaseTimerRef.current = window.setTimeout(() => {
-      setInput("jump", false);
+      setTouchJump(controlStateRef.current, false);
+      syncInputFromSources();
       jumpReleaseTimerRef.current = null;
     }, 130);
-  }, [setInput]);
+  }, [syncInputFromSources]);
+
+  const releaseTouchPoint = useCallback(
+    (pointerId: number) => {
+      const point = touchPointsRef.current.get(pointerId);
+      touchPointsRef.current.delete(pointerId);
+      releaseTouchDirection(controlStateRef.current, pointerId);
+      syncTouchDirection();
+      return point;
+    },
+    [syncTouchDirection],
+  );
 
   const sideForTouch = (
     event: React.PointerEvent<HTMLDivElement>,
@@ -3348,8 +3344,9 @@ export default function Game() {
           sinceLastTap < 350 &&
           distanceFromLastTap < 96);
       const controlsDirection = !isSecondFinger;
+      const side = sideForTouch(event);
       touchPointsRef.current.set(event.pointerId, {
-        side: sideForTouch(event),
+        side,
         controlsDirection,
         startedAt: now,
         startX: event.clientX,
@@ -3358,6 +3355,9 @@ export default function Game() {
         y: event.clientY,
         isJumpTap,
       });
+      if (controlsDirection) {
+        setTouchDirection(controlStateRef.current, event.pointerId, side);
+      }
       syncTouchDirection();
       if (isJumpTap) {
         lastTapRef.current.time = 0;
@@ -3372,14 +3372,19 @@ export default function Game() {
       point.side = sideForTouch(event);
       point.x = event.clientX;
       point.y = event.clientY;
+      if (point.controlsDirection) {
+        setTouchDirection(
+          controlStateRef.current,
+          event.pointerId,
+          point.side,
+        );
+      }
       syncTouchDirection();
     },
     onPointerUp: (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.pointerType !== "touch") return;
       event.preventDefault();
-      const point = touchPointsRef.current.get(event.pointerId);
-      touchPointsRef.current.delete(event.pointerId);
-      syncTouchDirection();
+      const point = releaseTouchPoint(event.pointerId);
       if (
         point &&
         !point.isJumpTap &&
@@ -3395,8 +3400,10 @@ export default function Game() {
     },
     onPointerCancel: (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.pointerType !== "touch") return;
-      touchPointsRef.current.delete(event.pointerId);
-      syncTouchDirection();
+      releaseTouchPoint(event.pointerId);
+    },
+    onLostPointerCapture: (event: React.PointerEvent<HTMLDivElement>) => {
+      releaseTouchPoint(event.pointerId);
     },
   };
 
