@@ -199,6 +199,10 @@ test("ships social metadata and accessible controls", async () => {
     new URL("../app/Game.tsx", import.meta.url),
     "utf8",
   );
+  const musicHealthSource = await readFile(
+    new URL("../app/music-health.js", import.meta.url),
+    "utf8",
+  );
 
   assert.match(html, /og:image/i);
   assert.match(html, /social-preview\.jpg/i);
@@ -248,7 +252,10 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /llm10-passed-without-question\.mp3/i);
   assert.match(gameSource, /l11-promptfall-reprise\.mp3/i);
   assert.match(gameSource, /inactiveAudio\.muted = true/i);
-  assert.match(gameSource, /desiredAudio\.muted = false/i);
+  assert.match(musicHealthSource, /audio\.muted = false/i);
+  assert.match(musicHealthSource, /"stalled"/i);
+  assert.match(musicHealthSource, /"ended"/i);
+  assert.match(musicHealthSource, /MUSIC_STALL_THRESHOLD_MS/i);
   assert.doesNotMatch(gameSource, /musicPrimedRef/i);
   assert.match(gameSource, /sfx-next-level\.mp3/i);
   assert.match(gameSource, /sfx-player-hit\.mp3/i);

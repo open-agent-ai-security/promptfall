@@ -17,6 +17,7 @@ import {
   FACT_CALLOUT_TOTAL_MS,
   shouldFastDismissFactCallout,
 } from "./fact-callout.js";
+import { createMusicHealthMonitor } from "./music-health.js";
 
 type Scene =
   | "splash"
@@ -2137,6 +2138,9 @@ export default function Game() {
   const [muted, setMuted] = useState(false);
   const mutedRef = useRef(false);
   const musicRef = useRef<Partial<Record<MusicTrackKey, HTMLAudioElement>>>({});
+  const musicHealthRef = useRef<ReturnType<
+    typeof createMusicHealthMonitor
+  > | null>(null);
   const sfxRef = useRef<Partial<Record<SfxKey, HTMLAudioElement>>>({});
   const activeSfxRef = useRef(new Map<HTMLAudioElement, SfxKey>());
   const laserFiringRef = useRef<boolean[]>([]);
@@ -2262,6 +2266,27 @@ export default function Game() {
     [setMusicEnvelope],
   );
 
+  const enforceSingleMusicTrack = useCallback(
+    (desiredTrack: MusicTrackKey) => {
+      (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
+        if (key === desiredTrack) return;
+        const track = musicRef.current[key];
+        const fade = musicFadeRef.current.get(key);
+        if (fade !== undefined) {
+          window.cancelAnimationFrame(fade);
+          musicFadeRef.current.delete(key);
+        }
+        track?.pause();
+        if (track) {
+          track.currentTime = 0;
+          track.muted = true;
+        }
+        setMusicEnvelope(key, 0);
+      });
+    },
+    [setMusicEnvelope],
+  );
+
   const transitionMusic = useCallback(
     (
       nextTrack: MusicTrackKey | null,
@@ -2323,39 +2348,18 @@ export default function Game() {
         setMusicEnvelope(nextTrack, 0);
       }
       activeMusicRef.current = nextTrack;
-      void nextAudio.play().catch(() => {
-        // Browsers may wait for the first key press or tap before allowing music.
-      });
+      // transitionMusic already owns the outgoing/incoming fade pair. Let the
+      // health monitor start the new song without cutting that crossfade short.
+      void musicHealthRef.current?.ensure({ enforce: false });
       fadeMusic(nextTrack, MUSIC_VOLUME, fadeIn);
     },
     [fadeMusic, setMusicEnvelope],
   );
 
   const unlockMusic = useCallback(() => {
-    const desiredTrack = desiredMusicRef.current;
-    if (!desiredTrack || mutedRef.current) return;
-    const desiredAudio = musicRef.current[desiredTrack];
-    if (!desiredAudio) return;
-
-    // Never start background tracks merely to unlock them. Mobile Safari can
-    // make those supposedly silent elements audible. Only the desired song is
-    // allowed to play; everything else is stopped and held muted.
-    (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
-      if (key === desiredTrack) return;
-      const track = musicRef.current[key];
-      track?.pause();
-      if (track) {
-        track.currentTime = 0;
-        track.muted = true;
-      }
-      musicEnvelopeRef.current.set(key, 0);
-    });
-
-    desiredAudio.muted = false;
-    if (!desiredAudio.paused) return;
-    void desiredAudio.play().catch(() => {
-      // Audio remains optional if the browser declines playback.
-    });
+    // User gestures retry autoplay rejection and also recover a desired track
+    // whose media clock stopped despite paused remaining false.
+    void musicHealthRef.current?.ensure({ gesture: true });
   }, []);
 
   const playSfx = useCallback((key: SfxKey) => {
@@ -2529,6 +2533,16 @@ export default function Game() {
       ),
     ) as Record<MusicTrackKey, HTMLAudioElement>;
     musicRef.current = tracks;
+    const musicHealth = createMusicHealthMonitor({
+      tracks,
+      getDesiredKey: () => desiredMusicRef.current,
+      isMuted: () => mutedRef.current,
+      isVisible: () => document.visibilityState === "visible",
+      enforceSingleTrack: (key) =>
+        enforceSingleMusicTrack(key as MusicTrackKey),
+    });
+    musicHealthRef.current = musicHealth;
+    musicHealth.start();
     const musicFades = musicFadeRef.current;
 
     return () => {
@@ -2536,6 +2550,8 @@ export default function Game() {
         window.clearTimeout(titleTransitionTimerRef.current);
         titleTransitionTimerRef.current = null;
       }
+      musicHealth.stop();
+      musicHealthRef.current = null;
       musicFades.forEach((frame) =>
         window.cancelAnimationFrame(frame),
       );
@@ -2547,7 +2563,7 @@ export default function Game() {
       });
       musicRef.current = {};
     };
-  }, []);
+  }, [enforceSingleMusicTrack]);
 
   useEffect(() => {
     const clips = Object.fromEntries(
@@ -2632,6 +2648,22 @@ export default function Game() {
       });
     };
   }, [unlockMusic]);
+
+  useEffect(() => {
+    const restoreMusic = () => {
+      if (document.visibilityState === "visible") {
+        void musicHealthRef.current?.restore();
+      }
+    };
+    document.addEventListener("visibilitychange", restoreMusic);
+    window.addEventListener("pageshow", restoreMusic);
+    window.addEventListener("focus", restoreMusic);
+    return () => {
+      document.removeEventListener("visibilitychange", restoreMusic);
+      window.removeEventListener("pageshow", restoreMusic);
+      window.removeEventListener("focus", restoreMusic);
+    };
+  }, []);
 
   useEffect(() => {
     if (scene === "splash") {
