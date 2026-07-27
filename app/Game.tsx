@@ -2485,16 +2485,17 @@ export default function Game() {
       ),
     ) as Record<MusicTrackKey, HTMLAudioElement>;
     musicRef.current = tracks;
+    const musicFades = musicFadeRef.current;
 
     return () => {
       if (titleTransitionTimerRef.current !== null) {
         window.clearTimeout(titleTransitionTimerRef.current);
         titleTransitionTimerRef.current = null;
       }
-      musicFadeRef.current.forEach((frame) =>
+      musicFades.forEach((frame) =>
         window.cancelAnimationFrame(frame),
       );
-      musicFadeRef.current.clear();
+      musicFades.clear();
       Object.values(tracks).forEach((track) => {
         track.pause();
         track.removeAttribute("src");
@@ -2518,14 +2519,15 @@ export default function Game() {
       }),
     ) as Record<SfxKey, HTMLAudioElement>;
     sfxRef.current = clips;
+    const activeSfx = activeSfxRef.current;
 
     return () => {
-      activeSfxRef.current.forEach((_key, voice) => {
+      activeSfx.forEach((_key, voice) => {
         voice.pause();
         voice.removeAttribute("src");
         voice.load();
       });
-      activeSfxRef.current.clear();
+      activeSfx.clear();
       Object.values(clips).forEach((clip) => {
         clip.pause();
         clip.removeAttribute("src");
