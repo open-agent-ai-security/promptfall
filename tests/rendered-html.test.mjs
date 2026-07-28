@@ -176,6 +176,17 @@ test("ships landscape controls with oversized invisible hit targets", async () =
   assert.match(styles, /orientation: landscape/);
 });
 
+test("keeps mobile instructions and quiz answers readable", async () => {
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(styles, /font-size: clamp\(10px, 1\.35vw, 14px\)/);
+  assert.match(styles, /font-size: clamp\(17px, 2\.2vw, 25px\)/);
+  assert.match(styles, /font-size: clamp\(12px, 1\.55vw, 16px\)/);
+});
+
 test("holds learning callouts unless gameplay resumes after the grace period", () => {
   const idle = { left: false, right: false, jump: false };
   const moving = { left: false, right: true, jump: false };

@@ -3813,21 +3813,26 @@ kbd {
   }
 
   .instruction-number {
-    font-size: clamp(18px, 2.2vw, 28px);
+    font-size: clamp(20px, 2.5vw, 30px);
   }
 
   .instruction-panel h2 {
     margin-bottom: 2px;
-    font-size: clamp(12px, 1.35vw, 17px);
+    font-size: clamp(14px, 1.7vw, 20px);
   }
 
   .instruction-panel p {
-    font-size: clamp(8px, 0.82vw, 11px);
-    line-height: 1.15;
+    font-size: clamp(10px, 1.35vw, 14px);
+    line-height: 1.18;
   }
 
   .instruction-control-line {
     min-height: 1.35em;
+    white-space: normal;
+  }
+
+  .learning-tip-line {
+    white-space: normal;
   }
 
   .instructions-return {
@@ -3909,15 +3914,15 @@ kbd {
 
   .quiz-header small,
   .quiz-score small {
-    font-size: clamp(6px, 0.75vw, 9px);
+    font-size: clamp(8px, 0.9vw, 11px);
   }
 
   .quiz-header h2 {
-    font-size: clamp(25px, 4vw, 42px);
+    font-size: clamp(28px, 4.2vw, 46px);
   }
 
   .quiz-score strong {
-    font-size: clamp(19px, 2.7vw, 30px);
+    font-size: clamp(21px, 2.9vw, 33px);
   }
 
   .quiz-progress {
@@ -3926,13 +3931,13 @@ kbd {
   }
 
   .quiz-mode {
-    font-size: clamp(8px, 1vw, 12px);
+    font-size: clamp(10px, 1.2vw, 14px);
   }
 
   .quiz-question h3 {
     margin: 3px 0 6px;
-    font-size: clamp(14px, 1.85vw, 21px);
-    line-height: 1.08;
+    font-size: clamp(17px, 2.2vw, 25px);
+    line-height: 1.1;
   }
 
   .quiz-answers {
@@ -3940,22 +3945,22 @@ kbd {
   }
 
   .quiz-answer {
-    grid-template-columns: 31px 1fr;
-    padding: 3px 8px;
-    font-size: clamp(9px, 1.05vw, 12px);
-    line-height: 1.08;
+    grid-template-columns: 35px 1fr;
+    padding: 4px 10px;
+    font-size: clamp(12px, 1.55vw, 16px);
+    line-height: 1.12;
   }
 
   .quiz-answer kbd {
-    width: 24px;
+    width: 28px;
     border-width: 1px;
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .quiz-feedback {
-    min-height: 23px;
+    min-height: 25px;
     padding-top: 3px;
-    font-size: clamp(8px, 1vw, 12px);
+    font-size: clamp(10px, 1.2vw, 14px);
   }
 
   .praxen-ad-content {
