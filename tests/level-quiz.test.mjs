@@ -78,10 +78,10 @@ test("balances true and false checks across the ten vulnerabilities", () => {
   assert.equal(correctAnswers.filter((answer) => answer === "FALSE").length, 5);
 });
 
-test("keeps correct feedback quick and gives wrong answers time to teach", () => {
-  assert.equal(QUIZ_FEEDBACK_MS, 1_650);
+test("holds reinforcement long enough to read and correction longer", () => {
+  assert.equal(QUIZ_FEEDBACK_MS, 2_600);
   assert.equal(QUIZ_WRONG_FEEDBACK_MS, 5_000);
-  assert.ok(QUIZ_WRONG_FEEDBACK_MS > QUIZ_FEEDBACK_MS * 3);
+  assert.ok(QUIZ_WRONG_FEEDBACK_MS >= QUIZ_FEEDBACK_MS + 2_000);
 });
 
 test("wires the quiz before level-complete and winner scenes", async () => {

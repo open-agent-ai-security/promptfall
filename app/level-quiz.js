@@ -1,5 +1,5 @@
 export const QUIZ_QUESTION_COUNT = 3;
-export const QUIZ_FEEDBACK_MS = 1_650;
+export const QUIZ_FEEDBACK_MS = 2_600;
 export const QUIZ_WRONG_FEEDBACK_MS = 5_000;
 
 const trueFalse = (prompt, correct, explanation) => ({

@@ -3946,9 +3946,41 @@ export default function Game() {
                 ))}
               </div>
 
+              {quizAnswerIndex !== null && (
+                <div
+                  key={`${levelIndex}-${quizQuestionIndex}-${quizAnswerIndex}`}
+                  className={`quiz-feedback-burst${quizAnswerIndex === quizQuestion.correctIndex ? " is-correct" : " is-wrong"}`}
+                  role="status"
+                  aria-live="assertive"
+                >
+                  <span>
+                    {quizAnswerIndex === quizQuestion.correctIndex
+                      ? "REINFORCEMENT"
+                      : "CORRECTION"}
+                  </span>
+                  <strong>
+                    {quizAnswerIndex === quizQuestion.correctIndex
+                      ? "CORRECT!"
+                      : "NOT QUITE"}
+                  </strong>
+                  <p>
+                    {quizAnswerIndex === quizQuestion.correctIndex ? (
+                      quizQuestion.explanation
+                    ) : (
+                      <>
+                        RIGHT ANSWER:{" "}
+                        <b>
+                          {quizQuestion.options[quizQuestion.correctIndex]}
+                        </b>
+                      </>
+                    )}
+                  </p>
+                </div>
+              )}
+
               <section
                 key={`${levelIndex}-${quizQuestionIndex}`}
-                className="quiz-question"
+                className={`quiz-question${quizAnswerIndex !== null ? " is-answered" : ""}`}
                 aria-live="polite"
               >
                 <div className="quiz-mode">
@@ -3980,26 +4012,14 @@ export default function Game() {
                     );
                   })}
                 </div>
-                <div
-                  className={`quiz-feedback${quizAnswerIndex === null ? "" : quizAnswerIndex === quizQuestion.correctIndex ? " is-correct" : " is-wrong"}`}
-                  aria-live="assertive"
-                >
-                  {quizAnswerIndex === null ? (
-                    <span>
-                      PRESS 1–3 OR TAP YOUR ANSWER
-                      {quizQuestion.mode === "true-false"
-                        ? " // T/F ALSO WORK"
-                        : ""}
-                    </span>
-                  ) : quizAnswerIndex === quizQuestion.correctIndex ? (
-                    <strong>CORRECT! {quizQuestion.explanation}</strong>
-                  ) : (
-                    <strong>
-                      NOT QUITE. ANSWER:{" "}
-                      {quizQuestion.options[quizQuestion.correctIndex]}
-                    </strong>
-                  )}
-                </div>
+                {quizAnswerIndex === null && (
+                  <div className="quiz-answer-hint">
+                    PRESS 1–3 OR TAP YOUR ANSWER
+                    {quizQuestion.mode === "true-false"
+                      ? " // T/F ALSO WORK"
+                      : ""}
+                  </div>
+                )}
               </section>
             </div>
           </div>

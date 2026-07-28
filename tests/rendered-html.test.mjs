@@ -247,6 +247,27 @@ test("keeps mobile instructions and quiz answers readable", async () => {
   assert.match(styles, /font-size: clamp\(12px, 1\.55vw, 16px\)/);
 });
 
+test("punches quiz reinforcement and correction above the answered question", async () => {
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(gameSource, /className={`quiz-feedback-burst/);
+  assert.match(gameSource, /REINFORCEMENT/);
+  assert.match(gameSource, /CORRECTION/);
+  assert.match(gameSource, /RIGHT ANSWER:/);
+  assert.match(styles, /\.quiz-feedback-burst\s*{/);
+  assert.match(styles, /animation: quiz-feedback-slam 560ms/);
+  assert.match(styles, /@keyframes quiz-feedback-slam/);
+  assert.match(styles, /\.quiz-question\.is-answered/);
+  assert.doesNotMatch(gameSource, /className={`quiz-feedback\$/);
+});
+
 test("does not leave touch quiz answers in a shifted hover state", async () => {
   const styles = await readFile(
     new URL("../app/globals.css", import.meta.url),
