@@ -155,6 +155,36 @@ test("keeps mobile jump active until its pointer is released", async () => {
   assert.doesNotMatch(gameSource, /pulseTouchJump|jumpReleaseTimerRef/);
 });
 
+test("starts mobile jump audio inside the pointer gesture", async () => {
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    gameSource,
+    /pressMobileJump[\s\S]*playerRef\.current\.grounded[\s\S]*playSfx\("jump"\)/,
+  );
+  assert.match(
+    gameSource,
+    /mobileJumpSfxRef\.current[\s\S]*mobileJumpSfxRef\.current = false/,
+  );
+});
+
+test("uses the media muted property for iPhone-safe sound control", async () => {
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    gameSource,
+    /track\.muted = mutedRef\.current \|\| clampedVolume <= 0/,
+  );
+  assert.match(gameSource, /nextAudio\.muted = mutedRef\.current/);
+  assert.match(gameSource, /voice\.muted = muted/);
+});
+
 test("ships landscape controls with oversized invisible hit targets", async () => {
   const styles = await readFile(
     new URL("../app/globals.css", import.meta.url),

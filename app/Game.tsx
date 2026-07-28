@@ -2090,6 +2090,7 @@ export default function Game() {
   const controlStateRef = useRef(createControlState());
   const jumpLatchRef = useRef(false);
   const jumpPointerRef = useRef<number | null>(null);
+  const mobileJumpSfxRef = useRef(false);
   const playerRef = useRef<Player>({
     x: 150,
     y: 516,
@@ -2163,6 +2164,7 @@ export default function Game() {
     inputRef.current = { left: false, right: false, jump: false };
     jumpLatchRef.current = false;
     jumpPointerRef.current = null;
+    mobileJumpSfxRef.current = false;
   }, []);
 
   const clearFactCallout = useCallback(() => {
@@ -2228,6 +2230,7 @@ export default function Game() {
       const track = musicRef.current[key];
       if (track) {
         track.volume = mutedRef.current ? 0 : clampedVolume;
+        track.muted = mutedRef.current || clampedVolume <= 0;
       }
     },
     [],
@@ -2347,7 +2350,7 @@ export default function Game() {
 
       const nextAudio = musicRef.current[nextTrack];
       if (!nextAudio) return;
-      nextAudio.muted = false;
+      nextAudio.muted = mutedRef.current;
       const isNewTrack = previousTrack !== nextTrack;
       if (restart) {
         nextAudio.currentTime = 0;
@@ -2377,6 +2380,7 @@ export default function Game() {
 
     const voice = source.cloneNode(true) as HTMLAudioElement;
     voice.preload = "auto";
+    voice.muted = false;
     voice.volume = SFX_SOURCES[key].volume;
     const releaseVoice = () => {
       activeSfxRef.current.delete(voice);
@@ -2681,12 +2685,17 @@ export default function Game() {
     (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
       const track = musicRef.current[key];
       if (track) {
+        const envelope = musicEnvelopeRef.current.get(key) ?? 0;
         track.volume = muted
           ? 0
-          : (musicEnvelopeRef.current.get(key) ?? 0);
+          : envelope;
+        track.muted =
+          muted ||
+          (key !== activeMusicRef.current && envelope <= 0);
       }
     });
     activeSfxRef.current.forEach((key, voice) => {
+      voice.muted = muted;
       voice.volume = muted ? 0 : SFX_SOURCES[key].volume;
     });
     if (!muted) unlockMusic();
@@ -3035,7 +3044,11 @@ export default function Game() {
           player.vy = -JUMP_SPEED;
           player.grounded = false;
           jumpLatchRef.current = true;
-          playSfx("jump");
+          if (mobileJumpSfxRef.current) {
+            mobileJumpSfxRef.current = false;
+          } else {
+            playSfx("jump");
+          }
         }
         if (!input.jump) jumpLatchRef.current = false;
         if (!input.jump && player.vy < -260) player.vy *= Math.pow(0.018, dt);
@@ -3484,12 +3497,19 @@ export default function Game() {
   const pressMobileJump = useCallback(
     (event: React.PointerEvent<HTMLButtonElement>) => {
       event.preventDefault();
+      if (jumpPointerRef.current !== null) return;
       event.currentTarget.setPointerCapture(event.pointerId);
       jumpPointerRef.current = event.pointerId;
+      if (playerRef.current.grounded && !jumpLatchRef.current) {
+        // iOS requires a newly created media voice to start inside the touch
+        // gesture. The game loop still owns the actual jump physics.
+        mobileJumpSfxRef.current = true;
+        playSfx("jump");
+      }
       setTouchJump(controlStateRef.current, true);
       syncInputFromSources();
     },
-    [syncInputFromSources],
+    [playSfx, syncInputFromSources],
   );
 
   const releaseMobileJump = useCallback(
@@ -3499,6 +3519,9 @@ export default function Game() {
       jumpPointerRef.current = null;
       setTouchJump(controlStateRef.current, false);
       syncInputFromSources();
+      if (playerRef.current.grounded && !jumpLatchRef.current) {
+        mobileJumpSfxRef.current = false;
+      }
     },
     [syncInputFromSources],
   );
