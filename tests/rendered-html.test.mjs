@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 import {
   clearControlState,
@@ -330,25 +330,25 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /praxi-jump-v6\.png/i);
   assert.match(gameSource, /prompt-injection-v2\.png/i);
   assert.match(gameSource, /enemies-game-v1/i);
-  assert.match(gameSource, /gameplay-background-l2-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l2-v1\.webp/i);
   assert.match(gameSource, /sensitive-disclosure-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l3-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l3-v1\.webp/i);
   assert.match(gameSource, /excessive-agency-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l4-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l4-v1\.webp/i);
   assert.match(gameSource, /supply-chain-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l5-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l5-v1\.webp/i);
   assert.match(gameSource, /data-model-poisoning-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l6-v2\.png/i);
+  assert.match(gameSource, /gameplay-background-l6-v2\.webp/i);
   assert.match(gameSource, /unbounded-consumption-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l7-v2\.png/i);
+  assert.match(gameSource, /gameplay-background-l7-v2\.webp/i);
   assert.match(gameSource, /misinformation-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l8-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l8-v1\.webp/i);
   assert.match(gameSource, /hidden-context-exposure-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l9-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l9-v1\.webp/i);
   assert.match(gameSource, /vector-embedding-weaknesses-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l10-v2\.png/i);
+  assert.match(gameSource, /gameplay-background-l10-v2\.webp/i);
   assert.match(gameSource, /improper-output-handling-v1\.png/i);
-  assert.match(gameSource, /gameplay-background-l11-gauntlet-v1\.png/i);
+  assert.match(gameSource, /gameplay-background-l11-gauntlet-v1\.webp/i);
   assert.match(gameSource, /THE GAUNTLET/i);
   assert.match(gameSource, /\(\?:Digit\|Numpad\)/i);
   assert.match(gameSource, /event\.code === "KeyG"/i);
@@ -495,4 +495,50 @@ test("preloads an optimized title background ahead of music", async () => {
   );
   assert.match(gameSource, /gameplay-background-v2\.webp/);
   assert.match(styles, /gameplay-background-v2\.webp/g);
+});
+
+test("loads optimized level backgrounds only when they are needed", async () => {
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+  const backgroundFiles = [
+    "gameplay-background-v2.webp",
+    "gameplay-background-l2-v1.webp",
+    "gameplay-background-l3-v1.webp",
+    "gameplay-background-l4-v1.webp",
+    "gameplay-background-l5-v1.webp",
+    "gameplay-background-l6-v2.webp",
+    "gameplay-background-l7-v2.webp",
+    "gameplay-background-l8-v1.webp",
+    "gameplay-background-l9-v1.webp",
+    "gameplay-background-l10-v2.webp",
+    "gameplay-background-l11-gauntlet-v1.webp",
+  ];
+
+  let totalBytes = 0;
+  for (const filename of backgroundFiles) {
+    const details = await stat(
+      new URL(`../public/assets/${filename}`, import.meta.url),
+    );
+    totalBytes += details.size;
+    assert.ok(details.size < 500_000, `${filename} should stay under 500 KB`);
+  }
+  assert.ok(totalBytes < 4_000_000, "active backgrounds should stay under 4 MB");
+
+  assert.doesNotMatch(
+    gameSource,
+    /backgrounds:\s*LEVELS\.map/,
+    "startup should not eagerly download every background",
+  );
+  assert.match(
+    gameSource,
+    /if \(scene !== "quiz"\) return;\s*preloadLevelBackground\(levelIndex \+ 1\)/,
+    "the quiz should preload the next level background",
+  );
+  assert.match(
+    gameSource,
+    /preloadLevelBackground\(nextLevelIndex\);\s*resetGame\(nextLevelIndex\)/,
+    "direct level starts should request their background",
+  );
 });

@@ -170,7 +170,7 @@ type SfxKey =
   | "enemyHit";
 
 type GameArt = {
-  backgrounds?: HTMLImageElement[];
+  backgrounds?: Array<HTMLImageElement | undefined>;
   runFrames?: HTMLImageElement[];
   ready?: HTMLImageElement;
   jump?: HTMLImageElement;
@@ -617,7 +617,7 @@ const LEVELS = [
     name: "SENSITIVE INFORMATION DISCLOSURE",
     objectiveName: "Sensitive Information Disclosure",
     soundtrack: "Everything You Told Me",
-    background: "./assets/gameplay-background-l2-v1.png",
+    background: "./assets/gameplay-background-l2-v1.webp",
     enemy: "./assets/enemies-game-v1/sensitive-disclosure-v1.png",
     lessons: SENSITIVE_INFORMATION_DISCLOSURE_LESSONS,
   },
@@ -627,7 +627,7 @@ const LEVELS = [
     name: "EXCESSIVE AGENCY",
     objectiveName: "Excessive Agency",
     soundtrack: "Too Much Rope",
-    background: "./assets/gameplay-background-l3-v1.png",
+    background: "./assets/gameplay-background-l3-v1.webp",
     enemy: "./assets/enemies-game-v1/excessive-agency-v1.png",
     lessons: EXCESSIVE_AGENCY_LESSONS,
   },
@@ -637,7 +637,7 @@ const LEVELS = [
     name: "SUPPLY CHAIN",
     objectiveName: "Supply Chain",
     soundtrack: "Looks Like the Real Thing",
-    background: "./assets/gameplay-background-l4-v1.png",
+    background: "./assets/gameplay-background-l4-v1.webp",
     enemy: "./assets/enemies-game-v1/supply-chain-v1.png",
     lessons: SUPPLY_CHAIN_LESSONS,
   },
@@ -647,7 +647,7 @@ const LEVELS = [
     name: "DATA AND MODEL POISONING",
     objectiveName: "Data and Model Poisoning",
     soundtrack: "Raised on a Lie",
-    background: "./assets/gameplay-background-l5-v1.png",
+    background: "./assets/gameplay-background-l5-v1.webp",
     enemy: "./assets/enemies-game-v1/data-model-poisoning-v1.png",
     lessons: DATA_MODEL_POISONING_LESSONS,
   },
@@ -657,7 +657,7 @@ const LEVELS = [
     name: "UNBOUNDED CONSUMPTION",
     objectiveName: "Unbounded Consumption",
     soundtrack: "Again and Again",
-    background: "./assets/gameplay-background-l6-v2.png",
+    background: "./assets/gameplay-background-l6-v2.webp",
     enemy: "./assets/enemies-game-v1/unbounded-consumption-v1.png",
     lessons: UNBOUNDED_CONSUMPTION_LESSONS,
   },
@@ -667,7 +667,7 @@ const LEVELS = [
     name: "MISINFORMATION",
     objectiveName: "Misinformation",
     soundtrack: "Beautifully Wrong",
-    background: "./assets/gameplay-background-l7-v2.png",
+    background: "./assets/gameplay-background-l7-v2.webp",
     enemy: "./assets/enemies-game-v1/misinformation-v1.png",
     lessons: MISINFORMATION_LESSONS,
   },
@@ -677,7 +677,7 @@ const LEVELS = [
     name: "HIDDEN CONTEXT EXPOSURE",
     objectiveName: "Hidden Context Exposure",
     soundtrack: "You Drew Me a Map",
-    background: "./assets/gameplay-background-l8-v1.png",
+    background: "./assets/gameplay-background-l8-v1.webp",
     enemy: "./assets/enemies-game-v1/hidden-context-exposure-v1.png",
     lessons: HIDDEN_CONTEXT_EXPOSURE_LESSONS,
   },
@@ -687,7 +687,7 @@ const LEVELS = [
     name: "VECTOR AND EMBEDDING WEAKNESSES",
     objectiveName: "Vector and Embedding Weaknesses",
     soundtrack: "Close Enough to Be Dangerous",
-    background: "./assets/gameplay-background-l9-v1.png",
+    background: "./assets/gameplay-background-l9-v1.webp",
     enemy: "./assets/enemies-game-v1/vector-embedding-weaknesses-v1.png",
     lessons: VECTOR_EMBEDDING_WEAKNESSES_LESSONS,
   },
@@ -697,7 +697,7 @@ const LEVELS = [
     name: "IMPROPER OUTPUT HANDLING",
     objectiveName: "Improper Output Handling",
     soundtrack: "Passed Without Question",
-    background: "./assets/gameplay-background-l10-v2.png",
+    background: "./assets/gameplay-background-l10-v2.webp",
     enemy: "./assets/enemies-game-v1/improper-output-handling-v1.png",
     lessons: IMPROPER_OUTPUT_HANDLING_LESSONS,
   },
@@ -707,7 +707,7 @@ const LEVELS = [
     name: "THE GAUNTLET",
     objectiveName: "Gauntlet",
     soundtrack: "Promptfall (Reprise)",
-    background: "./assets/gameplay-background-l11-gauntlet-v1.png",
+    background: "./assets/gameplay-background-l11-gauntlet-v1.webp",
     enemy: "./assets/enemies-game-v1/prompt-injection-v2.png",
     lessons: GAUNTLET_LESSONS,
   },
@@ -2136,6 +2136,21 @@ export default function Game() {
   const [quizQuestionIndex, setQuizQuestionIndex] = useState(0);
   const [quizAnswerIndex, setQuizAnswerIndex] = useState<number | null>(null);
   const [quizScore, setQuizScore] = useState(0);
+
+  const preloadLevelBackground = useCallback((targetLevelIndex: number) => {
+    if (targetLevelIndex < 0 || targetLevelIndex >= LEVELS.length) return;
+
+    const backgrounds =
+      artRef.current.backgrounds ??
+      Array<HTMLImageElement | undefined>(LEVELS.length);
+    artRef.current.backgrounds = backgrounds;
+    if (backgrounds[targetLevelIndex]) return;
+
+    const image = new Image();
+    image.decoding = "async";
+    image.src = LEVELS[targetLevelIndex].background;
+    backgrounds[targetLevelIndex] = image;
+  }, []);
   const [muted, setMuted] = useState(false);
   const mutedRef = useRef(false);
   const musicRef = useRef<Partial<Record<MusicTrackKey, HTMLAudioElement>>>({});
@@ -2470,6 +2485,7 @@ export default function Game() {
       window.clearTimeout(titleTransitionTimerRef.current);
       titleTransitionTimerRef.current = null;
     }
+    preloadLevelBackground(nextLevelIndex);
     resetGame(nextLevelIndex);
     transitionMusic(musicForLevel(nextLevelIndex), {
       fadeOut: 900,
@@ -2481,7 +2497,7 @@ export default function Game() {
     sceneRef.current = "levelIntro";
     setScene("levelIntro");
     playSfx("nextLevel");
-  }, [playSfx, resetGame, transitionMusic]);
+  }, [playSfx, preloadLevelBackground, resetGame, transitionMusic]);
 
   const startCampaign = useCallback(() => {
     startLevel(0);
@@ -2669,7 +2685,7 @@ export default function Game() {
       return image;
     };
     artRef.current = {
-      backgrounds: LEVELS.map((level) => load(level.background)),
+      backgrounds: Array<HTMLImageElement | undefined>(LEVELS.length),
       runFrames: Array.from({ length: 7 }, (_, frame) =>
         load(`./assets/praxi-run-v5/praxi-run-${frame}.png`),
       ),
@@ -2678,7 +2694,13 @@ export default function Game() {
       enemies: LEVELS.map((level) => load(level.enemy)),
       bonusCrate: load("./assets/integrity-crate-v1.png"),
     };
-  }, []);
+    preloadLevelBackground(0);
+  }, [preloadLevelBackground]);
+
+  useEffect(() => {
+    if (scene !== "quiz") return;
+    preloadLevelBackground(levelIndex + 1);
+  }, [levelIndex, preloadLevelBackground, scene]);
 
   useEffect(() => {
     mutedRef.current = muted;
