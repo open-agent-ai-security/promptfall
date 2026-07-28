@@ -125,7 +125,7 @@ button {
   overflow: hidden;
   background:
     linear-gradient(rgba(1, 5, 13, 0.75), rgba(1, 6, 15, 0.92)),
-    url("./gameplay-background-v2.png") center / cover;
+    url("./gameplay-background-v2.webp") center / cover;
   animation: splash-in 4.2s ease both;
 }
 
@@ -299,7 +299,7 @@ button {
   inset: -6%;
   background:
     linear-gradient(to bottom, rgba(0, 5, 16, 0.08), rgba(0, 4, 12, 0.72)),
-    url("./gameplay-background-v2.png") center / cover;
+    url("./gameplay-background-v2.webp") center / cover;
   animation: title-camera 12s ease-in-out infinite alternate;
 }
 

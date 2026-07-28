@@ -470,3 +470,29 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /event\.metaKey \|\| event\.ctrlKey \|\| event\.altKey/i);
   assert.match(gameSource, /Move Praxi right and jump on each threat/i);
 });
+
+test("preloads an optimized title background ahead of music", async () => {
+  const staticHtml = await readFile(
+    new URL("../static/index.html", import.meta.url),
+    "utf8",
+  );
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    staticHtml,
+    /href="\.\/assets\/gameplay-background-v2\.webp"[\s\S]*as="image"[\s\S]*fetchpriority="high"/,
+  );
+  assert.match(
+    staticHtml,
+    /promptfall-title\.mp3"[\s\S]*fetchpriority="low"/,
+  );
+  assert.match(gameSource, /gameplay-background-v2\.webp/);
+  assert.match(styles, /gameplay-background-v2\.webp/g);
+});

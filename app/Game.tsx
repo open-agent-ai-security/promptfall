@@ -607,7 +607,7 @@ const LEVELS = [
     name: "PROMPT INJECTION",
     objectiveName: "Prompt Injection",
     soundtrack: "Borrowed Hands",
-    background: "./assets/gameplay-background-v2.png",
+    background: "./assets/gameplay-background-v2.webp",
     enemy: "./assets/enemies-game-v1/prompt-injection-v2.png",
     lessons: PROMPT_INJECTION_LESSONS,
   },

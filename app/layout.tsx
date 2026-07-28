@@ -75,10 +75,17 @@ export default function RootLayout({
       <head>
         <link
           rel="preload"
+          href="/assets/gameplay-background-v2.webp"
+          as="image"
+          type="image/webp"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
           href="/assets/music/promptfall-title.mp3"
           as="audio"
           type="audio/mpeg"
-          fetchPriority="high"
+          fetchPriority="low"
         />
         <script
           data-goatcounter="https://open-agent-ai-security.goatcounter.com/count"
