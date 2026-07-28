@@ -2129,12 +2129,19 @@ kbd {
     transform 120ms ease;
 }
 
-.quiz-answer:hover:not(:disabled),
-.quiz-answer:focus-visible {
+.quiz-answer:focus-visible:not(:disabled) {
   border-color: #fff;
   filter: brightness(1.28);
-  transform: translateX(7px);
-  outline: none;
+  outline: 2px solid rgba(255, 255, 255, 0.92);
+  outline-offset: -4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .quiz-answer:hover:not(:disabled) {
+    border-color: #fff;
+    filter: brightness(1.28);
+    transform: translateX(7px);
+  }
 }
 
 .quiz-answer kbd {

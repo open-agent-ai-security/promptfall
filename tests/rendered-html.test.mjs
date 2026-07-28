@@ -187,6 +187,20 @@ test("keeps mobile instructions and quiz answers readable", async () => {
   assert.match(styles, /font-size: clamp\(12px, 1\.55vw, 16px\)/);
 });
 
+test("does not leave touch quiz answers in a shifted hover state", async () => {
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(styles, /@media \(hover: hover\) and \(pointer: fine\)/);
+  assert.match(styles, /\.quiz-answer:focus-visible:not\(:disabled\)/);
+  assert.doesNotMatch(
+    styles,
+    /\.quiz-answer:hover:not\(:disabled\),\s*\.quiz-answer:focus-visible/,
+  );
+});
+
 test("holds learning callouts unless gameplay resumes after the grace period", () => {
   const idle = { left: false, right: false, jump: false };
   const moving = { left: false, right: true, jump: false };
