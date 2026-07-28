@@ -142,6 +142,19 @@ test("keeps a directional hold active while the separate jump control fires", ()
   });
 });
 
+test("keeps mobile jump active until its pointer is released", async () => {
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(gameSource, /onPointerDown=\{pressMobileJump\}/);
+  assert.match(gameSource, /onPointerUp=\{releaseMobileJump\}/);
+  assert.match(gameSource, /onPointerCancel=\{releaseMobileJump\}/);
+  assert.match(gameSource, /onLostPointerCapture=\{releaseMobileJump\}/);
+  assert.doesNotMatch(gameSource, /pulseTouchJump|jumpReleaseTimerRef/);
+});
+
 test("ships landscape controls with oversized invisible hit targets", async () => {
   const styles = await readFile(
     new URL("../app/globals.css", import.meta.url),
@@ -150,15 +163,16 @@ test("ships landscape controls with oversized invisible hit targets", async () =
 
   assert.match(styles, /\.mobile-direction-rocker/);
   assert.match(styles, /top: 52%/);
-  assert.match(styles, /\.mobile-direction-face/);
+  assert.match(styles, /\.mobile-arrow-face/);
+  assert.match(styles, /\.mobile-arrow--left/);
+  assert.match(styles, /\.mobile-arrow--right/);
+  assert.match(styles, /\.mobile-arrow--up/);
   assert.match(styles, /\.mobile-control-button--jump/);
-  assert.match(styles, /\.mobile-jump-face/);
   assert.match(styles, /width: clamp\(64px, 8\.4vw, 74px\)/);
   assert.match(styles, /height: clamp\(88px, 25vh, 104px\)/);
-  assert.match(styles, /width: clamp\(46px, 5\.8vw, 54px\)/);
-  assert.match(styles, /height: clamp\(62px, 18vh, 78px\)/);
+  assert.match(styles, /width: clamp\(52px, 7vw, 64px\)/);
   assert.match(styles, /width: clamp\(104px, 13\.5vw, 120px\)/);
-  assert.match(styles, /width: clamp\(68px, 8\.8vw, 82px\)/);
+  assert.match(styles, /width: clamp\(58px, 7\.8vw, 70px\)/);
   assert.match(styles, /orientation: landscape/);
 });
 

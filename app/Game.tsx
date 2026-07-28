@@ -2089,7 +2089,7 @@ export default function Game() {
   const inputRef = useRef({ left: false, right: false, jump: false });
   const controlStateRef = useRef(createControlState());
   const jumpLatchRef = useRef(false);
-  const jumpReleaseTimerRef = useRef<number | null>(null);
+  const jumpPointerRef = useRef<number | null>(null);
   const playerRef = useRef<Player>({
     x: 150,
     y: 516,
@@ -2162,10 +2162,7 @@ export default function Game() {
     clearControlState(controlStateRef.current);
     inputRef.current = { left: false, right: false, jump: false };
     jumpLatchRef.current = false;
-    if (jumpReleaseTimerRef.current !== null) {
-      window.clearTimeout(jumpReleaseTimerRef.current);
-      jumpReleaseTimerRef.current = null;
-    }
+    jumpPointerRef.current = null;
   }, []);
 
   const clearFactCallout = useCallback(() => {
@@ -3484,18 +3481,27 @@ export default function Game() {
     triggerGameOver,
   ]);
 
-  const pulseTouchJump = useCallback(() => {
-    if (jumpReleaseTimerRef.current !== null) {
-      window.clearTimeout(jumpReleaseTimerRef.current);
-    }
-    setTouchJump(controlStateRef.current, true);
-    syncInputFromSources();
-    jumpReleaseTimerRef.current = window.setTimeout(() => {
+  const pressMobileJump = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
+      jumpPointerRef.current = event.pointerId;
+      setTouchJump(controlStateRef.current, true);
+      syncInputFromSources();
+    },
+    [syncInputFromSources],
+  );
+
+  const releaseMobileJump = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      if (jumpPointerRef.current !== event.pointerId) return;
+      jumpPointerRef.current = null;
       setTouchJump(controlStateRef.current, false);
       syncInputFromSources();
-      jumpReleaseTimerRef.current = null;
-    }, 130);
-  }, [syncInputFromSources]);
+    },
+    [syncInputFromSources],
+  );
 
   const pressMobileDirection = useCallback(
     (
@@ -3517,15 +3523,6 @@ export default function Game() {
       syncInputFromSources();
     },
     [syncInputFromSources],
-  );
-
-  const pressMobileJump = useCallback(
-    (event: React.PointerEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      event.currentTarget.setPointerCapture(event.pointerId);
-      pulseTouchJump();
-    },
-    [pulseTouchJump],
   );
 
   const currentLevel = LEVELS[levelIndex];
@@ -3728,7 +3725,7 @@ export default function Game() {
                       <strong>MOVE</strong> Use the left and right arrow buttons.
                     </span>
                     <span className="instruction-control-line">
-                      <strong>JUMP</strong> Tap the jump button.
+                      <strong>JUMP</strong> Hold ↑ for a higher jump.
                     </span>
                   </p>
                 </div>
@@ -4095,10 +4092,10 @@ export default function Game() {
               onLostPointerCapture={releaseMobileDirection}
             >
               <span
-                className="mobile-direction-face mobile-direction-face--left"
+                className="mobile-arrow-face"
                 aria-hidden="true"
               >
-                ◀
+                <span className="mobile-arrow mobile-arrow--left" />
               </span>
             </button>
             <button
@@ -4111,10 +4108,10 @@ export default function Game() {
               onLostPointerCapture={releaseMobileDirection}
             >
               <span
-                className="mobile-direction-face mobile-direction-face--right"
+                className="mobile-arrow-face"
                 aria-hidden="true"
               >
-                ▶
+                <span className="mobile-arrow mobile-arrow--right" />
               </span>
             </button>
           </div>
@@ -4123,10 +4120,12 @@ export default function Game() {
             className="mobile-control-button mobile-control-button--jump"
             aria-label="Jump"
             onPointerDown={pressMobileJump}
+            onPointerUp={releaseMobileJump}
+            onPointerCancel={releaseMobileJump}
+            onLostPointerCapture={releaseMobileJump}
           >
-            <span className="mobile-jump-face" aria-hidden="true">
-              <strong>A</strong>
-              <small>JUMP</small>
+            <span className="mobile-arrow-face" aria-hidden="true">
+              <span className="mobile-arrow mobile-arrow--up" />
             </span>
           </button>
         </div>
