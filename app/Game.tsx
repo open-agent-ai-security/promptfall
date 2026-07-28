@@ -4094,7 +4094,12 @@ export default function Game() {
               onPointerCancel={releaseMobileDirection}
               onLostPointerCapture={releaseMobileDirection}
             >
-              <span aria-hidden="true">◀</span>
+              <span
+                className="mobile-direction-face mobile-direction-face--left"
+                aria-hidden="true"
+              >
+                ◀
+              </span>
             </button>
             <button
               type="button"
@@ -4105,7 +4110,12 @@ export default function Game() {
               onPointerCancel={releaseMobileDirection}
               onLostPointerCapture={releaseMobileDirection}
             >
-              <span aria-hidden="true">▶</span>
+              <span
+                className="mobile-direction-face mobile-direction-face--right"
+                aria-hidden="true"
+              >
+                ▶
+              </span>
             </button>
           </div>
           <button
@@ -4114,8 +4124,10 @@ export default function Game() {
             aria-label="Jump"
             onPointerDown={pressMobileJump}
           >
-            <span aria-hidden="true">A</span>
-            <small aria-hidden="true">JUMP</small>
+            <span className="mobile-jump-face" aria-hidden="true">
+              <strong>A</strong>
+              <small>JUMP</small>
+            </span>
           </button>
         </div>
       )}

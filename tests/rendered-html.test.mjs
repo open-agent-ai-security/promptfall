@@ -142,16 +142,22 @@ test("keeps a directional hold active while the separate jump control fires", ()
   });
 });
 
-test("ships landscape game controls with thumb-sized targets", async () => {
+test("ships landscape controls with oversized invisible hit targets", async () => {
   const styles = await readFile(
     new URL("../app/globals.css", import.meta.url),
     "utf8",
   );
 
   assert.match(styles, /\.mobile-direction-rocker/);
+  assert.match(styles, /top: 52%/);
+  assert.match(styles, /\.mobile-direction-face/);
   assert.match(styles, /\.mobile-control-button--jump/);
+  assert.match(styles, /\.mobile-jump-face/);
+  assert.match(styles, /width: clamp\(64px, 8\.4vw, 74px\)/);
+  assert.match(styles, /height: clamp\(88px, 25vh, 104px\)/);
   assert.match(styles, /width: clamp\(46px, 5\.8vw, 54px\)/);
   assert.match(styles, /height: clamp\(62px, 18vh, 78px\)/);
+  assert.match(styles, /width: clamp\(104px, 13\.5vw, 120px\)/);
   assert.match(styles, /width: clamp\(68px, 8\.8vw, 82px\)/);
   assert.match(styles, /orientation: landscape/);
 });

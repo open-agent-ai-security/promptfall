@@ -1444,12 +1444,23 @@ kbd {
 
 .mobile-direction-rocker {
   position: absolute;
-  top: 57%;
+  top: 52%;
   left: max(58px, calc(var(--safe-left) + 18px));
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-  padding: 5px;
+  gap: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.mobile-direction-rocker::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: clamp(106px, 12.8vw, 122px);
+  height: clamp(72px, 20vh, 88px);
   border: 1px solid rgba(76, 222, 255, 0.55);
   border-radius: 18px;
   background: rgba(2, 14, 25, 0.82);
@@ -1458,20 +1469,16 @@ kbd {
     0 7px 20px rgba(0, 0, 0, 0.55),
     0 0 18px rgba(45, 204, 255, 0.16);
   transform: translate(-50%, -50%);
-  pointer-events: auto;
 }
 
 .mobile-control-button {
   display: grid;
   place-items: center;
   margin: 0;
-  border: 1px solid rgba(128, 239, 255, 0.52);
+  padding: 0;
+  border: 0;
   color: #dffaff;
-  background:
-    linear-gradient(145deg, rgba(17, 67, 91, 0.96), rgba(3, 21, 36, 0.98));
-  box-shadow:
-    inset 0 2px 2px rgba(255, 255, 255, 0.14),
-    inset 0 -5px 8px rgba(0, 0, 0, 0.4);
+  background: transparent;
   font-family: Impact, "Arial Black", sans-serif;
   cursor: pointer;
   pointer-events: auto;
@@ -1483,31 +1490,60 @@ kbd {
 
 .mobile-control-button--left,
 .mobile-control-button--right {
-  width: clamp(46px, 5.8vw, 54px);
-  height: clamp(62px, 18vh, 78px);
-  font-size: clamp(22px, 3.3vw, 32px);
-  text-shadow: 0 0 12px rgba(93, 228, 255, 0.9);
+  width: clamp(64px, 8.4vw, 74px);
+  height: clamp(88px, 25vh, 104px);
 }
 
-.mobile-control-button--left {
+.mobile-direction-face {
+  display: grid;
+  place-items: center;
+  width: clamp(46px, 5.8vw, 54px);
+  height: clamp(62px, 18vh, 78px);
+  border: 1px solid rgba(128, 239, 255, 0.52);
+  color: #dffaff;
+  background:
+    linear-gradient(145deg, rgba(17, 67, 91, 0.96), rgba(3, 21, 36, 0.98));
+  box-shadow:
+    inset 0 2px 2px rgba(255, 255, 255, 0.14),
+    inset 0 -5px 8px rgba(0, 0, 0, 0.4);
+  font-size: clamp(22px, 3.3vw, 32px);
+  text-shadow: 0 0 12px rgba(93, 228, 255, 0.9);
+  pointer-events: none;
+}
+
+.mobile-direction-face--left {
   border-radius: 13px 5px 5px 13px;
 }
 
-.mobile-control-button--right {
+.mobile-direction-face--right {
   border-radius: 5px 13px 13px 5px;
 }
 
-.mobile-control-button--left:active,
-.mobile-control-button--right:active {
+.mobile-control-button--left:active .mobile-direction-face,
+.mobile-control-button--right:active .mobile-direction-face {
   color: #fff;
   background: linear-gradient(145deg, #1688b2, #075070);
   transform: translateY(2px);
+}
+
+.mobile-control-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -8px;
 }
 
 .mobile-control-button--jump {
   position: absolute;
   top: 57%;
   right: max(58px, calc(var(--safe-right) + 18px));
+  width: clamp(104px, 13.5vw, 120px);
+  aspect-ratio: 1;
+  transform: translate(50%, -50%);
+}
+
+.mobile-jump-face {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-content: center;
   width: clamp(68px, 8.8vw, 82px);
   aspect-ratio: 1;
   border: 2px solid rgba(255, 197, 89, 0.78);
@@ -1520,30 +1556,29 @@ kbd {
     inset 0 -8px 12px rgba(74, 12, 2, 0.45),
     0 8px 22px rgba(0, 0, 0, 0.58),
     0 0 20px rgba(255, 126, 25, 0.32);
-  grid-template-rows: 1fr auto;
-  align-content: center;
   padding: 12px 5px 9px;
   text-shadow:
     2px 2px 0 #681b07,
     0 0 12px rgba(255, 231, 136, 0.72);
-  transform: translate(50%, -50%) rotate(-7deg);
+  transform: rotate(-7deg);
+  pointer-events: none;
 }
 
-.mobile-control-button--jump > span {
+.mobile-jump-face > strong {
   font-size: clamp(25px, 4vw, 38px);
   line-height: 0.75;
 }
 
-.mobile-control-button--jump > small {
+.mobile-jump-face > small {
   font-family: "Arial Black", Arial, sans-serif;
   font-size: clamp(7px, 1.15vw, 10px);
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 
-.mobile-control-button--jump:active {
+.mobile-control-button--jump:active .mobile-jump-face {
   filter: brightness(1.18);
-  transform: translate(50%, -47%) rotate(-7deg) scale(0.96);
+  transform: translateY(2px) rotate(-7deg) scale(0.96);
 }
 
 .screen--complete {
