@@ -19,7 +19,6 @@ import {
 } from "./fact-callout.js";
 import {
   QUIZ_FEEDBACK_MS,
-  QUIZ_WRONG_FEEDBACK_MS,
   buildLevelQuiz,
 } from "./level-quiz.js";
 import { createMusicHealthMonitor } from "./music-health.js";
@@ -2545,6 +2544,37 @@ export default function Game() {
     startLevel(levelIndexRef.current);
   }, [startLevel]);
 
+  const advanceQuizFeedback = useCallback(() => {
+    if (
+      sceneRef.current !== "quiz" ||
+      quizAnswerIndexRef.current === null
+    ) {
+      return false;
+    }
+
+    if (quizAdvanceTimerRef.current !== null) {
+      window.clearTimeout(quizAdvanceTimerRef.current);
+      quizAdvanceTimerRef.current = null;
+    }
+    quizAnswerIndexRef.current = null;
+    setQuizAnswerIndex(null);
+
+    const questions = buildLevelQuiz(LEVELS, levelIndexRef.current);
+    const nextQuestion = quizQuestionIndexRef.current + 1;
+    if (nextQuestion < questions.length) {
+      quizQuestionIndexRef.current = nextQuestion;
+      setQuizQuestionIndex(nextQuestion);
+      return true;
+    }
+
+    const completedCampaign =
+      levelIndexRef.current === LEVELS.length - 1;
+    sceneRef.current = completedCampaign ? "winner" : "complete";
+    setScene(completedCampaign ? "winner" : "complete");
+    playSfx("levelComplete");
+    return true;
+  }, [playSfx]);
+
   const answerQuiz = useCallback(
     (answerIndex: number) => {
       if (
@@ -2571,25 +2601,12 @@ export default function Game() {
       if (quizAdvanceTimerRef.current !== null) {
         window.clearTimeout(quizAdvanceTimerRef.current);
       }
-      quizAdvanceTimerRef.current = window.setTimeout(() => {
-        quizAdvanceTimerRef.current = null;
-        quizAnswerIndexRef.current = null;
-        setQuizAnswerIndex(null);
-        const nextQuestion = quizQuestionIndexRef.current + 1;
-        if (nextQuestion < questions.length) {
-          quizQuestionIndexRef.current = nextQuestion;
-          setQuizQuestionIndex(nextQuestion);
-          return;
-        }
-
-        const completedCampaign =
-          levelIndexRef.current === LEVELS.length - 1;
-        sceneRef.current = completedCampaign ? "winner" : "complete";
-        setScene(completedCampaign ? "winner" : "complete");
-        playSfx("levelComplete");
-      }, correct ? QUIZ_FEEDBACK_MS : QUIZ_WRONG_FEEDBACK_MS);
+      quizAdvanceTimerRef.current = window.setTimeout(
+        advanceQuizFeedback,
+        QUIZ_FEEDBACK_MS,
+      );
     },
-    [playSfx],
+    [advanceQuizFeedback, playSfx],
   );
 
   useEffect(() => {
@@ -2875,6 +2892,11 @@ export default function Game() {
         return;
       }
       if (sceneRef.current === "quiz") {
+        if (quizAnswerIndexRef.current !== null) {
+          event.preventDefault();
+          if (!event.repeat) advanceQuizFeedback();
+          return;
+        }
         if (event.code === "KeyM") {
           event.preventDefault();
           if (!event.repeat) setMuted((value) => !value);
@@ -2986,6 +3008,7 @@ export default function Game() {
     };
   }, [
     advanceCampaign,
+    advanceQuizFeedback,
     answerQuiz,
     enterTitle,
     releaseAllInputs,
@@ -3913,7 +3936,15 @@ export default function Game() {
         )}
 
         {scene === "quiz" && quizQuestion && (
-          <div className="quiz-screen" data-testid="level-quiz">
+          <div
+            className="quiz-screen"
+            data-testid="level-quiz"
+            onPointerDown={() => {
+              if (quizAnswerIndexRef.current !== null) {
+                advanceQuizFeedback();
+              }
+            }}
+          >
             <div className="quiz-grid" aria-hidden="true" />
             <div className="quiz-debrief">
               <header className="quiz-header">

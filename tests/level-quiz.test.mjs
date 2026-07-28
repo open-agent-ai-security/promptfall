@@ -78,10 +78,10 @@ test("balances true and false checks across the ten vulnerabilities", () => {
   assert.equal(correctAnswers.filter((answer) => answer === "FALSE").length, 5);
 });
 
-test("holds reinforcement long enough to read and correction longer", () => {
-  assert.equal(QUIZ_FEEDBACK_MS, 2_600);
+test("holds reinforcement and correction for the same five seconds", () => {
+  assert.equal(QUIZ_FEEDBACK_MS, 5_000);
   assert.equal(QUIZ_WRONG_FEEDBACK_MS, 5_000);
-  assert.ok(QUIZ_WRONG_FEEDBACK_MS >= QUIZ_FEEDBACK_MS + 2_000);
+  assert.equal(QUIZ_WRONG_FEEDBACK_MS, QUIZ_FEEDBACK_MS);
 });
 
 test("wires the quiz before level-complete and winner scenes", async () => {
@@ -93,8 +93,17 @@ test("wires the quiz before level-complete and winner scenes", async () => {
   assert.match(source, /sceneRef\.current = "quiz"/);
   assert.match(source, /scene === "quiz"/);
   assert.match(source, /answerQuiz/);
+  assert.match(source, /advanceQuizFeedback/);
   assert.match(source, /QUIZ_FEEDBACK_MS/);
-  assert.match(source, /correct \? QUIZ_FEEDBACK_MS : QUIZ_WRONG_FEEDBACK_MS/);
+  assert.match(
+    source,
+    /window\.setTimeout\(\s*advanceQuizFeedback,\s*QUIZ_FEEDBACK_MS/,
+  );
+  assert.match(source, /onPointerDown/);
+  assert.match(
+    source,
+    /quizAnswerIndexRef\.current !== null[\s\S]*advanceQuizFeedback/,
+  );
 });
 
 test("offers keyboard and touch-friendly continue or replay actions", async () => {
