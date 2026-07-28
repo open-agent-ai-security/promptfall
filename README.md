@@ -70,13 +70,12 @@ unlock the campaign victory sequence.
 
 ### Mobile
 
-- Hold the left or right half of the playfield to run.
-- While holding one side, tap with a second finger to jump without losing
-  momentum.
+- Use the left/right rocker to run.
+- Tap the separate jump button while holding a direction to carry momentum.
 - Landscape orientation provides the best mission view.
 
-The game scales to a 16:9 presentation and supports touch-first play without
-requiring permanent on-screen direction buttons.
+The game scales to a 16:9 presentation. In landscape mode, the controls use
+the phone's side gutters and overlap only the extreme edges of the playfield.
 
 ---
 

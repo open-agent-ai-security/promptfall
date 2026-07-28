@@ -39,6 +39,14 @@ button {
 }
 
 .game-shell {
+  --game-width: min(
+    calc(100vw - var(--safe-left) - var(--safe-right)),
+    calc((100dvh - var(--safe-top) - var(--safe-bottom)) * 16 / 9)
+  );
+  --game-height: min(
+    calc(100dvh - var(--safe-top) - var(--safe-bottom)),
+    calc((100vw - var(--safe-left) - var(--safe-right)) * 9 / 16)
+  );
   position: fixed;
   inset: 0;
   display: grid;
@@ -71,14 +79,8 @@ button {
 
 .game-frame {
   position: relative;
-  width: min(
-    calc(100vw - var(--safe-left) - var(--safe-right)),
-    calc((100dvh - var(--safe-top) - var(--safe-bottom)) * 16 / 9)
-  );
-  height: min(
-    calc(100dvh - var(--safe-top) - var(--safe-bottom)),
-    calc((100vw - var(--safe-left) - var(--safe-right)) * 9 / 16)
-  );
+  width: var(--game-width);
+  height: var(--game-height);
   overflow: hidden;
   isolation: isolate;
   background: #06101b;
@@ -1429,86 +1431,119 @@ kbd {
     0 0 16px rgba(255, 218, 50, 0.95);
 }
 
-.touch-controls {
-  position: absolute;
-  z-index: 8;
-  right: 3%;
-  bottom: 3%;
-  left: 3%;
+.mobile-gamepad {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
   display: none;
-  align-items: center;
-  justify-content: space-between;
   pointer-events: none;
-  animation: touch-hints-retire 5.2s 900ms ease-out both;
-}
-
-.touch-playfield {
-  position: absolute;
-  z-index: 5;
-  top: 18%;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: none;
   touch-action: none;
   user-select: none;
   -webkit-touch-callout: none;
 }
 
-.touch-side-hint {
-  width: clamp(52px, 10vw, 80px);
-  aspect-ratio: 1;
+.mobile-direction-rocker {
+  position: absolute;
+  top: 57%;
+  left: max(58px, calc(var(--safe-left) + 18px));
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid rgba(76, 222, 255, 0.55);
+  border-radius: 18px;
+  background: rgba(2, 14, 25, 0.82);
+  box-shadow:
+    inset 0 0 18px rgba(62, 219, 255, 0.12),
+    0 7px 20px rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(45, 204, 255, 0.16);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.mobile-control-button {
   display: grid;
   place-items: center;
-  border: 1px solid rgba(89, 227, 255, 0.42);
+  margin: 0;
+  border: 1px solid rgba(128, 239, 255, 0.52);
+  color: #dffaff;
+  background:
+    linear-gradient(145deg, rgba(17, 67, 91, 0.96), rgba(3, 21, 36, 0.98));
+  box-shadow:
+    inset 0 2px 2px rgba(255, 255, 255, 0.14),
+    inset 0 -5px 8px rgba(0, 0, 0, 0.4);
+  font-family: Impact, "Arial Black", sans-serif;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+.mobile-control-button--left,
+.mobile-control-button--right {
+  width: clamp(46px, 5.8vw, 54px);
+  height: clamp(62px, 18vh, 78px);
+  font-size: clamp(22px, 3.3vw, 32px);
+  text-shadow: 0 0 12px rgba(93, 228, 255, 0.9);
+}
+
+.mobile-control-button--left {
+  border-radius: 13px 5px 5px 13px;
+}
+
+.mobile-control-button--right {
+  border-radius: 5px 13px 13px 5px;
+}
+
+.mobile-control-button--left:active,
+.mobile-control-button--right:active {
+  color: #fff;
+  background: linear-gradient(145deg, #1688b2, #075070);
+  transform: translateY(2px);
+}
+
+.mobile-control-button--jump {
+  position: absolute;
+  top: 57%;
+  right: max(58px, calc(var(--safe-right) + 18px));
+  width: clamp(68px, 8.8vw, 82px);
+  aspect-ratio: 1;
+  border: 2px solid rgba(255, 197, 89, 0.78);
   border-radius: 50%;
-  color: rgba(220, 251, 255, 0.9);
-  background: rgba(4, 22, 35, 0.72);
-  box-shadow: inset 0 0 20px rgba(40, 196, 255, 0.07);
-  text-align: center;
+  color: #fff1a8;
+  background:
+    radial-gradient(circle at 35% 28%, #ffbd47, #c84b0b 58%, #5d1605 100%);
+  box-shadow:
+    inset 0 4px 4px rgba(255, 255, 255, 0.22),
+    inset 0 -8px 12px rgba(74, 12, 2, 0.45),
+    0 8px 22px rgba(0, 0, 0, 0.58),
+    0 0 20px rgba(255, 126, 25, 0.32);
+  grid-template-rows: 1fr auto;
+  align-content: center;
+  padding: 12px 5px 9px;
+  text-shadow:
+    2px 2px 0 #681b07,
+    0 0 12px rgba(255, 231, 136, 0.72);
+  transform: translate(50%, -50%) rotate(-7deg);
 }
 
-.touch-side-hint strong {
-  margin-top: -0.08em;
-  font-size: clamp(28px, 5vw, 42px);
-  line-height: 0.68;
+.mobile-control-button--jump > span {
+  font-size: clamp(25px, 4vw, 38px);
+  line-height: 0.75;
 }
 
-.touch-side-hint small,
-.touch-jump-hint small {
-  display: block;
+.mobile-control-button--jump > small {
   font-family: "Arial Black", Arial, sans-serif;
-  font-size: clamp(6px, 0.82vw, 9px);
+  font-size: clamp(7px, 1.15vw, 10px);
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 
-.touch-jump-hint {
-  display: grid;
-  place-items: center;
-  min-width: clamp(92px, 18vw, 152px);
-  padding: clamp(7px, 1vw, 11px) clamp(9px, 1.4vw, 16px);
-  border: 1px solid rgba(255, 169, 53, 0.58);
-  color: var(--orange-soft);
-  background: rgba(36, 18, 5, 0.66);
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
-  text-align: center;
-}
-
-.touch-jump-hint strong {
-  font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(11px, 1.55vw, 18px);
-  font-style: italic;
-  letter-spacing: 0.06em;
-}
-
-.touch-jump-hint small {
-  color: #fff0a2;
-}
-
-.touch-side-hint--right {
-  border-color: rgba(255, 169, 53, 0.58);
-  color: var(--orange-soft);
+.mobile-control-button--jump:active {
+  filter: brightness(1.18);
+  transform: translate(50%, -47%) rotate(-7deg) scale(0.96);
 }
 
 .screen--complete {
@@ -3406,18 +3441,6 @@ kbd {
   }
 }
 
-@keyframes touch-hints-retire {
-  0%,
-  68% {
-    opacity: 0.88;
-    filter: brightness(1);
-  }
-  100% {
-    opacity: 0.18;
-    filter: brightness(0.72);
-  }
-}
-
 @keyframes praxen-orbit {
   to {
     transform: rotate(360deg);
@@ -3521,12 +3544,15 @@ kbd {
   }
 }
 
-@media (hover: none), (pointer: coarse) {
-  .touch-controls,
-  .touch-playfield {
-    display: flex;
+@media (orientation: landscape) and (hover: none),
+  (orientation: landscape) and (pointer: coarse),
+  (orientation: landscape) and (max-width: 1000px) and (max-height: 500px) {
+  .mobile-gamepad {
+    display: block;
   }
+}
 
+@media (hover: none), (pointer: coarse) {
   .desktop-start-copy,
   .desktop-control-copy,
   .arcade-level-select {

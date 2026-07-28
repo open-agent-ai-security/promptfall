@@ -124,7 +124,7 @@ test("clears interrupted controls and recognizes Space as gameplay input", () =>
   assert.equal(isGameplayControlCode(" "), false);
 });
 
-test("keeps a directional hold active throughout a second-finger jump", () => {
+test("keeps a directional hold active while the separate jump control fires", () => {
   const controls = createControlState();
   setTouchDirection(controls, 1, "right");
   setTouchJump(controls, true);
@@ -140,6 +140,20 @@ test("keeps a directional hold active throughout a second-finger jump", () => {
     right: true,
     jump: false,
   });
+});
+
+test("ships landscape game controls with thumb-sized targets", async () => {
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(styles, /\.mobile-direction-rocker/);
+  assert.match(styles, /\.mobile-control-button--jump/);
+  assert.match(styles, /width: clamp\(46px, 5\.8vw, 54px\)/);
+  assert.match(styles, /height: clamp\(62px, 18vh, 78px\)/);
+  assert.match(styles, /width: clamp\(68px, 8\.8vw, 82px\)/);
+  assert.match(styles, /orientation: landscape/);
 });
 
 test("holds learning callouts unless gameplay resumes after the grace period", () => {
@@ -337,9 +351,13 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /scene === "title" \|\| scene === "instructions"/i);
   assert.match(gameSource, /DIRECT LEVEL SELECT/i);
   assert.match(gameSource, /1–9 \/ 0 \/ G/i);
-  assert.match(gameSource, /aria-label="Touch controls: hold the left or right half/i);
-  assert.match(gameSource, /TAP OTHER SIDE TO JUMP/i);
-  assert.match(gameSource, /pointerType !== "touch"/i);
+  assert.match(gameSource, /aria-label="Mobile game controls"/i);
+  assert.match(gameSource, /aria-label="Move left"/i);
+  assert.match(gameSource, /aria-label="Move right"/i);
+  assert.match(gameSource, /aria-label="Jump"/i);
+  assert.match(gameSource, /ARROWS MOVE/i);
+  assert.match(gameSource, /JUMP BUTTON JUMPS/i);
+  assert.doesNotMatch(gameSource, /pointerType !== "touch"/i);
   assert.match(gameSource, /onLostPointerCapture/i);
   assert.match(gameSource, /visibilitychange/i);
   assert.match(gameSource, /pagehide/i);

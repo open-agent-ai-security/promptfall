@@ -88,17 +88,6 @@ type Enemy = {
   pulse: number;
 };
 
-type TouchPoint = {
-  side: "left" | "right";
-  controlsDirection: boolean;
-  startedAt: number;
-  startX: number;
-  startY: number;
-  x: number;
-  y: number;
-  isJumpTap: boolean;
-};
-
 type EnemySpawn = Omit<Enemy, "active">;
 
 type BonusCrate = {
@@ -2100,8 +2089,6 @@ export default function Game() {
   const inputRef = useRef({ left: false, right: false, jump: false });
   const controlStateRef = useRef(createControlState());
   const jumpLatchRef = useRef(false);
-  const touchPointsRef = useRef<Map<number, TouchPoint>>(new Map());
-  const lastTapRef = useRef({ time: 0, x: 0, y: 0 });
   const jumpReleaseTimerRef = useRef<number | null>(null);
   const playerRef = useRef<Player>({
     x: 150,
@@ -2173,8 +2160,6 @@ export default function Game() {
 
   const releaseAllInputs = useCallback(() => {
     clearControlState(controlStateRef.current);
-    touchPointsRef.current.clear();
-    lastTapRef.current.time = 0;
     inputRef.current = { left: false, right: false, jump: false };
     jumpLatchRef.current = false;
     if (jumpReleaseTimerRef.current !== null) {
@@ -3499,10 +3484,6 @@ export default function Game() {
     triggerGameOver,
   ]);
 
-  const syncTouchDirection = useCallback(() => {
-    syncInputFromSources();
-  }, [syncInputFromSources]);
-
   const pulseTouchJump = useCallback(() => {
     if (jumpReleaseTimerRef.current !== null) {
       window.clearTimeout(jumpReleaseTimerRef.current);
@@ -3516,104 +3497,36 @@ export default function Game() {
     }, 130);
   }, [syncInputFromSources]);
 
-  const releaseTouchPoint = useCallback(
-    (pointerId: number) => {
-      const point = touchPointsRef.current.get(pointerId);
-      touchPointsRef.current.delete(pointerId);
-      releaseTouchDirection(controlStateRef.current, pointerId);
-      syncTouchDirection();
-      return point;
-    },
-    [syncTouchDirection],
-  );
-
-  const sideForTouch = (
-    event: React.PointerEvent<HTMLDivElement>,
-  ): "left" | "right" => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    return event.clientX < rect.left + rect.width / 2 ? "left" : "right";
-  };
-
-  const touchPlayfieldProps = {
-    onPointerDown: (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.pointerType !== "touch") return;
+  const pressMobileDirection = useCallback(
+    (
+      event: React.PointerEvent<HTMLButtonElement>,
+      direction: "left" | "right",
+    ) => {
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
-      const now = performance.now();
-      const sinceLastTap = now - lastTapRef.current.time;
-      const distanceFromLastTap = Math.hypot(
-        event.clientX - lastTapRef.current.x,
-        event.clientY - lastTapRef.current.y,
-      );
-      const isSecondFinger = touchPointsRef.current.size > 0;
-      const isJumpTap =
-        isSecondFinger ||
-        (sinceLastTap > 45 &&
-          sinceLastTap < 350 &&
-          distanceFromLastTap < 96);
-      const controlsDirection = !isSecondFinger;
-      const side = sideForTouch(event);
-      touchPointsRef.current.set(event.pointerId, {
-        side,
-        controlsDirection,
-        startedAt: now,
-        startX: event.clientX,
-        startY: event.clientY,
-        x: event.clientX,
-        y: event.clientY,
-        isJumpTap,
-      });
-      if (controlsDirection) {
-        setTouchDirection(controlStateRef.current, event.pointerId, side);
-      }
-      syncTouchDirection();
-      if (isJumpTap) {
-        lastTapRef.current.time = 0;
-        pulseTouchJump();
-      }
+      setTouchDirection(controlStateRef.current, event.pointerId, direction);
+      syncInputFromSources();
     },
-    onPointerMove: (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.pointerType !== "touch") return;
-      const point = touchPointsRef.current.get(event.pointerId);
-      if (!point) return;
+    [syncInputFromSources],
+  );
+
+  const releaseMobileDirection = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
       event.preventDefault();
-      point.side = sideForTouch(event);
-      point.x = event.clientX;
-      point.y = event.clientY;
-      if (point.controlsDirection) {
-        setTouchDirection(
-          controlStateRef.current,
-          event.pointerId,
-          point.side,
-        );
-      }
-      syncTouchDirection();
+      releaseTouchDirection(controlStateRef.current, event.pointerId);
+      syncInputFromSources();
     },
-    onPointerUp: (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.pointerType !== "touch") return;
+    [syncInputFromSources],
+  );
+
+  const pressMobileJump = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
       event.preventDefault();
-      const point = releaseTouchPoint(event.pointerId);
-      if (
-        point &&
-        !point.isJumpTap &&
-        performance.now() - point.startedAt < 260 &&
-        Math.hypot(point.x - point.startX, point.y - point.startY) < 28
-      ) {
-        lastTapRef.current = {
-          time: performance.now(),
-          x: point.x,
-          y: point.y,
-        };
-      }
+      event.currentTarget.setPointerCapture(event.pointerId);
+      pulseTouchJump();
     },
-    onPointerCancel: (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.pointerType !== "touch") return;
-      releaseTouchPoint(event.pointerId);
-    },
-    onLostPointerCapture: (event: React.PointerEvent<HTMLDivElement>) => {
-      releaseTouchPoint(event.pointerId);
-    },
-  };
+    [pulseTouchJump],
+  );
 
   const currentLevel = LEVELS[levelIndex];
   const factLesson = currentLevel.lessons[factLessonIndex];
@@ -3736,7 +3649,7 @@ export default function Game() {
                   ← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP
                 </span>
                 <span className="touch-control-copy">
-                  HOLD LEFT / RIGHT&nbsp;&nbsp;•&nbsp;&nbsp;TAP OTHER SIDE TO JUMP
+                  ARROWS MOVE&nbsp;&nbsp;•&nbsp;&nbsp;JUMP BUTTON JUMPS
                 </span>
                 <span className="arcade-level-select">
                   1–9 / 0 / G&nbsp;&nbsp;DIRECT LEVEL SELECT
@@ -3812,10 +3725,10 @@ export default function Game() {
                   </p>
                   <p className="touch-instruction-copy">
                     <span className="instruction-control-line">
-                      <strong>MOVE</strong> Hold left or right.
+                      <strong>MOVE</strong> Use the left and right arrow buttons.
                     </span>
                     <span className="instruction-control-line">
-                      <strong>JUMP</strong> Tap the other side.
+                      <strong>JUMP</strong> Tap the jump button.
                     </span>
                   </p>
                 </div>
@@ -3942,30 +3855,6 @@ export default function Game() {
               </div>
             </div>
 
-            {scene === "playing" && (
-              <>
-                <div
-                  className="touch-playfield"
-                  role="application"
-                  aria-label="Touch controls: hold the left or right half of the playfield to move. Tap with a second finger to jump, or double-tap with one finger."
-                  {...touchPlayfieldProps}
-                />
-                <div className="touch-controls" aria-hidden="true">
-                  <div className="touch-side-hint touch-side-hint--left">
-                    <strong>‹</strong>
-                    <small>HOLD LEFT</small>
-                  </div>
-                  <div className="touch-jump-hint">
-                    <strong>SECOND FINGER</strong>
-                    <small>JUMP</small>
-                  </div>
-                  <div className="touch-side-hint touch-side-hint--right">
-                    <strong>›</strong>
-                    <small>HOLD RIGHT</small>
-                  </div>
-                </div>
-              </>
-            )}
           </>
         )}
 
@@ -4189,6 +4078,47 @@ export default function Game() {
 
         <div className="scanlines" aria-hidden="true" />
       </section>
+      {scene === "playing" && (
+        <div
+          className="mobile-gamepad"
+          role="group"
+          aria-label="Mobile game controls"
+        >
+          <div className="mobile-direction-rocker">
+            <button
+              type="button"
+              className="mobile-control-button mobile-control-button--left"
+              aria-label="Move left"
+              onPointerDown={(event) => pressMobileDirection(event, "left")}
+              onPointerUp={releaseMobileDirection}
+              onPointerCancel={releaseMobileDirection}
+              onLostPointerCapture={releaseMobileDirection}
+            >
+              <span aria-hidden="true">◀</span>
+            </button>
+            <button
+              type="button"
+              className="mobile-control-button mobile-control-button--right"
+              aria-label="Move right"
+              onPointerDown={(event) => pressMobileDirection(event, "right")}
+              onPointerUp={releaseMobileDirection}
+              onPointerCancel={releaseMobileDirection}
+              onLostPointerCapture={releaseMobileDirection}
+            >
+              <span aria-hidden="true">▶</span>
+            </button>
+          </div>
+          <button
+            type="button"
+            className="mobile-control-button mobile-control-button--jump"
+            aria-label="Jump"
+            onPointerDown={pressMobileJump}
+          >
+            <span aria-hidden="true">A</span>
+            <small aria-hidden="true">JUMP</small>
+          </button>
+        </div>
+      )}
       <p className="sr-only" aria-live="polite">
         {scene === "levelIntro"
           ? `Level ${currentLevel.number}: ${currentLevel.name}. Get ready.`
