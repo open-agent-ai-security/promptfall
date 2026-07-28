@@ -4096,6 +4096,17 @@ export default function Game() {
           </div>
         )}
 
+        {scene !== "playing" && scene !== "complete" && (
+          <button
+            className="mute-button mute-button--overlay"
+            type="button"
+            onClick={() => setMuted((value) => !value)}
+            aria-label={muted ? "Enable sound" : "Mute sound"}
+          >
+            {muted ? "SOUND OFF" : "SOUND ON"}
+          </button>
+        )}
+
         <div className="scanlines" aria-hidden="true" />
       </section>
       {scene === "playing" && (

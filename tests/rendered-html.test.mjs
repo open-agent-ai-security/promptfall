@@ -185,6 +185,36 @@ test("uses the media muted property for iPhone-safe sound control", async () => 
   assert.match(gameSource, /voice\.muted = muted/);
 });
 
+test("keeps sound control available outside the gameplay HUD", async () => {
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    gameSource,
+    /scene !== "playing" && scene !== "complete"[\s\S]*mute-button--overlay/,
+  );
+  assert.match(styles, /\.mute-button--overlay[\s\S]*position: absolute/);
+});
+
+test("removes redundant branding from the mobile gameplay HUD", async () => {
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    styles,
+    /@media \(max-width: 600px\)[\s\S]*\.hud-brand\s*\{\s*display: none/,
+  );
+  assert.match(styles, /\.hud-level-meta\s*\{[\s\S]*margin-left: 0/);
+});
+
 test("ships landscape controls with oversized invisible hit targets", async () => {
   const styles = await readFile(
     new URL("../app/globals.css", import.meta.url),
