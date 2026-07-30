@@ -29,6 +29,7 @@ type Scene =
   | "instructions"
   | "levelIntro"
   | "playing"
+  | "paused"
   | "quiz"
   | "complete"
   | "winner"
@@ -2117,6 +2118,9 @@ export default function Game() {
   const captureTimeRef = useRef(0);
   const fieldUnlockStartedRef = useRef<number | null>(null);
   const factTimerRef = useRef<number | null>(null);
+  const factTimerDeadlineRef = useRef(0);
+  const factTimerRemainingRef = useRef(0);
+  const factTimerModeRef = useRef<"visible" | "dismissing" | null>(null);
   const factShownAtRef = useRef(0);
   const factVisibleRef = useRef(false);
   const factDismissingRef = useRef(false);
@@ -2168,6 +2172,7 @@ export default function Game() {
   );
   const musicFadeRef = useRef(new Map<MusicTrackKey, number>());
   const titleTransitionTimerRef = useRef<number | null>(null);
+  const pauseStartedAtRef = useRef(0);
 
   const syncInputFromSources = useCallback(() => {
     inputRef.current = getControlInput(controlStateRef.current);
@@ -2186,43 +2191,72 @@ export default function Game() {
       window.clearTimeout(factTimerRef.current);
       factTimerRef.current = null;
     }
+    factTimerDeadlineRef.current = 0;
+    factTimerRemainingRef.current = 0;
+    factTimerModeRef.current = null;
     factVisibleRef.current = false;
     factDismissingRef.current = false;
     setCallout(false);
     setCalloutDismissing(false);
   }, []);
 
+  const scheduleFactTimer = useCallback(
+    (mode: "visible" | "dismissing", duration: number) => {
+      if (factTimerRef.current !== null) {
+        window.clearTimeout(factTimerRef.current);
+      }
+      const remaining = Math.max(0, duration);
+      factTimerModeRef.current = mode;
+      factTimerRemainingRef.current = remaining;
+      factTimerDeadlineRef.current = performance.now() + remaining;
+      factTimerRef.current = window.setTimeout(() => {
+        factTimerRef.current = null;
+        factTimerDeadlineRef.current = 0;
+        factTimerRemainingRef.current = 0;
+        factTimerModeRef.current = null;
+        factVisibleRef.current = false;
+        setCallout(false);
+        if (mode === "dismissing") {
+          factDismissingRef.current = false;
+          setCalloutDismissing(false);
+        }
+      }, remaining);
+    },
+    [],
+  );
+
   const showFactCallout = useCallback(() => {
-    if (factTimerRef.current !== null) {
-      window.clearTimeout(factTimerRef.current);
-    }
     factShownAtRef.current = performance.now();
     factVisibleRef.current = true;
     factDismissingRef.current = false;
     setCalloutDismissing(false);
     setCallout(true);
-    factTimerRef.current = window.setTimeout(() => {
-      factVisibleRef.current = false;
-      setCallout(false);
-      factTimerRef.current = null;
-    }, FACT_CALLOUT_TOTAL_MS);
-  }, []);
+    scheduleFactTimer("visible", FACT_CALLOUT_TOTAL_MS);
+  }, [scheduleFactTimer]);
 
   const dismissFactCalloutForMovement = useCallback(() => {
     if (!factVisibleRef.current || factDismissingRef.current) return;
-    if (factTimerRef.current !== null) {
-      window.clearTimeout(factTimerRef.current);
-    }
     factDismissingRef.current = true;
     setCalloutDismissing(true);
-    factTimerRef.current = window.setTimeout(() => {
-      factVisibleRef.current = false;
-      factDismissingRef.current = false;
-      setCallout(false);
-      setCalloutDismissing(false);
-      factTimerRef.current = null;
-    }, FACT_CALLOUT_DISMISS_MS);
+    scheduleFactTimer("dismissing", FACT_CALLOUT_DISMISS_MS);
+  }, [scheduleFactTimer]);
+
+  const pauseFactTimer = useCallback(() => {
+    if (factTimerRef.current === null) return;
+    window.clearTimeout(factTimerRef.current);
+    factTimerRef.current = null;
+    factTimerRemainingRef.current = Math.max(
+      0,
+      factTimerDeadlineRef.current - performance.now(),
+    );
+    factTimerDeadlineRef.current = 0;
   }, []);
+
+  const resumeFactTimer = useCallback(() => {
+    const mode = factTimerModeRef.current;
+    if (!mode || !factVisibleRef.current) return;
+    scheduleFactTimer(mode, factTimerRemainingRef.current);
+  }, [scheduleFactTimer]);
 
   const resetQuiz = useCallback(() => {
     if (quizAdvanceTimerRef.current !== null) {
@@ -2432,6 +2466,41 @@ export default function Game() {
       });
     }
   }, []);
+
+  const pauseGame = useCallback(() => {
+    if (sceneRef.current !== "playing") return;
+    releaseAllInputs();
+    pauseStartedAtRef.current = performance.now();
+    pauseFactTimer();
+    sceneRef.current = "paused";
+    setScene("paused");
+  }, [pauseFactTimer, releaseAllInputs]);
+
+  const resumeGame = useCallback(() => {
+    if (sceneRef.current !== "paused") return;
+    const pausedFor = Math.max(
+      0,
+      performance.now() - pauseStartedAtRef.current,
+    );
+    if (factVisibleRef.current) {
+      factShownAtRef.current += pausedFor;
+    }
+    pauseStartedAtRef.current = 0;
+    resumeFactTimer();
+    lastTimeRef.current = performance.now();
+    sceneRef.current = "playing";
+    setScene("playing");
+  }, [resumeFactTimer]);
+
+  const togglePause = useCallback(() => {
+    if (sceneRef.current === "playing") {
+      pauseGame();
+      return;
+    }
+    if (sceneRef.current === "paused") {
+      resumeGame();
+    }
+  }, [pauseGame, resumeGame]);
 
   const triggerGameOver = useCallback(() => {
     if (sceneRef.current !== "playing") return;
@@ -2720,25 +2789,34 @@ export default function Game() {
   }, [levelIndex, preloadLevelBackground, scene]);
 
   useEffect(() => {
-    mutedRef.current = muted;
+    const audioSuppressed = muted || scene === "paused";
+    mutedRef.current = audioSuppressed;
     (Object.keys(MUSIC_SOURCES) as MusicTrackKey[]).forEach((key) => {
       const track = musicRef.current[key];
       if (track) {
         const envelope = musicEnvelopeRef.current.get(key) ?? 0;
-        track.volume = muted
+        track.volume = audioSuppressed
           ? 0
           : envelope;
         track.muted =
-          muted ||
+          audioSuppressed ||
           (key !== activeMusicRef.current && envelope <= 0);
+        if (scene === "paused") track.pause();
       }
     });
     activeSfxRef.current.forEach((key, voice) => {
+      if (scene === "paused") {
+        voice.pause();
+        voice.removeAttribute("src");
+        voice.load();
+        activeSfxRef.current.delete(voice);
+        return;
+      }
       voice.muted = muted;
       voice.volume = muted ? 0 : SFX_SOURCES[key].volume;
     });
-    if (!muted) unlockMusic();
-  }, [muted, unlockMusic]);
+    if (!audioSuppressed) unlockMusic();
+  }, [muted, scene, unlockMusic]);
 
   useEffect(() => {
     const handleMusicUnlock = () => unlockMusic();
@@ -2881,6 +2959,22 @@ export default function Game() {
         if (sceneRef.current === "playing") releaseAllInputs();
         return;
       }
+      if (
+        (sceneRef.current === "playing" ||
+          sceneRef.current === "paused") &&
+        event.code === "KeyP"
+      ) {
+        event.preventDefault();
+        if (!event.repeat) togglePause();
+        return;
+      }
+      if (sceneRef.current === "paused") {
+        if (event.code === "KeyM") {
+          event.preventDefault();
+          if (!event.repeat) setMuted((value) => !value);
+        }
+        return;
+      }
       if (sceneRef.current === "instructions") {
         event.preventDefault();
         if (!event.repeat) returnToTitle();
@@ -3018,6 +3112,7 @@ export default function Game() {
     syncInputFromSources,
     startCampaign,
     startLevel,
+    togglePause,
   ]);
 
   useEffect(() => {
@@ -3863,7 +3958,9 @@ export default function Game() {
           </div>
         )}
 
-        {(scene === "playing" || scene === "complete") && (
+        {(scene === "playing" ||
+          scene === "paused" ||
+          scene === "complete") && (
           <>
             <div className="hud" aria-live="polite">
               <div className="hud-brand">
@@ -3896,6 +3993,22 @@ export default function Game() {
                     {String(encounterCount).padStart(2, "0")}
                   </strong>
                 </div>
+                {(scene === "playing" || scene === "paused") && (
+                  <button
+                    className={`pause-button${scene === "paused" ? " is-resume" : ""}`}
+                    type="button"
+                    onClick={scene === "paused" ? resumeGame : pauseGame}
+                    aria-label={scene === "paused" ? "Resume game" : "Pause game"}
+                  >
+                    <span className="pause-icon" aria-hidden="true">
+                      {scene === "paused" ? "▶" : "Ⅱ"}
+                    </span>
+                    <span className="pause-label">
+                      {scene === "paused" ? "RESUME" : "PAUSE"}
+                    </span>
+                    <kbd>P</kbd>
+                  </button>
+                )}
                 <button
                   className="mute-button"
                   type="button"
@@ -3932,6 +4045,25 @@ export default function Game() {
               <strong>{currentLevel.name}</strong>
             </div>
             <div className="level-go">GO!</div>
+          </div>
+        )}
+
+        {scene === "paused" && (
+          <div
+            className="pause-screen"
+            data-testid="pause-screen"
+            role="dialog"
+            aria-label="Game paused"
+          >
+            <div className="pause-grid" aria-hidden="true" />
+            <div className="pause-burst">
+              <span>SYSTEM HOLD // AUDIO SUSPENDED</span>
+              <strong>PAUSED</strong>
+              <button type="button" onClick={resumeGame}>
+                <span className="desktop-start-copy">PRESS P TO RESUME</span>
+                <span className="touch-start-copy">TAP TO RESUME</span>
+              </button>
+            </div>
           </div>
         )}
 
@@ -4169,7 +4301,9 @@ export default function Game() {
           </div>
         )}
 
-        {scene !== "playing" && scene !== "complete" && (
+        {scene !== "playing" &&
+          scene !== "paused" &&
+          scene !== "complete" && (
           <button
             className="mute-button mute-button--overlay"
             type="button"
@@ -4242,6 +4376,8 @@ export default function Game() {
           ? `Level ${currentLevel.number}: ${currentLevel.name}. Get ready.`
           : scene === "playing"
             ? `Level ${currentLevel.number} active. ${captured} of ${encounterCount} encounters cleared. ${health} integrity remaining.`
+          : scene === "paused"
+            ? "Game paused. Press P or activate Resume to continue."
           : scene === "quiz"
             ? `Level ${currentLevel.number} knowledge check. Question ${quizQuestionIndex + 1} of three. ${quizQuestion?.prompt ?? ""}`
           : scene === "complete"

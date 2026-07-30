@@ -197,9 +197,33 @@ test("keeps sound control available outside the gameplay HUD", async () => {
 
   assert.match(
     gameSource,
-    /scene !== "playing" && scene !== "complete"[\s\S]*mute-button--overlay/,
+    /scene !== "playing" &&[\s\S]*scene !== "paused" &&[\s\S]*scene !== "complete" &&[\s\S]*mute-button--overlay/,
   );
   assert.match(styles, /\.mute-button--overlay[\s\S]*position: absolute/);
+});
+
+test("pauses gameplay, callout timing, and audio from keyboard or HUD", async () => {
+  const gameSource = await readFile(
+    new URL("../app/Game.tsx", import.meta.url),
+    "utf8",
+  );
+  const styles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(gameSource, /\| "paused"/);
+  assert.match(gameSource, /event\.code === "KeyP"/);
+  assert.match(gameSource, /if \(!event\.repeat\) togglePause\(\)/);
+  assert.match(gameSource, /const audioSuppressed = muted \|\| scene === "paused"/);
+  assert.match(gameSource, /if \(scene === "paused"\) track\.pause\(\)/);
+  assert.match(gameSource, /pauseFactTimer\(\)/);
+  assert.match(gameSource, /resumeFactTimer\(\)/);
+  assert.match(gameSource, /data-testid="pause-screen"/);
+  assert.match(gameSource, /aria-label=\{scene === "paused" \? "Resume game" : "Pause game"\}/);
+  assert.match(styles, /\.pause-screen\s*\{/);
+  assert.match(styles, /\.pause-burst\s*\{/);
+  assert.match(styles, /@keyframes pause-burst-in/);
 });
 
 test("removes redundant branding from the mobile gameplay HUD", async () => {
