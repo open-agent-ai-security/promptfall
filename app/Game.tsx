@@ -3805,10 +3805,10 @@ export default function Game() {
               </button>
               <div className="arcade-controls">
                 <span className="desktop-control-copy">
-                  ← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP
+                  ← → / A D&nbsp;&nbsp;MOVE&nbsp;&nbsp;•&nbsp;&nbsp;SPACE&nbsp;&nbsp;JUMP&nbsp;&nbsp;•&nbsp;&nbsp;P&nbsp;&nbsp;PAUSE
                 </span>
                 <span className="touch-control-copy">
-                  ARROWS MOVE&nbsp;&nbsp;•&nbsp;&nbsp;JUMP BUTTON JUMPS
+                  ARROWS MOVE&nbsp;&nbsp;•&nbsp;&nbsp;↑ JUMPS&nbsp;&nbsp;•&nbsp;&nbsp;HUD BUTTON PAUSES
                 </span>
                 <span className="arcade-level-select">
                   1–9 / 0 / G&nbsp;&nbsp;DIRECT LEVEL SELECT
@@ -3873,13 +3873,16 @@ export default function Game() {
               <section className="instruction-panel">
                 <span className="instruction-number">02</span>
                 <div>
-                  <h2>MOVE + JUMP</h2>
+                  <h2>CONTROLS</h2>
                   <p className="desktop-instruction-copy">
                     <span className="instruction-control-line">
                       <strong>MOVE</strong> <kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd>
                     </span>
                     <span className="instruction-control-line">
                       <strong>JUMP</strong> <kbd>SPACE</kbd> / <kbd>W</kbd> / <kbd>↑</kbd>
+                    </span>
+                    <span className="instruction-control-line">
+                      <strong>PAUSE</strong> <kbd>P</kbd> / HUD button · any key resumes
                     </span>
                   </p>
                   <p className="touch-instruction-copy">
@@ -3888,6 +3891,9 @@ export default function Game() {
                     </span>
                     <span className="instruction-control-line">
                       <strong>JUMP</strong> Hold ↑ for a higher jump.
+                    </span>
+                    <span className="instruction-control-line">
+                      <strong>PAUSE</strong> Tap Ⅱ in the HUD · tap anywhere to resume.
                     </span>
                   </p>
                 </div>
@@ -3921,7 +3927,7 @@ export default function Game() {
                   <h2>LEARNING TIPS</h2>
                   <p>
                     <span className="learning-tip-line">
-                      <strong>1.</strong> Pause to read the intel after each capture.
+                      <strong>1.</strong> Pause to read each hint after a capture.
                     </span>
                     <span className="learning-tip-line">
                       <strong>2.</strong> Listen for insights in each level&apos;s lyrics.

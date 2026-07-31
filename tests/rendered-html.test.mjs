@@ -194,7 +194,6 @@ test("keeps sound control available outside the gameplay HUD", async () => {
     new URL("../app/globals.css", import.meta.url),
     "utf8",
   );
-
   assert.match(
     gameSource,
     /scene !== "playing" &&[\s\S]*scene !== "paused" &&[\s\S]*scene !== "complete" &&[\s\S]*mute-button--overlay/,
@@ -209,6 +208,10 @@ test("pauses gameplay, callout timing, and audio from keyboard or HUD", async ()
   );
   const styles = await readFile(
     new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const readme = await readFile(
+    new URL("../README.md", import.meta.url),
     "utf8",
   );
 
@@ -230,6 +233,8 @@ test("pauses gameplay, callout timing, and audio from keyboard or HUD", async ()
   assert.match(styles, /\.pause-burst\s*\{[\s\S]*top: 13%[\s\S]*right: 2\.4%/);
   assert.match(styles, /\.fact-callout\.is-paused\s*\{[\s\S]*animation-play-state: paused/);
   assert.match(styles, /@keyframes pause-burst-in/);
+  assert.match(readme, /Pause: `P` or the on-screen pause button/);
+  assert.match(readme, /Pausing freezes the level, soundtrack, sound effects/);
 });
 
 test("removes redundant branding from the mobile gameplay HUD", async () => {
@@ -498,6 +503,8 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /MEET PRAXI/i);
   assert.match(gameSource, /instructions-tail-generator/i);
   assert.match(gameSource, /instruction-control-line/i);
+  assert.match(gameSource, /<strong>PAUSE<\/strong> <kbd>P<\/kbd> \/ HUD button/i);
+  assert.match(gameSource, /Tap Ⅱ in the HUD/i);
   assert.match(gameSource, /LEARNING TIPS/i);
   assert.match(gameSource, /instruction-number">05/i);
   assert.match(gameSource, /Listen for insights/i);
@@ -512,7 +519,7 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /aria-label="Move right"/i);
   assert.match(gameSource, /aria-label="Jump"/i);
   assert.match(gameSource, /ARROWS MOVE/i);
-  assert.match(gameSource, /JUMP BUTTON JUMPS/i);
+  assert.match(gameSource, /HUD BUTTON PAUSES/i);
   assert.doesNotMatch(gameSource, /pointerType !== "touch"/i);
   assert.match(gameSource, /onLostPointerCapture/i);
   assert.match(gameSource, /visibilitychange/i);

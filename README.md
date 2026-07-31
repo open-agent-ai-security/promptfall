@@ -64,6 +64,7 @@ unlock the campaign victory sequence.
 
 - Move: `A` / `D` or Left / Right Arrow
 - Jump: `W`, Up Arrow, or Space
+- Pause: `P` or the on-screen pause button; press any key to resume
 - Sound toggle: `M` or the on-screen sound button
 - Direct level select: `1`–`9` for Levels 1–9, `0` for Level 10, and `G`
   for the Gauntlet
@@ -72,7 +73,11 @@ unlock the campaign victory sequence.
 
 - Use the left/right rocker to run.
 - Tap the separate jump button while holding a direction to carry momentum.
+- Tap the HUD pause button to pause; tap anywhere to resume.
 - Landscape orientation provides the best mission view.
+
+Pausing freezes the level, soundtrack, sound effects, and educational hint
+timing so players can read each hint without losing gameplay time.
 
 The game scales to a 16:9 presentation. In landscape mode, the controls use
 the phone's side gutters and overlap only the extreme edges of the playfield.
