@@ -456,6 +456,9 @@ test("ships social metadata and accessible controls", async () => {
   assert.match(gameSource, /campaign-winner/i);
   assert.match(gameSource, /integrity-crate-v1\.png/i);
   assert.match(gameSource, /BONUS_LEVEL_INTERVAL/i);
+  assert.match(gameSource, /bonusCrate:\s*\{ x: 1490, y: 520 \}/i);
+  assert.match(gameSource, /bonusCrate:\s*\{ x: 1940, y: 520 \}/i);
+  assert.match(gameSource, /configuredSpawn\?\.x \?\? 2010/i);
   assert.match(gameSource, /LEVEL_LAYOUTS/i);
   assert.match(gameSource, /\+1 INTEGRITY!/i);
   assert.match(gameSource, /SENSITIVE INFORMATION DISCLOSURE/i);

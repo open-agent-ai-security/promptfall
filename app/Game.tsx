@@ -109,6 +109,7 @@ type LevelLayout = {
   platforms: Platform[];
   enemies: EnemySpawn[];
   energyTraps?: EnergyTrap[];
+  bonusCrate?: Pick<BonusCrate, "x" | "y">;
   worldWidth?: number;
   exitFieldX?: number;
 };
@@ -740,6 +741,7 @@ const enemySpawn = (
 const LEVEL_LAYOUTS: LevelLayout[] = [
   {
     // Keep Level 1 forgiving while players learn momentum and stomp timing.
+    bonusCrate: { x: 1490, y: 520 },
     platforms: [
       { x: 0, y: 606, w: 620, h: 114, kind: "floor" },
       { x: 680, y: 606, w: 510, h: 114, kind: "floor" },
@@ -1126,6 +1128,7 @@ const LEVEL_LAYOUTS: LevelLayout[] = [
   {
     worldWidth: 6000,
     exitFieldX: 5700,
+    bonusCrate: { x: 1940, y: 520 },
     platforms: [
       { x: 0, y: 606, w: 650, h: 114, kind: "floor" },
       { x: 730, y: 606, w: 490, h: 114, kind: "floor" },
@@ -1273,17 +1276,21 @@ const createEnemies = (levelIndex = 0): Enemy[] =>
     };
   });
 
-const createBonusCrate = (levelIndex = 0): BonusCrate | null =>
-  LEVELS[levelIndex].number % BONUS_LEVEL_INTERVAL === 0
-    ? {
-        x: 2010,
-        y: 520,
-        w: 58,
-        h: 58,
-        collected: false,
-        pulse: 0,
-      }
-    : null;
+const createBonusCrate = (levelIndex = 0): BonusCrate | null => {
+  const configuredSpawn = LEVEL_LAYOUTS[levelIndex].bonusCrate;
+  const scheduledBonus =
+    LEVELS[levelIndex].number % BONUS_LEVEL_INTERVAL === 0;
+  if (!configuredSpawn && !scheduledBonus) return null;
+
+  return {
+    x: configuredSpawn?.x ?? 2010,
+    y: configuredSpawn?.y ?? 520,
+    w: 58,
+    h: 58,
+    collected: false,
+    pulse: 0,
+  };
+};
 
 const stars = Array.from({ length: 70 }, (_, i) => ({
   x: (i * 173 + 41) % VIEW_W,
