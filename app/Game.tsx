@@ -2969,10 +2969,8 @@ export default function Game() {
         return;
       }
       if (sceneRef.current === "paused") {
-        if (event.code === "KeyM") {
-          event.preventDefault();
-          if (!event.repeat) setMuted((value) => !value);
-        }
+        event.preventDefault();
+        if (!event.repeat) resumeGame();
         return;
       }
       if (sceneRef.current === "instructions") {
@@ -3107,6 +3105,7 @@ export default function Game() {
     enterTitle,
     releaseAllInputs,
     replayCurrentLevel,
+    resumeGame,
     returnToTitle,
     showInstructions,
     syncInputFromSources,
@@ -4023,7 +4022,7 @@ export default function Game() {
             <div
               key={`fact-${levelIndex}-${captured}`}
               ref={factRef}
-              className={`fact-callout ${callout ? "is-visible" : ""}${calloutDismissing ? " is-dismissing" : ""}`}
+              className={`fact-callout ${callout ? "is-visible" : ""}${calloutDismissing ? " is-dismissing" : ""}${scene === "paused" ? " is-paused" : ""}`}
               role="status"
               aria-live="polite"
             >
@@ -4054,14 +4053,14 @@ export default function Game() {
             data-testid="pause-screen"
             role="dialog"
             aria-label="Game paused"
+            onPointerDown={resumeGame}
           >
-            <div className="pause-grid" aria-hidden="true" />
             <div className="pause-burst">
               <span>SYSTEM HOLD // AUDIO SUSPENDED</span>
               <strong>PAUSED</strong>
               <button type="button" onClick={resumeGame}>
-                <span className="desktop-start-copy">PRESS P TO RESUME</span>
-                <span className="touch-start-copy">TAP TO RESUME</span>
+                <span className="desktop-start-copy">PRESS ANY KEY TO RESUME</span>
+                <span className="touch-start-copy">TAP ANYWHERE TO RESUME</span>
               </button>
             </div>
           </div>
@@ -4377,7 +4376,7 @@ export default function Game() {
           : scene === "playing"
             ? `Level ${currentLevel.number} active. ${captured} of ${encounterCount} encounters cleared. ${health} integrity remaining.`
           : scene === "paused"
-            ? "Game paused. Press P or activate Resume to continue."
+            ? "Game paused. Press any key or activate Resume to continue."
           : scene === "quiz"
             ? `Level ${currentLevel.number} knowledge check. Question ${quizQuestionIndex + 1} of three. ${quizQuestion?.prompt ?? ""}`
           : scene === "complete"

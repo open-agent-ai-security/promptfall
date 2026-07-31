@@ -219,10 +219,16 @@ test("pauses gameplay, callout timing, and audio from keyboard or HUD", async ()
   assert.match(gameSource, /if \(scene === "paused"\) track\.pause\(\)/);
   assert.match(gameSource, /pauseFactTimer\(\)/);
   assert.match(gameSource, /resumeFactTimer\(\)/);
+  assert.match(gameSource, /scene === "paused" \? " is-paused"/);
   assert.match(gameSource, /data-testid="pause-screen"/);
+  assert.match(gameSource, /onPointerDown=\{resumeGame\}/);
+  assert.match(gameSource, /PRESS ANY KEY TO RESUME/);
+  assert.match(gameSource, /if \(!event\.repeat\) resumeGame\(\)/);
   assert.match(gameSource, /aria-label=\{scene === "paused" \? "Resume game" : "Pause game"\}/);
   assert.match(styles, /\.pause-screen\s*\{/);
   assert.match(styles, /\.pause-burst\s*\{/);
+  assert.match(styles, /\.pause-burst\s*\{[\s\S]*top: 13%[\s\S]*right: 2\.4%/);
+  assert.match(styles, /\.fact-callout\.is-paused\s*\{[\s\S]*animation-play-state: paused/);
   assert.match(styles, /@keyframes pause-burst-in/);
 });
 
