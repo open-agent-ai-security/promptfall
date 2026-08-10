@@ -10,8 +10,22 @@ updates:
     schedule:
       interval: weekly
     groups:
+      # React's runtime packages publish as a synchronized stack and enforce
+      # exact peer versions. Keep the runtimes and their type packages in one
+      # PR so Dependabot never leaves the lockfile with a mixed React release.
+      react-stack:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-server-dom-webpack"
+          - "@types/react"
+          - "@types/react-dom"
       dev-dependencies:
         dependency-type: development
+        exclude-patterns:
+          - "react-server-dom-webpack"
+          - "@types/react"
+          - "@types/react-dom"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
