@@ -1,0 +1,46 @@
+# Copyright 2026 Exabeam, Inc.
+# SPDX-License-Identifier: Apache-2.0
+name: Bug report
+description: Something in Promptfall didn't work — gameplay, controls, audio, or content.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Thanks for playing Promptfall. One thing before you file: **security
+        problems** (script injection, supply chain, deploy pipeline) go through a
+        [private security advisory](https://github.com/open-agent-ai-security/promptfall/security/advisories/new),
+        not a public issue — see SECURITY.md.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: |
+        1. Started level LLM05 on mobile
+        2. Expected the quiz to advance after answering
+        3. Instead it ...
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where in the game?
+      description: Level (e.g. LLM03, the Gauntlet), title screen, quiz, etc.
+    validations:
+      required: false
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      description: Browser + version, and desktop or mobile (with OS).
+      placeholder: "Safari 19, iPhone 16, iOS 19.2"
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots, console errors (F12 → Console), or steps that make it reproducible.
+    validations:
+      required: false

@@ -1,0 +1,29 @@
+# Copyright 2026 Exabeam, Inc.
+# SPDX-License-Identifier: Apache-2.0
+name: Educational content feedback
+description: A lesson, quiz question, or key insight is inaccurate, outdated, or unclear.
+labels: ["content"]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        The lessons teach the [OWASP Top 10 for LLM Applications](https://genai.owasp.org/llm-top-10/) —
+        accuracy matters more to us than anything else in the game. Thanks for
+        holding it to that bar.
+  - type: input
+    id: where
+    attributes:
+      label: Where is it?
+      description: Level and encounter (e.g. "LLM07, second defense hint") or quiz question text.
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's wrong, and what should it say?
+      description: >-
+        Quote the current text, explain the problem, and propose a correction if
+        you have one. Cite the OWASP material (or another source) that supports
+        the change.
+    validations:
+      required: true
