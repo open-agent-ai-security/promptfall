@@ -27,7 +27,10 @@ Add a `Signed-off-by` line to every commit. Git adds it for you with `-s`:
 git commit -s -m "Your commit message"
 ```
 
-The name and email must be a real identity.
+The name and email must be a known identity — your real name, or an established
+identity you're known by in the community (a long-standing handle counts),
+reachable at the address you sign with. Anonymous or throwaway identities aren't
+accepted.
 
 ## How to contribute
 
